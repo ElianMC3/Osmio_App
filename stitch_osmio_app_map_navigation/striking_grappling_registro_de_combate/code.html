@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OSMIO | Combat Log</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..900&display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(26, 26, 26, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid #2A2A2A;
+        }
+        .inner-glow:active {
+            box-shadow: inset 0 0 10px rgba(223, 255, 0, 0.4);
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            background: #2A2A2A;
+            border-radius: 0;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            height: 16px;
+            width: 16px;
+            border-radius: 0;
+            background: #DFFF00;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -6px;
+        }
+        .discipline-indicator {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error": "#690005",
+                        "error-container": "#93000a",
+                        "on-secondary-fixed": "#001453",
+                        "inverse-primary": "#576500",
+                        "on-tertiary": "#213145",
+                        "tertiary-fixed-dim": "#b7c8e1",
+                        "on-secondary-container": "#a0b1ff",
+                        "tertiary-container": "#d3e4fe",
+                        "primary": "#ffffff",
+                        "outline-variant": "#454932",
+                        "surface": "#131313",
+                        "on-surface": "#e5e2e1",
+                        "primary-fixed": "#d2f000",
+                        "on-primary-fixed-variant": "#414c00",
+                        "on-primary-container": "#5d6b00",
+                        "on-error-container": "#ffdad6",
+                        "primary-container": "#d2f000",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface-container-low": "#1c1b1b",
+                        "on-secondary": "#002584",
+                        "surface-bright": "#3a3939",
+                        "secondary-fixed-dim": "#b8c4ff",
+                        "on-secondary-fixed-variant": "#173bab",
+                        "primary-fixed-dim": "#b8d300",
+                        "tertiary-fixed": "#d3e4fe",
+                        "surface-variant": "#353534",
+                        "surface-dim": "#131313",
+                        "secondary-fixed": "#dde1ff",
+                        "on-tertiary-fixed": "#0b1c30",
+                        "surface-container-highest": "#353534",
+                        "inverse-on-surface": "#313030",
+                        "secondary": "#b8c4ff",
+                        "on-surface-variant": "#c6c9ab",
+                        "surface-tint": "#b8d300",
+                        "error": "#ffb4ab",
+                        "background": "#131313",
+                        "tertiary": "#ffffff",
+                        "inverse-surface": "#e5e2e1",
+                        "outline": "#909378",
+                        "on-tertiary-container": "#56657c",
+                        "on-primary-fixed": "#191e00",
+                        "on-tertiary-fixed-variant": "#38485d",
+                        "secondary-container": "#173bab",
+                        "surface-container": "#201f1f",
+                        "on-primary": "#2c3400",
+                        "on-background": "#e5e2e1"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "lg": "24px",
+                        "xl": "40px",
+                        "unit": "4px",
+                        "md": "16px",
+                        "gutter": "12px",
+                        "container-margin": "20px",
+                        "sm": "8px",
+                        "xs": "4px"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["JetBrains Mono"],
+                        "headline-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "data-display": ["JetBrains Mono"],
+                        "display-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "500"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-sm": ["11px", {"lineHeight": "1", "fontWeight": "500"}],
+                        "data-display": ["24px", {"lineHeight": "1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800"}],
+                        "headline-md": ["20px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-lg overflow-x-hidden selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 backdrop-blur-xl bg-surface/80 border-b border-surface-variant">
+<div class="flex justify-between items-center px-container-margin h-16 w-full max-w-[1440px] mx-auto">
+<h1 class="font-data-display text-data-display text-primary tracking-tighter uppercase">OSMIO</h1>
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors cursor-pointer" data-icon="calendar_today">calendar_today</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors cursor-pointer" data-icon="settings">settings</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-surface-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A cinematic, high-contrast close-up portrait of a determined MMA athlete in a dimly lit, gritty gym setting. The lighting is dramatic, highlighting the textures of sweat and intensity on the fighter's face. The overall aesthetic is dark, tactical, and high-performance, using a monochrome palette with sharp neon green accents in the background gear." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-T2Ohy527GLkmcGb6ttFk4aRijUpdxVBEaF07Pn62kOZQCUeLzhkj5PYXPk6BivogCo5GqmAgDENECO8BK6MvpByJOJYBm3KzwcuQ76ycWFh5wTJTX2diETeE5wo8UC1Tjz5Vw7cVSMyWFrqeKQAYTaF1qkFd5-gNwHAEh9e_TeS2N_WPZqpEF6pJeZEA3u0mvSiGRxqCPn2k4BEzt-mhvpQqhLhtlIFu7pmCg1fS2VNyZNZz4ztxtA"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Sidebar Navigation (Desktop) -->
+<aside class="h-screen w-64 fixed left-0 top-0 hidden lg:flex flex-col bg-surface-container border-r border-surface-variant py-lg z-40">
+<div class="px-md mb-xl">
+<h2 class="font-data-display text-data-display text-primary">OSMIO</h2>
+<p class="font-label-caps text-label-caps text-on-surface-variant opacity-60">Combat Intel</p>
+</div>
+<nav class="flex-1 space-y-xs">
+<a class="flex items-center gap-sm text-on-surface-variant px-4 py-3 hover:bg-surface-bright transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<a class="flex items-center gap-sm text-on-surface-variant px-4 py-3 hover:bg-surface-bright transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="fitness_center">fitness_center</span>
+<span class="font-label-caps text-label-caps">Training</span>
+</a>
+<a class="flex items-center gap-sm text-on-surface-variant px-4 py-3 hover:bg-surface-bright transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="monitoring">monitoring</span>
+<span class="font-label-caps text-label-caps">Analytics</span>
+</a>
+<a class="flex items-center gap-sm text-primary border-l-4 border-primary bg-surface-container-high px-4 py-3 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="add_box">add_box</span>
+<span class="font-label-caps text-label-caps">Log Session</span>
+</a>
+</nav>
+<div class="px-md mt-auto">
+<button class="w-full py-4 bg-primary-fixed text-on-primary-fixed font-label-caps text-label-caps font-bold tracking-widest hover:opacity-90 active:scale-95 transition-all">
+                LOG WORKOUT
+            </button>
+<div class="mt-lg space-y-xs">
+<a class="flex items-center gap-sm text-on-surface-variant px-4 py-2 text-label-sm hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span>Support</span>
+</a>
+<a class="flex items-center gap-sm text-on-surface-variant px-4 py-2 text-label-sm hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span>Sign Out</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="lg:ml-64 pt-24 pb-32 px-container-margin max-w-[1440px] mx-auto min-h-screen">
+<!-- Header Section -->
+<header class="mb-xl">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-md">
+<div>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary uppercase tracking-tight">Registro de Sesión</h2>
+<p class="text-on-surface-variant font-label-caps text-label-caps mt-xs">Intel ID: #LOG-2024-8842</p>
+</div>
+<div class="flex items-center gap-sm bg-surface-container p-1 rounded-lg">
+<button class="px-6 py-2 font-label-caps text-label-caps bg-primary-fixed text-on-primary-fixed transition-all" id="btn-striking" onclick="switchDiscipline('striking')">Striking</button>
+<button class="px-6 py-2 font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-all" id="btn-grappling" onclick="switchDiscipline('grappling')">Grappling</button>
+</div>
+</div>
+</header>
+<!-- Form Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-lg">
+<!-- Round Tracker Card (Large) -->
+<section class="md:col-span-7 lg:col-span-8 bg-surface-container-low border border-surface-variant p-lg relative overflow-hidden group">
+<div class="flex justify-between items-start mb-lg">
+<div>
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-xs">Nº DE ROUNDS</h3>
+<div class="flex items-baseline gap-xs">
+<span class="font-data-display text-display-lg text-primary-fixed" id="round-counter">08</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant opacity-40">/ 12 MAX</span>
+</div>
+</div>
+<div class="flex gap-sm">
+<button class="w-12 h-12 flex items-center justify-center border border-surface-variant hover:bg-surface-bright active:inner-glow transition-all" onclick="adjustRound(-1)">
+<span class="material-symbols-outlined" data-icon="remove">remove</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center bg-primary-fixed text-on-primary-fixed hover:opacity-90 active:inner-glow transition-all" onclick="adjustRound(1)">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+</div>
+</div>
+<!-- Visual Stepper -->
+<div class="flex gap-2 h-16 items-end" id="stepper-container">
+<!-- Stepper items injected by JS -->
+</div>
+<!-- Decorative Background Element -->
+<div class="absolute -right-12 -bottom-12 opacity-[0.03] pointer-events-none group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-[200px]" data-icon="sports_kabaddi" style="font-variation-settings: 'FILL' 1;">sports_kabaddi</span>
+</div>
+</section>
+<!-- Session Type Card -->
+<section class="md:col-span-5 lg:col-span-4 bg-surface-container-low border border-surface-variant p-lg">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-lg">MODALIDAD</h3>
+<div class="grid grid-cols-2 gap-sm">
+<button class="modal-tag active flex flex-col items-center justify-center p-md border border-primary-fixed bg-primary-fixed/10 text-primary-fixed transition-all" onclick="toggleTag(this)">
+<span class="material-symbols-outlined mb-2" data-icon="swords">swords</span>
+<span class="font-label-caps text-label-caps text-[10px]">Sparring</span>
+</button>
+<button class="modal-tag flex flex-col items-center justify-center p-md border border-surface-variant text-on-surface-variant hover:border-primary transition-all" onclick="toggleTag(this)">
+<span class="material-symbols-outlined mb-2" data-icon="front_hand">front_hand</span>
+<span class="font-label-caps text-label-caps text-[10px]">Pads</span>
+</button>
+<button class="modal-tag flex flex-col items-center justify-center p-md border border-surface-variant text-on-surface-variant hover:border-primary transition-all" onclick="toggleTag(this)">
+<span class="material-symbols-outlined mb-2" data-icon="fitness_center">fitness_center</span>
+<span class="font-label-caps text-label-caps text-[10px]">Heavy Bag</span>
+</button>
+<button class="modal-tag flex flex-col items-center justify-center p-md border border-surface-variant text-on-surface-variant hover:border-primary transition-all" onclick="toggleTag(this)">
+<span class="material-symbols-outlined mb-2" data-icon="vibration">vibration</span>
+<span class="font-label-caps text-label-caps text-[10px]">Drills</span>
+</button>
+</div>
+</section>
+<!-- Intensity Sliders -->
+<section class="md:col-span-6 bg-surface-container-low border border-surface-variant p-lg">
+<div class="space-y-xl">
+<div class="group">
+<div class="flex justify-between items-center mb-md">
+<label class="font-label-caps text-label-caps text-on-surface-variant">INTENSIDAD PERCIBIDA</label>
+<span class="font-data-display text-primary text-headline-md" id="val-intensity">7.5</span>
+</div>
+<input class="slider-input" max="10" min="0" oninput="updateVal('intensity', this.value)" step="0.5" type="range" value="7.5"/>
+<div class="flex justify-between mt-sm">
+<span class="text-label-sm font-label-sm text-on-surface-variant opacity-40 uppercase">Recovery</span>
+<span class="text-label-sm font-label-sm text-on-surface-variant opacity-40 uppercase">Maximum</span>
+</div>
+</div>
+<div class="group">
+<div class="flex justify-between items-center mb-md">
+<label class="font-label-caps text-label-caps text-on-surface-variant">ENFOQUE TÉCNICO</label>
+<span class="font-data-display text-primary text-headline-md" id="val-focus">9.0</span>
+</div>
+<input class="slider-input" max="10" min="0" oninput="updateVal('focus', this.value)" step="0.5" type="range" value="9"/>
+<div class="flex justify-between mt-sm">
+<span class="text-label-sm font-label-sm text-on-surface-variant opacity-40 uppercase">Low Focus</span>
+<span class="text-label-sm font-label-sm text-on-surface-variant opacity-40 uppercase">High Precision</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Coach Notes Section -->
+<section class="md:col-span-6 bg-surface-container-low border border-surface-variant p-lg">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-md">FEEDBACK DEL COACH</h3>
+<div class="relative h-full min-h-[160px]">
+<textarea class="w-full h-full bg-surface-container-lowest border border-surface-variant p-md font-body-lg text-on-surface focus:border-primary-fixed focus:ring-0 outline-none resize-none transition-all placeholder:text-on-surface-variant placeholder:opacity-30" placeholder="Escribe las correcciones tácticas y puntos de mejora aquí..."></textarea>
+<div class="absolute bottom-4 right-4 pointer-events-none opacity-20">
+<span class="material-symbols-outlined" data-icon="edit_note">edit_note</span>
+</div>
+</div>
+</section>
+<!-- Data Insights / Mini Graph -->
+<section class="md:col-span-12 bg-surface-container-low border border-surface-variant p-lg overflow-hidden relative">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-lg">
+<div>
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-xs">PROYECCIÓN DE VOLUMEN SEMANAL</h3>
+<p class="text-on-surface-variant text-label-sm font-label-sm">+12% vs. Anterior</p>
+</div>
+<div class="flex-1 max-w-md h-12 relative flex items-end gap-1">
+<!-- Tiny Data Points -->
+<div class="flex-1 bg-surface-variant h-[40%]"></div>
+<div class="flex-1 bg-surface-variant h-[60%]"></div>
+<div class="flex-1 bg-surface-variant h-[55%]"></div>
+<div class="flex-1 bg-primary-fixed h-[85%]"></div>
+<div class="flex-1 bg-surface-variant h-[30%]"></div>
+<div class="flex-1 bg-surface-variant h-[70%]"></div>
+<div class="flex-1 bg-surface-variant h-[20%]"></div>
+</div>
+</div>
+<!-- Heatmap Style Grid -->
+<div class="mt-lg pt-lg border-t border-surface-variant flex gap-xs overflow-x-auto pb-xs">
+<!-- Generative small blocks for tactical feel -->
+<script>
+                        for(let i=0; i<42; i++) {
+                            const opacity = Math.random() > 0.7 ? 'bg-primary-fixed' : 'bg-surface-variant';
+                            document.write(`<div class="w-2 h-2 shrink-0 ${opacity}"></div>`);
+                        }
+                   </script>
+</div>
+</section>
+</div>
+<!-- Submission Section -->
+<div class="mt-xl flex justify-end gap-md">
+<button class="px-8 py-3 font-label-caps text-label-caps border border-surface-variant text-on-surface-variant hover:text-primary hover:border-primary transition-all uppercase">
+                Descartar
+            </button>
+<button class="px-12 py-3 font-label-caps text-label-caps bg-primary-fixed text-on-primary-fixed font-bold tracking-widest hover:opacity-90 active:scale-95 transition-all uppercase">
+                Guardar Log
+            </button>
+</div>
+</main>
+<!-- Bottom Navigation (Mobile) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 h-20 bg-surface/90 backdrop-blur-xl border-t border-surface-variant lg:hidden">
+<a class="text-on-surface-variant pt-2 flex flex-col items-center hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-sm text-label-sm mt-1">Home</span>
+</a>
+<a class="text-primary border-t-2 border-primary pt-2 flex flex-col items-center transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="sports_kabaddi" style="font-variation-settings: 'FILL' 1;">sports_kabaddi</span>
+<span class="font-label-sm text-label-sm mt-1">Workouts</span>
+</a>
+<a class="text-on-surface-variant pt-2 flex flex-col items-center hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="insights">insights</span>
+<span class="font-label-sm text-label-sm mt-1">Stats</span>
+</a>
+<a class="text-on-surface-variant pt-2 flex flex-col items-center hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm mt-1">Profile</span>
+</a>
+</nav>
+<script>
+        // UI Logic
+        let currentRounds = 8;
+        const maxRounds = 12;
+
+        function initStepper() {
+            const container = document.getElementById('stepper-container');
+            container.innerHTML = '';
+            for (let i = 1; i <= maxRounds; i++) {
+                const step = document.createElement('div');
+                step.className = `flex-1 h-2 transition-all duration-300 ${i <= currentRounds ? 'bg-primary-fixed' : 'bg-surface-variant'}`;
+                container.appendChild(step);
+            }
+        }
+
+        function adjustRound(delta) {
+            currentRounds = Math.max(0, Math.min(maxRounds, currentRounds + delta));
+            document.getElementById('round-counter').innerText = currentRounds.toString().padStart(2, '0');
+            initStepper();
+        }
+
+        function updateVal(type, val) {
+            document.getElementById(`val-${type}`).innerText = parseFloat(val).toFixed(1);
+        }
+
+        function toggleTag(el) {
+            el.classList.toggle('active');
+            if(el.classList.contains('active')) {
+                el.classList.remove('border-surface-variant', 'text-on-surface-variant');
+                el.classList.add('border-primary-fixed', 'bg-primary-fixed/10', 'text-primary-fixed');
+            } else {
+                el.classList.add('border-surface-variant', 'text-on-surface-variant');
+                el.classList.remove('border-primary-fixed', 'bg-primary-fixed/10', 'text-primary-fixed');
+            }
+        }
+
+        function switchDiscipline(type) {
+            const btnStriking = document.getElementById('btn-striking');
+            const btnGrappling = document.getElementById('btn-grappling');
+            
+            if(type === 'striking') {
+                btnStriking.className = 'px-6 py-2 font-label-caps text-label-caps bg-primary-fixed text-on-primary-fixed transition-all';
+                btnGrappling.className = 'px-6 py-2 font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-all';
+                // Trigger subtle color shift animations if needed
+            } else {
+                btnGrappling.className = 'px-6 py-2 font-label-caps text-label-caps bg-primary-fixed text-on-primary-fixed transition-all';
+                btnStriking.className = 'px-6 py-2 font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-all';
+            }
+        }
+
+        // Initialize UI
+        initStepper();
+    </script>
+</body></html>

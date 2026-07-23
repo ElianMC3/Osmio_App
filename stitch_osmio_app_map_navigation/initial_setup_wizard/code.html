@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed": "#dde1ff",
+                        "tertiary-container": "#d3e4fe",
+                        "surface": "#131313",
+                        "surface-variant": "#353534",
+                        "secondary-fixed-dim": "#b8c4ff",
+                        "primary": "#ffffff",
+                        "tertiary": "#ffffff",
+                        "on-secondary": "#002584",
+                        "on-primary": "#2c3400",
+                        "error": "#ffb4ab",
+                        "on-primary-container": "#5d6b00",
+                        "error-container": "#93000a",
+                        "on-secondary-fixed": "#001453",
+                        "surface-container": "#201f1f",
+                        "secondary": "#b8c4ff",
+                        "inverse-surface": "#e5e2e1",
+                        "on-surface-variant": "#c6c9ab",
+                        "surface-container-high": "#2a2a2a",
+                        "on-tertiary-fixed": "#0b1c30",
+                        "on-tertiary-container": "#56657c",
+                        "secondary-container": "#173bab",
+                        "tertiary-fixed": "#d3e4fe",
+                        "on-secondary-fixed-variant": "#173bab",
+                        "on-tertiary": "#213145",
+                        "on-primary-fixed-variant": "#414c00",
+                        "on-tertiary-fixed-variant": "#38485d",
+                        "outline": "#909378",
+                        "background": "#131313",
+                        "on-background": "#e5e2e1",
+                        "outline-variant": "#454932",
+                        "surface-container-highest": "#353534",
+                        "primary-fixed-dim": "#b8d300",
+                        "surface-bright": "#3a3939",
+                        "surface-container-low": "#1c1b1b",
+                        "on-primary-fixed": "#191e00",
+                        "inverse-primary": "#576500",
+                        "surface-tint": "#b8d300",
+                        "on-surface": "#e5e2e1",
+                        "on-error": "#690005",
+                        "primary-fixed": "#d2f000",
+                        "on-secondary-container": "#a0b1ff",
+                        "inverse-on-surface": "#313030",
+                        "on-error-container": "#ffdad6",
+                        "primary-container": "#d2f000",
+                        "tertiary-fixed-dim": "#b7c8e1",
+                        "surface-dim": "#131313",
+                        "surface-container-lowest": "#0e0e0e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "xs": "4px",
+                        "md": "16px",
+                        "lg": "24px",
+                        "xl": "40px",
+                        "gutter": "12px",
+                        "sm": "8px",
+                        "container-margin": "20px"
+                    },
+                    "fontFamily": {
+                        "data-display": ["JetBrains Mono"],
+                        "display-lg": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-caps": ["JetBrains Mono"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "data-display": ["24px", {"lineHeight": "1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "500"}],
+                        "label-sm": ["11px", {"lineHeight": "1", "fontWeight": "500"}],
+                        "headline-md": ["20px", {"lineHeight": "1.4", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0F0F0F;
+            color: #e5e2e1;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .glass-panel {
+            background: rgba(26, 26, 26, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid #2A2A2A;
+        }
+
+        .primary-glow:active {
+            box-shadow: inset 0 0 10px #d2f000;
+        }
+
+        .step-transition {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .neo-checkbox:checked + label {
+            border-color: #d2f000;
+            background: rgba(210, 240, 0, 0.1);
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: #2A2A2A;
+            height: 4px;
+            border-radius: 2px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 2px;
+            background: #d2f000;
+            cursor: pointer;
+        }
+
+        .grid-bg {
+            background-image: 
+                linear-gradient(rgba(210, 240, 0, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(210, 240, 0, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+    </style>
+</head>
+<body class="min-h-screen grid-bg">
+<!-- Top AppBar (Injected from Shared Components Hierarchy) -->
+<header class="fixed top-0 w-full z-50 backdrop-blur-xl bg-surface/80 border-b border-surface-variant h-16 flex items-center px-container-margin">
+<div class="flex justify-between items-center w-full max-w-[1440px] mx-auto">
+<h1 class="font-data-display text-data-display text-primary tracking-tighter uppercase">OSMIO</h1>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">help</button>
+<div class="w-8 h-8 rounded-full border border-primary/20 bg-surface-container-high overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A futuristic profile avatar representing a tactical athlete, rendered in a high-contrast dark-mode aesthetic with neon green accents, sharp digital lines, and a professional mission-control interface vibe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHu3Ooe0AT0wr9xqmlmqDcQ8A5MbdGglbYjabhofyDjQgUi_E4cHfh4jkQlHiGVSuhXpJvLiXModKRpCo64wdP3e9zhpmnlSEozFbRw5imY5PHMDHq16NYhPHZ7X1M5uCL-H_7Avk5kR0BAsIGfeuAeFltuVJX1J3OjaQx48b9F0KaozTjJx64szX51fJ3VnM2ejZxS_RTy4k3KRIxvmAY6gxXsutA0G2k7WkYNzc2X9XWAJ4sh-SxMg"/>
+</div>
+</div>
+</div>
+</header>
+<main class="pt-24 pb-12 px-container-margin max-w-2xl mx-auto">
+<!-- Progress Indicator -->
+<div class="mb-xl">
+<div class="flex justify-between items-end mb-sm">
+<span class="font-label-caps text-label-caps text-primary uppercase" id="step-label">PASO 1: DATOS BÁSICOS</span>
+<span class="font-data-display text-primary/50 text-sm" id="step-counter">01 / 04</span>
+</div>
+<div class="flex gap-xs h-1 w-full bg-surface-variant">
+<div class="h-full bg-primary-fixed w-1/4 transition-all duration-500" id="progress-bar-1"></div>
+<div class="h-full bg-surface-container w-1/4 transition-all duration-500" id="progress-bar-2"></div>
+<div class="h-full bg-surface-container w-1/4 transition-all duration-500" id="progress-bar-3"></div>
+<div class="h-full bg-surface-container w-1/4 transition-all duration-500" id="progress-bar-4"></div>
+</div>
+</div>
+<form class="relative" id="wizard-form">
+<!-- Step 1: Datos Básicos -->
+<section class="step-transition" id="step-1">
+<div class="mb-lg">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-xs">Bienvenido, Recluta</h2>
+<p class="text-on-surface-variant font-body-lg">Configura tu perfil biológico para calibrar los algoritmos de rendimiento.</p>
+</div>
+<div class="grid grid-cols-2 gap-md">
+<div class="col-span-1 space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant block uppercase">Peso (kg)</label>
+<input class="w-full bg-surface-container border border-surface-variant p-md focus:border-primary-fixed focus:ring-0 text-primary font-data-display" placeholder="75.0" type="number"/>
+</div>
+<div class="col-span-1 space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant block uppercase">Altura (cm)</label>
+<input class="w-full bg-surface-container border border-surface-variant p-md focus:border-primary-fixed focus:ring-0 text-primary font-data-display" placeholder="180" type="number"/>
+</div>
+<div class="col-span-1 space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant block uppercase">Edad</label>
+<input class="w-full bg-surface-container border border-surface-variant p-md focus:border-primary-fixed focus:ring-0 text-primary font-data-display" placeholder="28" type="number"/>
+</div>
+<div class="col-span-1 space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant block uppercase">Sexo</label>
+<select class="w-full bg-surface-container border border-surface-variant p-md focus:border-primary-fixed focus:ring-0 text-primary appearance-none">
+<option>Masculino</option>
+<option>Femenino</option>
+<option>Otro</option>
+</select>
+</div>
+</div>
+</section>
+<!-- Step 2: Objetivo (Selectable Cards) -->
+<section class="step-transition hidden opacity-0 translate-x-8" id="step-2">
+<div class="mb-lg">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-xs">Objetivo Principal</h2>
+<p class="text-on-surface-variant font-body-lg">Define el vector de tu evolución física actual.</p>
+</div>
+<div class="space-y-md">
+<input checked="" class="hidden peer/g1" id="goal-1" name="goal" type="radio"/>
+<label class="flex items-center gap-md p-lg glass-panel border border-surface-variant cursor-pointer peer-checked/g1:border-primary-fixed peer-checked/g1:bg-primary-fixed/5 transition-all" for="goal-1">
+<span class="material-symbols-outlined text-primary-fixed text-4xl">fitness_center</span>
+<div>
+<span class="font-headline-md block text-primary">Ganar Músculo</span>
+<span class="text-label-sm text-on-surface-variant uppercase tracking-widest">Hipertrofia &amp; Fuerza</span>
+</div>
+</label>
+<input class="hidden peer/g2" id="goal-2" name="goal" type="radio"/>
+<label class="flex items-center gap-md p-lg glass-panel border border-surface-variant cursor-pointer peer-checked/g2:border-primary-fixed peer-checked/g2:bg-primary-fixed/5 transition-all" for="goal-2">
+<span class="material-symbols-outlined text-primary-fixed text-4xl">bolt</span>
+<div>
+<span class="font-headline-md block text-primary">Mantener</span>
+<span class="text-label-sm text-on-surface-variant uppercase tracking-widest">Acondicionamiento Técnico</span>
+</div>
+</label>
+<input class="hidden peer/g3" id="goal-3" name="goal" type="radio"/>
+<label class="flex items-center gap-md p-lg glass-panel border border-surface-variant cursor-pointer peer-checked/g3:border-primary-fixed peer-checked/g3:bg-primary-fixed/5 transition-all" for="goal-3">
+<span class="material-symbols-outlined text-primary-fixed text-4xl">local_fire_department</span>
+<div>
+<span class="font-headline-md block text-primary">Bajar Grasa</span>
+<span class="text-label-sm text-on-surface-variant uppercase tracking-widest">Definición &amp; Resistencia</span>
+</div>
+</label>
+</div>
+</section>
+<!-- Step 3: Disciplinas (Checkboxes) -->
+<section class="step-transition hidden opacity-0 translate-x-8" id="step-3">
+<div class="mb-lg">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-xs">Tus Disciplinas</h2>
+<p class="text-on-surface-variant font-body-lg">Selecciona las áreas de combate que integras en tu régimen.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<div>
+<input class="hidden neo-checkbox peer" id="discipline-fuerza" type="checkbox"/>
+<label class="flex flex-col items-center justify-center p-xl glass-panel border border-surface-variant cursor-pointer transition-all aspect-square text-center" for="discipline-fuerza">
+<span class="material-symbols-outlined text-3xl mb-md">weight</span>
+<span class="font-label-caps text-label-caps uppercase">Fuerza</span>
+</label>
+</div>
+<div>
+<input class="hidden neo-checkbox peer" id="discipline-striking" type="checkbox"/>
+<label class="flex flex-col items-center justify-center p-xl glass-panel border border-surface-variant cursor-pointer transition-all aspect-square text-center" for="discipline-striking">
+<span class="material-symbols-outlined text-3xl mb-md">sports_kabaddi</span>
+<span class="font-label-caps text-label-caps uppercase">Striking</span>
+</label>
+</div>
+<div>
+<input class="hidden neo-checkbox peer" id="discipline-grappling" type="checkbox"/>
+<label class="flex flex-col items-center justify-center p-xl glass-panel border border-surface-variant cursor-pointer transition-all aspect-square text-center" for="discipline-grappling">
+<span class="material-symbols-outlined text-3xl mb-md">settings_accessibility</span>
+<span class="font-label-caps text-label-caps uppercase">Grappling</span>
+</label>
+</div>
+</div>
+</section>
+<!-- Step 4: Metas Semanales (Sliders) -->
+<section class="step-transition hidden opacity-0 translate-x-8" id="step-4">
+<div class="mb-lg">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-xs">Planificación</h2>
+<p class="text-on-surface-variant font-body-lg">Establece el volumen de fuego semanal y tu bloque de enfoque.</p>
+</div>
+<div class="space-y-xl">
+<div class="space-y-md">
+<div class="flex justify-between items-center">
+<label class="font-label-caps text-label-caps text-primary uppercase">Sesiones por semana</label>
+<span class="font-data-display text-primary-fixed text-xl" id="sessions-val">4</span>
+</div>
+<input max="7" min="1" oninput="document.getElementById('sessions-val').innerText = this.value" type="range" value="4"/>
+<div class="flex justify-between text-label-sm text-on-surface-variant px-1">
+<span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span>
+</div>
+</div>
+<div class="space-y-md">
+<label class="font-label-caps text-label-caps text-primary uppercase block">Bloque Intensivo</label>
+<div class="grid grid-cols-2 gap-sm">
+<button class="p-md bg-surface-container border border-surface-variant font-label-caps text-label-caps hover:bg-surface-bright transition-all text-left" type="button">
+                                AM <br/><span class="text-primary/40">05:00 - 09:00</span>
+</button>
+<button class="p-md bg-surface-container border border-primary-fixed font-label-caps text-label-caps bg-primary-fixed/5 transition-all text-left" type="button">
+                                PM <br/><span class="text-primary-fixed/60">17:00 - 21:00</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Navigation Buttons -->
+<div class="mt-xl flex gap-md">
+<button class="flex-1 border border-primary-fixed py-md font-label-caps text-label-caps text-primary-fixed uppercase tracking-widest hidden hover:bg-primary-fixed/10 transition-all" id="prev-btn" type="button">
+                    Anterior
+                </button>
+<button class="flex-[2] bg-primary-fixed py-md font-label-caps text-label-caps text-on-primary uppercase tracking-widest hover:opacity-90 transition-all active:scale-[0.98]" id="next-btn" type="button">
+                    Siguiente
+                </button>
+</div>
+</form>
+</main>
+<!-- Footer Decoration -->
+<div class="fixed bottom-0 left-0 w-full h-1 overflow-hidden">
+<div class="h-full bg-primary-fixed/20">
+<div class="h-full bg-primary-fixed w-0 transition-all duration-700" id="loading-line"></div>
+</div>
+</div>
+<script>
+        let currentStep = 1;
+        const totalSteps = 4;
+        const stepLabels = [
+            "PASO 1: DATOS BÁSICOS",
+            "PASO 2: OBJETIVO PRINCIPAL",
+            "PASO 3: TUS DISCIPLINAS",
+            "PASO 4: PLANIFICACIÓN"
+        ];
+
+        const updateUI = () => {
+            // Update labels
+            document.getElementById('step-label').innerText = stepLabels[currentStep - 1];
+            document.getElementById('step-counter').innerText = `0${currentStep} / 0${totalSteps}`;
+
+            // Update Progress Bars
+            for (let i = 1; i <= totalSteps; i++) {
+                const bar = document.getElementById(`progress-bar-${i}`);
+                if (i <= currentStep) {
+                    bar.className = "h-full bg-primary-fixed w-1/4 transition-all duration-500";
+                } else {
+                    bar.className = "h-full bg-surface-container w-1/4 transition-all duration-500";
+                }
+            }
+
+            // Update Visibility
+            for (let i = 1; i <= totalSteps; i++) {
+                const section = document.getElementById(`step-${i}`);
+                if (i === currentStep) {
+                    section.classList.remove('hidden');
+                    setTimeout(() => {
+                        section.classList.remove('opacity-0', 'translate-x-8');
+                    }, 50);
+                } else {
+                    section.classList.add('hidden', 'opacity-0', 'translate-x-8');
+                }
+            }
+
+            // Button Logic
+            const nextBtn = document.getElementById('next-btn');
+            const prevBtn = document.getElementById('prev-btn');
+
+            if (currentStep === 1) {
+                prevBtn.classList.add('hidden');
+            } else {
+                prevBtn.classList.remove('hidden');
+            }
+
+            if (currentStep === totalSteps) {
+                nextBtn.innerText = "FINALIZAR SETUP";
+                nextBtn.classList.add('bg-primary-fixed', 'text-on-primary');
+            } else {
+                nextBtn.innerText = "SIGUIENTE";
+            }
+        };
+
+        document.getElementById('next-btn').addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                updateUI();
+            } else {
+                // Final action
+                const btn = document.getElementById('next-btn');
+                btn.innerText = "SINCRONIZANDO...";
+                btn.disabled = true;
+                document.getElementById('loading-line').style.width = "100%";
+                setTimeout(() => {
+                    alert("Setup completado. Perfil OSMIO activado.");
+                }, 1000);
+            }
+        });
+
+        document.getElementById('prev-btn').addEventListener('click', () => {
+            if (currentStep > 1) {
+                currentStep--;
+                updateUI();
+            }
+        });
+
+        // Initialize
+        updateUI();
+    </script>
+</body></html>

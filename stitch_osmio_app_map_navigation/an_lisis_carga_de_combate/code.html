@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OSMIO | Analytics - Carga de Combate</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary": "#2c3400",
+                    "secondary-fixed": "#dde1ff",
+                    "outline-variant": "#454932",
+                    "tertiary": "#ffffff",
+                    "on-secondary-fixed-variant": "#173bab",
+                    "surface-container-lowest": "#0e0e0e",
+                    "inverse-primary": "#576500",
+                    "inverse-on-surface": "#313030",
+                    "error-container": "#93000a",
+                    "tertiary-fixed": "#d3e4fe",
+                    "on-secondary-fixed": "#001453",
+                    "on-background": "#e5e2e1",
+                    "surface-container-high": "#2a2a2a",
+                    "on-error-container": "#ffdad6",
+                    "inverse-surface": "#e5e2e1",
+                    "surface-dim": "#131313",
+                    "primary-container": "#d2f000",
+                    "surface-container-low": "#1c1b1b",
+                    "on-error": "#690005",
+                    "on-surface-variant": "#c6c9ab",
+                    "surface-container": "#201f1f",
+                    "surface-bright": "#3a3939",
+                    "primary": "#ffffff",
+                    "on-secondary": "#002584",
+                    "surface-container-highest": "#353534",
+                    "tertiary-fixed-dim": "#b7c8e1",
+                    "secondary-fixed-dim": "#b8c4ff",
+                    "on-tertiary-fixed-variant": "#38485d",
+                    "on-primary-fixed-variant": "#414c00",
+                    "error": "#ffb4ab",
+                    "surface-tint": "#b8d300",
+                    "primary-fixed": "#d2f000",
+                    "secondary-container": "#173bab",
+                    "on-primary-fixed": "#191e00",
+                    "tertiary-container": "#d3e4fe",
+                    "surface": "#131313",
+                    "on-tertiary": "#213145",
+                    "on-tertiary-container": "#56657c",
+                    "primary-fixed-dim": "#b8d300",
+                    "on-primary-container": "#5d6b00",
+                    "background": "#131313",
+                    "on-surface": "#e5e2e1",
+                    "outline": "#909378",
+                    "on-secondary-container": "#a0b1ff",
+                    "surface-variant": "#353534",
+                    "secondary": "#b8c4ff",
+                    "on-tertiary-fixed": "#0b1c30"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "container-margin": "20px",
+                    "md": "16px",
+                    "lg": "24px",
+                    "gutter": "12px",
+                    "xs": "4px",
+                    "xl": "40px",
+                    "unit": "4px",
+                    "sm": "8px"
+            },
+            "fontFamily": {
+                    "headline-lg-mobile": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-caps": ["JetBrains Mono"],
+                    "label-sm": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "data-display": ["JetBrains Mono"],
+                    "headline-md": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "500"}],
+                    "label-sm": ["11px", {"lineHeight": "1", "fontWeight": "500"}],
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800"}],
+                    "data-display": ["24px", {"lineHeight": "1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "headline-md": ["20px", {"lineHeight": "1.4", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-overlay {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .chart-grid {
+            background-image: linear-gradient(to right, #2A2A2A 1px, transparent 1px),
+                              linear-gradient(to bottom, #2A2A2A 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-lg overflow-hidden">
+<!-- SideNavBar (Authority: JSON) -->
+<nav class="fixed left-0 top-0 bottom-0 z-40 flex flex-col py-xl bg-surface-container-low dark:bg-surface-container-lowest border-r border-outline-variant w-64">
+<div class="px-lg mb-xl">
+<h1 class="font-display-lg text-display-lg text-primary-fixed italic tracking-tighter">OSMIO</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant mt-xs">MISSION CONTROL</p>
+</div>
+<div class="flex flex-col space-y-xs flex-grow">
+<a class="flex items-center gap-md py-sm transition-all hover:text-primary-fixed hover:bg-surface-container text-on-surface-variant pl-md active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<a class="flex items-center gap-md py-sm transition-all hover:text-primary-fixed hover:bg-surface-container text-on-surface-variant pl-md active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">fitness_center</span>
+<span class="font-label-caps text-label-caps">Training</span>
+</a>
+<!-- Active Tab: Analytics -->
+<a class="flex items-center gap-md py-sm transition-all text-primary-fixed border-l-4 border-primary-fixed bg-surface-container-high pl-md active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="font-label-caps text-label-caps">Analytics</span>
+</a>
+<a class="flex items-center gap-md py-sm transition-all hover:text-primary-fixed hover:bg-surface-container text-on-surface-variant pl-md active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">restaurant</span>
+<span class="font-label-caps text-label-caps">Nutrition</span>
+</a>
+</div>
+<div class="px-lg mt-auto">
+<button class="w-full py-md bg-primary-fixed text-on-primary-fixed font-label-caps text-label-caps font-bold hover:opacity-90 active:scale-95 transition-all">
+                LOG SESSION
+            </button>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="ml-64 h-screen overflow-y-auto bg-surface relative">
+<!-- Top Header Area -->
+<header class="sticky top-0 z-30 flex justify-between items-center px-lg h-16 bg-surface/80 backdrop-blur-xl border-b border-outline-variant">
+<h2 class="font-headline-md text-headline-md text-on-surface">ANALYTICS</h2>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary-fixed">calendar_today</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary-fixed">settings</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline">
+<img class="w-full h-full object-cover" data-alt="A focused close-up of a professional combat sports athlete's face, sweating during intense training in a dark, high-contrast environment. The lighting is cinematic and moody, emphasizing determination and tactical focus, with subtle neon yellow reflections on the skin to match the OSMIO brand identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPs6RM09hY79cvSKDXJ4bjTYxzCLNGYeLCXN-pDC_BgdZ3Dj1rIv6DTGd0cdTnzzc4p8W0cxeBgPWHcVtvzeYsK4e3xekCskxss2o1gsYXBls_mHp-9Z-PyUwIwHtoalWWGG3AE4-gFjsSIsem_WB-9pk-xQ8Bw15dAsb1HYqsCQv_ZXsKRdKsJosYqWU9BaMyUe7X915JXeWuHXMDWF2NoO8MSZXUzP8B9Zg9FLfzN6Vsn9drFmBEWg"/>
+</div>
+</div>
+</header>
+<div class="p-lg max-w-[1200px] mx-auto">
+<!-- Internal Tab Navigation -->
+<div class="flex items-end border-b border-outline-variant mb-xl gap-xl">
+<button class="pb-md font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface transition-colors">Fuerza</button>
+<button class="pb-md font-label-caps text-label-caps text-primary-fixed border-b-2 border-primary-fixed">Carga de Combate</button>
+<button class="pb-md font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface transition-colors">Consistencia</button>
+</div>
+<!-- Dashboard Filters & Controls -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-md mb-lg">
+<div>
+<h3 class="font-headline-lg text-headline-lg text-on-surface">CARGA DE COMBATE</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mt-1">VOLUMEN TÁCTICO &amp; INTENSIDAD ACUMULADA</p>
+</div>
+<div class="flex gap-xs bg-surface-container-low p-1 border border-outline-variant">
+<button class="px-md py-1 font-label-sm text-label-sm text-on-surface hover:bg-surface-container-high transition-colors">7 Días</button>
+<button class="px-md py-1 font-label-sm text-label-sm bg-primary-fixed text-on-primary-fixed font-bold">Últimas 4 Semanas</button>
+<button class="px-md py-1 font-label-sm text-label-sm text-on-surface hover:bg-surface-container-high transition-colors">3 Meses</button>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-gutter">
+<!-- Main Chart Card (Span 8) -->
+<div class="col-span-12 lg:col-span-8 bg-surface-container-low border border-outline-variant p-md flex flex-col h-[480px] relative overflow-hidden">
+<div class="flex justify-between items-start mb-lg">
+<div>
+<span class="font-label-caps text-label-caps text-on-surface-variant">VOLUMEN DE ROUNDS POR SEMANA</span>
+<div class="flex items-center gap-md mt-sm">
+<div class="flex items-center gap-xs">
+<span class="w-3 h-3 bg-primary-fixed"></span>
+<span class="font-label-sm text-label-sm">STRIKING</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="w-3 h-3 bg-secondary"></span>
+<span class="font-label-sm text-label-sm">GRAPPLING</span>
+</div>
+<div class="flex items-center gap-xs ml-4">
+<span class="w-3 h-0.5 bg-tertiary"></span>
+<span class="font-label-sm text-label-sm">INTENSIDAD (1-10)</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Mock Chart Visualization -->
+<div class="flex-grow flex items-end gap-lg chart-grid p-sm relative">
+<!-- Y-Axis Mock -->
+<div class="absolute left-0 top-0 h-full flex flex-col justify-between text-[10px] font-label-caps text-on-surface-variant pr-xs">
+<span>50</span><span>40</span><span>30</span><span>20</span><span>10</span><span>0</span>
+</div>
+<!-- Intensity Overlay Line (SVG) -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none" preserveaspectratio="none" viewbox="0 0 800 400">
+<path d="M 100,320 L 250,180 L 400,220 L 550,100 L 700,150" fill="none" stroke="white" stroke-dasharray="4" stroke-width="2"></path>
+<circle cx="100" cy="320" fill="white" r="4"></circle>
+<circle cx="250" cy="180" fill="white" r="4"></circle>
+<circle cx="400" cy="220" fill="white" r="4"></circle>
+<circle cx="550" cy="100" fill="white" r="4"></circle>
+<circle cx="700" cy="150" fill="white" r="4"></circle>
+</svg>
+<!-- Bars -->
+<div class="flex-1 flex flex-col justify-end items-center gap-1 group relative">
+<div class="w-12 bg-secondary opacity-80 h-32 hover:opacity-100 transition-opacity"></div>
+<div class="w-12 bg-primary-fixed h-40 hover:opacity-100 transition-opacity"></div>
+<span class="font-label-caps text-label-caps mt-2 text-on-surface-variant">SEM 01</span>
+</div>
+<div class="flex-1 flex flex-col justify-end items-center gap-1 group relative">
+<div class="w-12 bg-secondary opacity-80 h-24 hover:opacity-100 transition-opacity"></div>
+<div class="w-12 bg-primary-fixed h-56 hover:opacity-100 transition-opacity"></div>
+<span class="font-label-caps text-label-caps mt-2 text-on-surface-variant">SEM 02</span>
+</div>
+<div class="flex-1 flex flex-col justify-end items-center gap-1 group relative">
+<div class="w-12 bg-secondary opacity-80 h-48 hover:opacity-100 transition-opacity"></div>
+<div class="w-12 bg-primary-fixed h-32 hover:opacity-100 transition-opacity"></div>
+<span class="font-label-caps text-label-caps mt-2 text-on-surface-variant">SEM 03</span>
+</div>
+<div class="flex-1 flex flex-col justify-end items-center gap-1 group relative">
+<div class="w-12 bg-secondary opacity-80 h-16 hover:opacity-100 transition-opacity"></div>
+<div class="w-12 bg-primary-fixed h-64 hover:opacity-100 transition-opacity"></div>
+<span class="font-label-caps text-label-caps mt-2 text-on-surface-variant">SEM 04</span>
+</div>
+</div>
+</div>
+<!-- Right Sidebar Stats (Span 4) -->
+<div class="col-span-12 lg:col-span-4 flex flex-col gap-gutter">
+<!-- Stat Card 1 -->
+<div class="bg-surface-container-low border border-outline-variant p-md">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-xs">TOTAL ROUNDS MES</p>
+<div class="flex items-baseline gap-sm">
+<span class="font-display-lg text-display-lg text-primary-fixed">142</span>
+<span class="font-label-sm text-label-sm text-primary-fixed-dim">+12% vs prev.</span>
+</div>
+<div class="mt-md h-1 w-full bg-surface-container-highest">
+<div class="h-full bg-primary-fixed w-[85%]"></div>
+</div>
+</div>
+<!-- Stat Card 2: Distribution -->
+<div class="bg-surface-container-low border border-outline-variant p-md flex-grow">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-md">SPARRING VS TÉCNICA</p>
+<div class="space-y-lg">
+<div class="flex justify-between items-end">
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block uppercase">Sparring Duro</span>
+<span class="font-data-display text-data-display">42 <span class="text-xs font-normal">Rnds</span></span>
+</div>
+<span class="font-label-caps text-label-caps text-primary-fixed">29.5%</span>
+</div>
+<div class="h-2 w-full bg-surface-container-highest relative">
+<div class="absolute h-full bg-primary-fixed w-[29.5%] left-0"></div>
+</div>
+<div class="flex justify-between items-end">
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block uppercase">Drills Técnicos</span>
+<span class="font-data-display text-data-display">100 <span class="text-xs font-normal">Rnds</span></span>
+</div>
+<span class="font-label-caps text-label-caps text-secondary">70.5%</span>
+</div>
+<div class="h-2 w-full bg-surface-container-highest relative">
+<div class="absolute h-full bg-secondary w-[70.5%] left-0"></div>
+</div>
+</div>
+<!-- Data Annotation -->
+<div class="mt-lg p-sm border-l-2 border-outline-variant bg-surface-container-high/50 italic text-sm text-on-surface-variant">
+                            "Tu volumen de grappling ha aumentado un 18% esta semana, enfocando la carga en rounds de alta intensidad."
+                        </div>
+</div>
+</div>
+<!-- Bottom Metrics (Consistency Check) -->
+<div class="col-span-12 lg:col-span-4 bg-surface-container-low border border-outline-variant p-md flex items-center gap-lg">
+<div class="p-md rounded-full border border-primary-fixed/20 bg-primary-fixed/5 text-primary-fixed">
+<span class="material-symbols-outlined text-4xl">bolt</span>
+</div>
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant">INTENSIDAD PICO</p>
+<p class="font-headline-md text-headline-md">9.2 / 10</p>
+<p class="font-label-sm text-label-sm text-error">Sesión del Jueves</p>
+</div>
+</div>
+<div class="col-span-12 lg:col-span-4 bg-surface-container-low border border-outline-variant p-md flex items-center gap-lg">
+<div class="p-md rounded-full border border-secondary/20 bg-secondary/5 text-secondary">
+<span class="material-symbols-outlined text-4xl">timer</span>
+</div>
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant">DURACIÓN PROMEDIO</p>
+<p class="font-headline-md text-headline-md">5:00 <span class="text-xs text-on-surface-variant">MIN/RND</span></p>
+<p class="font-label-sm text-label-sm text-primary-fixed-dim">Intervalos Estándar</p>
+</div>
+</div>
+<div class="col-span-12 lg:col-span-4 bg-surface-container-low border border-outline-variant p-md flex items-center gap-lg">
+<div class="p-md rounded-full border border-tertiary/20 bg-tertiary/5 text-tertiary">
+<span class="material-symbols-outlined text-4xl">history</span>
+</div>
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant">RECUPERACIÓN INTER-ROUND</p>
+<p class="font-headline-md text-headline-md">1:00 <span class="text-xs text-on-surface-variant">MIN</span></p>
+<p class="font-label-sm text-label-sm text-primary-fixed-dim">Consistente</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Background Atmospheric Element -->
+<div class="absolute bottom-0 right-0 w-1/3 h-1/2 opacity-10 pointer-events-none overflow-hidden">
+
+</div>
+</main>
+<!-- FAB Suppression Rule: Not rendered as per navigation shell mandate for Details/Settings screens -->
+<script>
+        // Micro-interactions for bars
+        document.querySelectorAll('.group').forEach(group => {
+            group.addEventListener('mouseenter', () => {
+                group.style.transform = 'translateY(-4px)';
+                group.style.transition = 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            });
+            group.addEventListener('mouseleave', () => {
+                group.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body></html>

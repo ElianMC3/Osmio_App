@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=JetBrains+Mono:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #0F0F0F;
+            color: #e5e2e1;
+            font-family: 'Inter', sans-serif;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+        .glass-panel {
+            background: rgba(26, 26, 26, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid #2A2A2A;
+        }
+        .discipline-dot-striking { background-color: #d2f000; } /* Neon Yellowish */
+        .discipline-dot-grappling { background-color: #b8c4ff; } /* Blueish Secondary */
+        .discipline-dot-fuerza { background-color: #ffffff; }    /* White Tertiary */
+        
+        .active-day {
+            border: 1px solid #d2f000;
+            box-shadow: inset 0 0 10px rgba(210, 240, 0, 0.1);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "outline": "#909378",
+                      "surface-container": "#201f1f",
+                      "inverse-primary": "#576500",
+                      "on-primary-fixed": "#191e00",
+                      "secondary-fixed-dim": "#b8c4ff",
+                      "tertiary": "#ffffff",
+                      "primary-fixed": "#d2f000",
+                      "outline-variant": "#454932",
+                      "on-surface-variant": "#c6c9ab",
+                      "surface-container-highest": "#353534",
+                      "on-surface": "#e5e2e1",
+                      "on-secondary-fixed": "#001453",
+                      "background": "#131313",
+                      "on-tertiary-container": "#56657c",
+                      "on-secondary-fixed-variant": "#173bab",
+                      "secondary": "#b8c4ff",
+                      "on-secondary-container": "#a0b1ff",
+                      "primary": "#ffffff",
+                      "tertiary-container": "#d3e4fe",
+                      "on-tertiary": "#213145",
+                      "surface": "#131313",
+                      "on-background": "#e5e2e1",
+                      "inverse-surface": "#e5e2e1",
+                      "tertiary-fixed": "#d3e4fe",
+                      "surface-dim": "#131313",
+                      "surface-variant": "#353534",
+                      "primary-container": "#d2f000",
+                      "secondary-container": "#173bab",
+                      "surface-tint": "#b8d300",
+                      "surface-container-lowest": "#0e0e0e",
+                      "on-primary": "#2c3400",
+                      "on-tertiary-fixed-variant": "#38485d",
+                      "inverse-on-surface": "#313030",
+                      "on-primary-container": "#5d6b00",
+                      "on-secondary": "#002584",
+                      "surface-container-high": "#2a2a2a",
+                      "on-error-container": "#ffdad6",
+                      "tertiary-fixed-dim": "#b7c8e1",
+                      "on-tertiary-fixed": "#0b1c30",
+                      "on-primary-fixed-variant": "#414c00",
+                      "error-container": "#93000a",
+                      "surface-container-low": "#1c1b1b",
+                      "primary-fixed-dim": "#b8d300",
+                      "surface-bright": "#3a3939",
+                      "on-error": "#690005",
+                      "error": "#ffb4ab",
+                      "secondary-fixed": "#dde1ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "lg": "24px",
+                      "container-margin": "20px",
+                      "unit": "4px",
+                      "gutter": "12px",
+                      "xs": "4px",
+                      "sm": "8px",
+                      "xl": "40px",
+                      "md": "16px"
+              },
+              "fontFamily": {
+                      "data-display": ["JetBrains Mono"],
+                      "label-sm": ["Inter"],
+                      "headline-lg-mobile": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "label-caps": ["JetBrains Mono"],
+                      "display-lg": ["Inter"]
+              },
+              "fontSize": {
+                      "data-display": ["24px", {"lineHeight": "1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                      "label-sm": ["11px", {"lineHeight": "1", "fontWeight": "500"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                      "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-md": ["20px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                      "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "500"}],
+                      "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background overflow-hidden h-screen flex">
+<!-- SideNavBar (Authority: JSON & Platform Rule) -->
+<aside class="fixed left-0 top-0 h-screen w-64 z-50 bg-surface-container-lowest border-r border-outline-variant flex flex-col gap-sm py-xl px-md h-full">
+<div class="mb-xl px-sm">
+<h1 class="font-data-display text-data-display text-primary-fixed">STRKR-01</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant opacity-60">Peak Performance</p>
+</div>
+<nav class="flex-1 flex flex-col gap-xs">
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high hover:text-primary-fixed transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">Hoy</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high hover:text-primary-fixed transition-all" href="#">
+<span class="material-symbols-outlined">fitness_center</span>
+<span class="font-label-caps text-label-caps">Training</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-primary-fixed bg-primary-fixed border-r-4 border-primary-fixed font-bold scale-[0.98] transition-transform duration-200" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-caps text-label-caps">Analytics</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high hover:text-primary-fixed transition-all" href="#">
+<span class="material-symbols-outlined">restaurant</span>
+<span class="font-label-caps text-label-caps">Nutrition</span>
+</a>
+</nav>
+<div class="mt-auto px-sm pt-md">
+<button class="w-full py-md bg-primary-fixed text-on-primary-fixed font-label-caps text-label-caps font-bold hover:opacity-90 transition-opacity">
+                Log Session
+            </button>
+</div>
+</aside>
+<!-- Main Viewport -->
+<main class="ml-64 flex-1 flex flex-col h-full relative">
+<!-- TopNavBar (Authority: JSON) -->
+<header class="fixed top-0 left-64 right-0 z-40 bg-background/80 backdrop-blur-xl border-b border-outline-variant flex justify-between items-center h-16 px-md">
+<div class="flex items-center gap-sm">
+<span class="font-data-display text-data-display font-black text-primary-fixed tracking-tighter">APEX FIGHTER</span>
+<span class="text-outline-variant">/</span>
+<h2 class="font-label-caps text-label-caps text-on-surface tracking-widest">HISTORY / CALENDAR</h2>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary-fixed transition-colors">calendar_today</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary-fixed transition-colors">settings</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A focused close-up of a professional combat athlete's profile picture with high-contrast cinematic lighting in a dark gym setting. The fighter has a determined expression, with sweat visible on their brow, emphasizing the grit and performance theme of the app. The style is modern, tactical, and monochromatic with subtle yellow highlights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6bw0fDoiKY4vsELART0iE34kU41UNRe2nmSTqEG1MBg_J_AbDnyRnGj8z_cVZXOC6voK9-c0FtLIGLE9Ha-6JvjNRYpCPJLCG811-coD2eXuW9GplcgRlzEs80iML_02SxufzHe1h-5mkDunmMYZLsoycthdgUXfVYQnjO8i-yKTR4azudtTnB-aFfvVdJFnTRyGUD_MRqfJxgg3nP6VVENETxvYchy6zrQW2van6xPRdTlUckgD3Aw"/>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="mt-16 flex flex-1 overflow-hidden p-md gap-md">
+<!-- Calendar Section -->
+<section class="flex-[2] flex flex-col gap-md">
+<!-- Month Selection -->
+<div class="flex justify-between items-center px-sm">
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-primary-fixed hover:bg-surface-container-high p-xs rounded transition-all">chevron_left</button>
+<h3 class="font-data-display text-headline-md text-primary">OCTUBRE 2024</h3>
+<button class="material-symbols-outlined text-primary-fixed hover:bg-surface-container-high p-xs rounded transition-all">chevron_right</button>
+</div>
+<div class="flex gap-sm">
+<span class="flex items-center gap-xs font-label-caps text-[10px] text-on-surface-variant">
+<span class="w-2 h-2 discipline-dot-striking"></span> STRIKING
+                        </span>
+<span class="flex items-center gap-xs font-label-caps text-[10px] text-on-surface-variant">
+<span class="w-2 h-2 discipline-dot-grappling"></span> GRAPPLING
+                        </span>
+<span class="flex items-center gap-xs font-label-caps text-[10px] text-on-surface-variant">
+<span class="w-2 h-2 discipline-dot-fuerza"></span> FUERZA
+                        </span>
+</div>
+</div>
+<!-- The Grid -->
+<div class="calendar-grid flex-1 border-t border-l border-outline-variant">
+<!-- Days Labels -->
+<div class="border-r border-b border-outline-variant py-sm text-center font-label-caps text-label-caps text-on-surface-variant opacity-40">LUN</div>
+<div class="border-r border-b border-outline-variant py-sm text-center font-label-caps text-label-caps text-on-surface-variant opacity-40">MAR</div>
+<div class="border-r border-b border-outline-variant py-sm text-center font-label-caps text-label-caps text-on-surface-variant opacity-40">MIE</div>
+<div class="border-r border-b border-outline-variant py-sm text-center font-label-caps text-label-caps text-on-surface-variant opacity-40">JUE</div>
+<div class="border-r border-b border-outline-variant py-sm text-center font-label-caps text-label-caps text-on-surface-variant opacity-40">VIE</div>
+<div class="border-r border-b border-outline-variant py-sm text-center font-label-caps text-label-caps text-on-surface-variant opacity-40">SAB</div>
+<div class="border-r border-b border-outline-variant py-sm text-center font-label-caps text-label-caps text-on-surface-variant opacity-40">DOM</div>
+<!-- Placeholder Days (Example layout) -->
+<!-- Row 1 -->
+<div class="border-r border-b border-outline-variant p-sm flex flex-col justify-between h-24 bg-surface-container-lowest/20 opacity-20">
+<span class="font-data-display text-sm">30</span>
+</div>
+<div class="border-r border-b border-outline-variant p-sm flex flex-col justify-between h-24">
+<span class="font-data-display text-sm">01</span>
+<div class="flex gap-xs">
+<div class="w-2 h-2 discipline-dot-striking"></div>
+</div>
+</div>
+<div class="border-r border-b border-outline-variant p-sm flex flex-col justify-between h-24">
+<span class="font-data-display text-sm">02</span>
+<div class="flex gap-xs">
+<div class="w-2 h-2 discipline-dot-grappling"></div>
+<div class="w-2 h-2 discipline-dot-fuerza"></div>
+</div>
+</div>
+<div class="border-r border-b border-outline-variant p-sm flex flex-col justify-between h-24">
+<span class="font-data-display text-sm">03</span>
+</div>
+<div class="border-r border-b border-outline-variant p-sm flex flex-col justify-between h-24">
+<span class="font-data-display text-sm">04</span>
+<div class="flex gap-xs">
+<div class="w-2 h-2 discipline-dot-striking"></div>
+</div>
+</div>
+<div class="border-r border-b border-outline-variant p-sm flex flex-col justify-between h-24">
+<span class="font-data-display text-sm">05</span>
+</div>
+<div class="border-r border-b border-outline-variant p-sm flex flex-col justify-between h-24">
+<span class="font-data-display text-sm">06</span>
+</div>
+<!-- Row 2 -->
+<div class="border-r border-b border-outline-variant p-sm flex flex-col justify-between h-24">
+<span class="font-data-display text-sm">07</span>
+<div class="flex gap-xs">
+<div class="w-2 h-2 discipline-dot-fuerza"></div>
+</div>
+</div>
+<div class="border-r border-b border-outline-variant p-sm flex flex-col justify-between h-24 active-day bg-surface-container-high/40">
+<span class="font-data-display text-sm text-primary-fixed">08</span>
+<div class="flex gap-xs">
+<div class="w-2 h-2 discipline-dot-striking"></div>
+<div class="w-2 h-2 discipline-dot-grappling"></div>
+</div>
+</div>
+<div class="border-r border-b border-outline-variant p-sm flex flex-col justify-between h-24">
+<span class="font-data-display text-sm">09</span>
+</div>
+<div class="border-r border-b border-outline-variant p-sm flex flex-col justify-between h-24">
+<span class="font-data-display text-sm">10</span>
+<div class="flex gap-xs">
+<div class="w-2 h-2 discipline-dot-striking"></div>
+</div>
+</div>
+<div class="border-r border-b border-outline-variant p-sm flex flex-col justify-between h-24">
+<span class="font-data-display text-sm">11</span>
+<div class="flex gap-xs">
+<div class="w-2 h-2 discipline-dot-fuerza"></div>
+</div>
+</div>
+<div class="border-r border-b border-outline-variant p-sm flex flex-col justify-between h-24">
+<span class="font-data-display text-sm">12</span>
+</div>
+<div class="border-r border-b border-outline-variant p-sm flex flex-col justify-between h-24">
+<span class="font-data-display text-sm">13</span>
+</div>
+<!-- Row 3 & Beyond (Simulated) -->
+<script>
+                        const grid = document.querySelector('.calendar-grid');
+                        for(let i=14; i<=31; i++) {
+                            const div = document.createElement('div');
+                            div.className = "border-r border-b border-outline-variant p-sm flex flex-col justify-between h-24 hover:bg-surface-container-low transition-colors cursor-pointer";
+                            div.innerHTML = `<span class="font-data-display text-sm">${i}</span>`;
+                            if (i % 3 === 0) div.innerHTML += '<div class="flex gap-xs"><div class="w-2 h-2 discipline-dot-striking"></div></div>';
+                            grid.appendChild(div);
+                        }
+                    </script>
+</div>
+</section>
+<!-- Sidebar/Right Panel (Daily Intel) -->
+<aside class="w-80 flex flex-col gap-md">
+<div class="glass-panel p-md flex flex-col gap-md h-full">
+<header class="border-b border-outline-variant pb-sm">
+<h4 class="font-label-caps text-label-caps text-primary-fixed mb-xs">INTEL DE HOY</h4>
+<p class="font-data-display text-headline-md">MARTES 08</p>
+</header>
+<div class="flex flex-col gap-sm overflow-y-auto">
+<!-- Session Card 1 -->
+<div class="bg-surface-container-low border border-outline-variant p-md flex flex-col gap-sm">
+<div class="flex justify-between items-start">
+<span class="font-label-caps text-label-caps text-primary-fixed">STRIKING</span>
+<span class="font-data-display text-[14px]">90 MIN</span>
+</div>
+<p class="font-body-lg text-sm text-on-surface">6 Rnds Sparring + Bag Work</p>
+<div class="flex items-center gap-xs mt-xs text-[10px] font-label-caps text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">timer</span>
+                                07:00 AM - 08:30 AM
+                            </div>
+</div>
+<!-- Session Card 2 -->
+<div class="bg-surface-container-low border border-outline-variant p-md flex flex-col gap-sm">
+<div class="flex justify-between items-start">
+<span class="font-label-caps text-label-caps text-secondary">GRAPPLING</span>
+<span class="font-data-display text-[14px]">60 MIN</span>
+</div>
+<p class="font-body-lg text-sm text-on-surface">Takedown Defense &amp; Guard Passing drills</p>
+<div class="flex items-center gap-xs mt-xs text-[10px] font-label-caps text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">timer</span>
+                                06:00 PM - 07:00 PM
+                            </div>
+</div>
+<!-- Empty State Filler -->
+<div class="flex-1 flex items-center justify-center border border-dashed border-outline-variant p-xl opacity-20">
+<span class="font-label-caps text-[10px]">NO MORE SESSIONS</span>
+</div>
+</div>
+<div class="mt-auto pt-md border-t border-outline-variant">
+<button class="w-full py-sm border border-primary-fixed text-primary-fixed font-label-caps text-label-caps hover:bg-primary-fixed hover:text-on-primary-fixed transition-colors">
+                            VIEW DETAILS
+                        </button>
+</div>
+</div>
+</aside>
+</div>
+<!-- Statistics Footer -->
+<footer class="fixed bottom-0 left-64 right-0 h-12 bg-surface-container-lowest border-t border-outline-variant flex items-center px-md justify-between z-40">
+<div class="flex items-center gap-xl">
+<span class="font-label-caps text-label-caps text-on-surface-variant opacity-60">MONTHLY TOTALS:</span>
+<div class="flex items-center gap-md">
+<span class="font-label-caps text-[10px] text-on-surface-variant">ROUNDS</span>
+<span class="font-data-display text-primary-fixed">142</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="font-label-caps text-[10px] text-on-surface-variant">TONNAGE</span>
+<span class="font-data-display text-primary-fixed">12.8T</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="font-label-caps text-[10px] text-on-surface-variant">KCAL</span>
+<span class="font-data-display text-primary-fixed">24,502</span>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<div class="h-1 w-32 bg-surface-container-highest overflow-hidden">
+<div class="h-full bg-primary-fixed w-[72%]"></div>
+</div>
+<span class="font-data-display text-[10px] text-primary-fixed">72% GOAL</span>
+</div>
+</footer>
+</main>
+<!-- Visual Flair: Animated Atmospheric Background -->
+<div class="fixed inset-0 pointer-events-none z-[-1] opacity-30">
+
+</div>
+<script>
+        // Micro-interactions for calendar selection
+        document.querySelectorAll('.calendar-grid > div').forEach(cell => {
+            cell.addEventListener('click', function() {
+                // Remove previous active state
+                document.querySelectorAll('.active-day').forEach(el => el.classList.remove('active-day', 'bg-surface-container-high/40'));
+                
+                // Add to current
+                if(!this.classList.contains('opacity-20')) {
+                    this.classList.add('active-day', 'bg-surface-container-high/40');
+                    
+                    // Trigger a small haptic-like scaling effect
+                    this.style.transform = 'scale(0.98)';
+                    setTimeout(() => this.style.transform = 'scale(1)', 100);
+                }
+            });
+        });
+    </script>
+</body></html>

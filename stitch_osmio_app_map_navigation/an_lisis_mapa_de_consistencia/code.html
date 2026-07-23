@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OSMIO | Analytics - Consistencia</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- CSS for consistency and custom effects -->
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-overlay {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: repeat(53, 1fr);
+            grid-template-rows: repeat(7, 1fr);
+            gap: 3px;
+        }
+        .heatmap-cell {
+            aspect-ratio: 1/1;
+            border-radius: 1px;
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f0f0f;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2a2a2a;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #d2f000;
+        }
+    </style>
+<!-- Predicted Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#2c3400",
+                        "secondary-fixed": "#dde1ff",
+                        "outline-variant": "#454932",
+                        "tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#173bab",
+                        "surface-container-lowest": "#0e0e0e",
+                        "inverse-primary": "#576500",
+                        "inverse-on-surface": "#313030",
+                        "error-container": "#93000a",
+                        "tertiary-fixed": "#d3e4fe",
+                        "on-secondary-fixed": "#001453",
+                        "on-background": "#e5e2e1",
+                        "surface-container-high": "#2a2a2a",
+                        "on-error-container": "#ffdad6",
+                        "inverse-surface": "#e5e2e1",
+                        "surface-dim": "#131313",
+                        "primary-container": "#d2f000",
+                        "surface-container-low": "#1c1b1b",
+                        "on-error": "#690005",
+                        "on-surface-variant": "#c6c9ab",
+                        "surface-container": "#201f1f",
+                        "surface-bright": "#3a3939",
+                        "primary": "#ffffff",
+                        "on-secondary": "#002584",
+                        "surface-container-highest": "#353534",
+                        "tertiary-fixed-dim": "#b7c8e1",
+                        "secondary-fixed-dim": "#b8c4ff",
+                        "on-tertiary-fixed-variant": "#38485d",
+                        "on-primary-fixed-variant": "#414c00",
+                        "error": "#ffb4ab",
+                        "surface-tint": "#b8d300",
+                        "primary-fixed": "#d2f000",
+                        "secondary-container": "#173bab",
+                        "on-primary-fixed": "#191e00",
+                        "tertiary-container": "#d3e4fe",
+                        "surface": "#131313",
+                        "on-tertiary": "#213145",
+                        "on-tertiary-container": "#56657c",
+                        "primary-fixed-dim": "#b8d300",
+                        "on-primary-container": "#5d6b00",
+                        "background": "#131313",
+                        "on-surface": "#e5e2e1",
+                        "outline": "#909378",
+                        "on-secondary-container": "#a0b1ff",
+                        "surface-variant": "#353534",
+                        "secondary": "#b8c4ff",
+                        "on-tertiary-fixed": "#0b1c30"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "container-margin": "20px",
+                        "md": "16px",
+                        "lg": "24px",
+                        "gutter": "12px",
+                        "xs": "4px",
+                        "xl": "40px",
+                        "unit": "4px",
+                        "sm": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter", "sans-serif"],
+                        "body-lg": ["Inter", "sans-serif"],
+                        "label-caps": ["JetBrains Mono", "monospace"],
+                        "display-lg": ["Inter", "sans-serif"],
+                        "data-display": ["JetBrains Mono", "monospace"],
+                        "headline-md": ["Inter", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "500"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800"}],
+                        "data-display": ["24px", {"lineHeight": "1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "headline-md": ["20px", {"lineHeight": "1.4", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-lg selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Shell Layout -->
+<div class="flex min-h-screen">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 bottom-0 z-40 flex flex-col py-xl h-screen w-64 bg-surface-container-low dark:bg-surface-container-lowest border-r border-outline-variant">
+<div class="px-lg mb-xl">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 bg-primary-fixed flex items-center justify-center rounded">
+<span class="material-symbols-outlined text-on-primary-fixed" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+<div>
+<h1 class="font-display-lg text-headline-md text-primary-fixed italic tracking-tighter">OSMIO</h1>
+<p class="font-label-caps text-[10px] text-on-surface-variant tracking-widest">MISSION CONTROL</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-xs px-xs">
+<a class="flex items-center gap-md py-sm transition-all text-on-surface-variant pl-md hover:text-primary-fixed hover:bg-surface-container active:scale-95 duration-150 group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">dashboard</span>
+<span class="font-label-caps">Dashboard</span>
+</a>
+<a class="flex items-center gap-md py-sm transition-all text-on-surface-variant pl-md hover:text-primary-fixed hover:bg-surface-container active:scale-95 duration-150 group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">fitness_center</span>
+<span class="font-label-caps">Training</span>
+</a>
+<a class="flex items-center gap-md py-sm transition-all text-primary-fixed border-l-4 border-primary-fixed bg-surface-container-high pl-md active:scale-95 duration-150 group" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">monitoring</span>
+<span class="font-label-caps">Analytics</span>
+</a>
+<a class="flex items-center gap-md py-sm transition-all text-on-surface-variant pl-md hover:text-primary-fixed hover:bg-surface-container active:scale-95 duration-150 group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">restaurant</span>
+<span class="font-label-caps">Nutrition</span>
+</a>
+</nav>
+<div class="px-lg mt-auto">
+<button class="w-full bg-primary-fixed text-on-primary-fixed font-label-caps py-md rounded-lg active:scale-95 transition-transform flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined text-[18px]">add_task</span>
+                    LOG SESSION
+                </button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 ml-64 p-lg">
+<!-- Header Section -->
+<header class="flex justify-between items-end mb-xl">
+<div>
+<span class="font-label-caps text-primary-fixed mb-xs block">DATA CENTER</span>
+<h2 class="font-headline-lg text-on-surface">Analytics</h2>
+</div>
+<div class="flex items-center gap-md">
+<div class="text-right">
+<p class="font-label-caps text-[10px] text-on-surface-variant">CURRENT SESSION</p>
+<p class="font-data-display text-sm text-on-surface">HIIT INTENSIVO // B-04</p>
+</div>
+<div class="w-12 h-12 rounded-full border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A gritty, cinematic portrait of a professional fighter in low-key dramatic lighting. The athlete has a focused, intense expression, with sweat glistening on their skin. The background is a dark, industrial combat sports gym with blurred equipment. High contrast, charcoal and neon yellow color palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgPv2xQeZHnAPCM-As_eW_gPgtO3RdMNeO2PVIoumMRAK2g4v-qQiUq9pVSC_ThTKX8TZ0bJQ4ab3ZsxLBa2yUXPZ1rW_C3oVs2LccYAOscWmFeZaXDc3ueTbmuaKB-85JyuzwUAEtR-HSBumGlpZcwWScrktrUEjDGhXn59CKaYclYAvJPkoOaraA1g6VFne9NYPXzCErillVPc6r6pzAI4y9a_YwJWbAh73JDo2lGGV0q6lyMzUR2A"/>
+</div>
+</div>
+</header>
+<!-- Internal Tabs -->
+<div class="flex border-b border-outline-variant mb-lg overflow-x-auto whitespace-nowrap">
+<button class="px-lg py-md font-label-caps text-on-surface-variant hover:text-primary-fixed transition-colors">Fuerza</button>
+<button class="px-lg py-md font-label-caps text-on-surface-variant hover:text-primary-fixed transition-colors">Carga de Combate</button>
+<button class="px-lg py-md font-label-caps text-primary-fixed border-b-2 border-primary-fixed bg-surface-container-low">Consistencia</button>
+</div>
+<!-- Dashboard Grid -->
+<div class="grid grid-cols-12 gap-lg">
+<!-- 1. Contribution Heatmap (The 365 Grid) -->
+<section class="col-span-12 bg-surface-container-low border border-outline-variant p-lg rounded-xl">
+<div class="flex justify-between items-center mb-lg">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary-fixed">calendar_view_month</span>
+<h3 class="font-label-caps text-on-surface">VOLUMEN ANUAL DE ENTRENAMIENTO</h3>
+</div>
+<div class="flex items-center gap-xs">
+<span class="font-label-caps text-[10px] text-on-surface-variant mr-sm">MENOS</span>
+<div class="w-3 h-3 bg-surface-container-highest"></div>
+<div class="w-3 h-3 bg-[#3d4200]"></div>
+<div class="w-3 h-3 bg-[#727e00]"></div>
+<div class="w-3 h-3 bg-[#a9ba00]"></div>
+<div class="w-3 h-3 bg-primary-fixed"></div>
+<span class="font-label-caps text-[10px] text-on-surface-variant ml-sm">MÁS</span>
+</div>
+</div>
+<div class="overflow-x-auto pb-md">
+<div class="min-w-[800px]">
+<div class="grid grid-cols-[auto_1fr] gap-sm items-center">
+<!-- Day labels -->
+<div class="grid grid-rows-7 gap-[3px] text-[9px] font-label-caps text-on-surface-variant uppercase">
+<div class="h-3">Lun</div>
+<div class="h-3"></div>
+<div class="h-3">Mié</div>
+<div class="h-3"></div>
+<div class="h-3">Vie</div>
+<div class="h-3"></div>
+<div class="h-3">Dom</div>
+</div>
+<!-- Heatmap Grid -->
+<div class="heatmap-grid" id="heatmap">
+<!-- Cells will be generated by JS -->
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 2. Streaks (Rachas) -->
+<div class="col-span-12 lg:col-span-4 grid grid-rows-2 gap-lg">
+<!-- Current Streak -->
+<div class="bg-surface-container border border-outline-variant p-lg rounded-xl flex flex-col justify-center relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-md opacity-20 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-primary-fixed text-display-lg" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+</div>
+<span class="font-label-caps text-on-surface-variant mb-xs">RACHA ACTUAL</span>
+<div class="flex items-baseline gap-xs">
+<span class="font-display-lg text-primary-fixed">14</span>
+<span class="font-headline-md text-on-surface">DÍAS</span>
+</div>
+<p class="text-sm text-on-surface-variant mt-sm">Nivel de intensidad: <span class="text-primary-fixed">Alto</span></p>
+</div>
+<!-- Best Streak -->
+<div class="bg-surface-container border border-outline-variant p-lg rounded-xl flex flex-col justify-center border-l-4 border-l-primary-fixed">
+<span class="font-label-caps text-on-surface-variant mb-xs">MEJOR MARCA</span>
+<div class="flex items-baseline gap-xs">
+<span class="font-display-lg text-on-surface">42</span>
+<span class="font-headline-md text-on-surface-variant">DÍAS</span>
+</div>
+<p class="text-sm text-on-surface-variant mt-sm">Récord establecido en Octubre</p>
+</div>
+</div>
+<!-- 3. Compliance Gauge -->
+<div class="col-span-12 lg:col-span-4 bg-surface-container border border-outline-variant p-lg rounded-xl flex flex-col items-center justify-between text-center">
+<div class="w-full flex justify-between items-start mb-md">
+<span class="font-label-caps text-on-surface-variant">CUMPLIMIENTO (4 SEMANAS)</span>
+<span class="material-symbols-outlined text-primary-fixed">track_changes</span>
+</div>
+<div class="relative w-48 h-48 flex items-center justify-center">
+<!-- Background Circle -->
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-surface-container-highest" cx="96" cy="96" fill="transparent" r="80" stroke="currentColor" stroke-width="12"></circle>
+<!-- Progress Circle -->
+<circle class="text-primary-fixed transition-all duration-1000 ease-out" cx="96" cy="96" fill="transparent" r="80" stroke="currentColor" stroke-dasharray="502.6" stroke-dashoffset="40.2" stroke-linecap="square" stroke-width="12"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="font-display-lg text-on-surface leading-none">92<span class="text-headline-md">%</span></span>
+<span class="font-label-caps text-[10px] text-on-surface-variant mt-xs">META ALCANZADA</span>
+</div>
+</div>
+<div class="w-full grid grid-cols-2 gap-sm mt-md">
+<div class="bg-surface-container-low p-sm rounded border border-outline-variant">
+<p class="font-label-caps text-[9px] text-on-surface-variant">PROX. SESIÓN</p>
+<p class="font-data-display text-sm">MAÑANA</p>
+</div>
+<div class="bg-surface-container-low p-sm rounded border border-outline-variant">
+<p class="font-label-caps text-[9px] text-on-surface-variant">TENDENCIA</p>
+<p class="font-data-display text-sm text-primary-fixed">▲ 4%</p>
+</div>
+</div>
+</div>
+<!-- 4. Insights & CTA -->
+<div class="col-span-12 lg:col-span-4 flex flex-col gap-lg">
+<!-- Insights Card -->
+<div class="bg-primary-fixed text-on-primary-fixed p-lg rounded-xl flex-1 relative overflow-hidden">
+<div class="absolute -right-4 -bottom-4 opacity-10">
+<span class="material-symbols-outlined text-[120px]">psychology</span>
+</div>
+<div class="relative z-10">
+<div class="flex items-center gap-sm mb-md">
+<span class="material-symbols-outlined">lightbulb</span>
+<h3 class="font-label-caps font-bold">ANALYSIS_INSIGHT</h3>
+</div>
+<p class="font-headline-md mb-lg italic leading-tight">
+                                "Llevas un 92% de consistencia en el bloque intensivo."
+                            </p>
+<p class="text-sm font-medium opacity-80 border-t border-on-primary-fixed/20 pt-md">
+                                Estás superando el promedio de tu categoría por un 12.4%. Mantener este ritmo durante 6 días más activará el multiplicador de rendimiento.
+                            </p>
+</div>
+</div>
+<!-- Training Legend/Summary -->
+<div class="bg-surface-container border border-outline-variant p-lg rounded-xl">
+<h4 class="font-label-caps text-on-surface mb-md">DISTRIBUCIÓN DE DISCIPLINA</h4>
+<div class="space-y-sm">
+<div>
+<div class="flex justify-between text-[11px] font-label-caps mb-xs">
+<span>STRIKING</span>
+<span>45%</span>
+</div>
+<div class="h-1 w-full bg-surface-container-highest overflow-hidden">
+<div class="h-full bg-primary-fixed w-[45%]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-[11px] font-label-caps mb-xs">
+<span>GRAPPLING</span>
+<span>35%</span>
+</div>
+<div class="h-1 w-full bg-surface-container-highest overflow-hidden">
+<div class="h-full bg-secondary-fixed w-[35%]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-[11px] font-label-caps mb-xs">
+<span>FUERZA</span>
+<span>20%</span>
+</div>
+<div class="h-1 w-full bg-surface-container-highest overflow-hidden">
+<div class="h-full bg-tertiary-fixed w-[20%]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Stats Grid -->
+<div class="col-span-12 grid grid-cols-2 md:grid-cols-4 gap-gutter mt-xl border-t border-outline-variant pt-lg">
+<div>
+<p class="font-label-caps text-[10px] text-on-surface-variant">TOTAL SESIONES (AÑO)</p>
+<p class="font-data-display text-headline-md text-on-surface">284</p>
+</div>
+<div>
+<p class="font-label-caps text-[10px] text-on-surface-variant">HORAS ACTIVAS</p>
+<p class="font-data-display text-headline-md text-on-surface">512.5h</p>
+</div>
+<div>
+<p class="font-label-caps text-[10px] text-on-surface-variant">MISS RATE</p>
+<p class="font-data-display text-headline-md text-error">3.2%</p>
+</div>
+<div>
+<p class="font-label-caps text-[10px] text-on-surface-variant">VOLUMEN SEMANAL AVG</p>
+<p class="font-data-display text-headline-md text-on-surface">14.2 TN</p>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Micro-interactions & Heatmap Generation Script -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const heatmap = document.getElementById('heatmap');
+            
+            // Generate 365+ cells (53 weeks * 7 days)
+            const totalCells = 53 * 7;
+            const colors = [
+                'bg-surface-container-highest', // 0: Empty
+                'bg-[#3d4200]',                // 1: Low
+                'bg-[#727e00]',                // 2: Mid
+                'bg-[#a9ba00]',                // 3: High
+                'bg-primary-fixed'             // 4: Max
+            ];
+
+            for (let i = 0; i < totalCells; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'heatmap-cell transition-all duration-300 hover:scale-125 cursor-pointer';
+                
+                // Randomly assign intensity (heavier towards the end of the year/right side)
+                const randomIntensity = Math.random();
+                const weekIndex = Math.floor(i / 7);
+                let intensity;
+                
+                if (randomIntensity < 0.1) intensity = 0;
+                else if (randomIntensity < 0.4) intensity = 1;
+                else if (randomIntensity < 0.7) intensity = 2;
+                else if (randomIntensity < 0.9) intensity = 3;
+                else intensity = 4;
+                
+                // Simulate a "streak" in the last few weeks
+                if (weekIndex > 50) intensity = Math.random() > 0.1 ? 4 : 3;
+
+                cell.classList.add(colors[intensity]);
+                
+                // Add simple tooltip data attribute
+                cell.setAttribute('title', `Día ${i + 1}: Nivel ${intensity}`);
+                
+                heatmap.appendChild(cell);
+            }
+
+            // Hover effect on the gauge ring
+            const circle = document.querySelector('circle[stroke-dasharray="502.6"]');
+            circle.addEventListener('mouseenter', () => {
+                circle.style.strokeWidth = '16px';
+                circle.style.filter = 'drop-shadow(0 0 8px #d2f000)';
+            });
+            circle.addEventListener('mouseleave', () => {
+                circle.style.strokeWidth = '12px';
+                circle.style.filter = 'none';
+            });
+        });
+    </script>
+</body></html>

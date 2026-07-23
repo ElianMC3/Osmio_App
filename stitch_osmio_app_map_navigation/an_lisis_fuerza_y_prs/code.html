@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OSMIO | Analytics - Fuerza</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..900&display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(26, 26, 26, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid #2A2A2A;
+        }
+        .neon-glow {
+            box-shadow: 0 0 15px rgba(223, 255, 0, 0.15);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0F0F0F;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #2A2A2A;
+        }
+        .chart-gradient {
+            background: linear-gradient(to bottom, rgba(210, 240, 0, 0.15), transparent);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary": "#2c3400",
+                      "secondary-fixed": "#dde1ff",
+                      "outline-variant": "#454932",
+                      "tertiary": "#ffffff",
+                      "on-secondary-fixed-variant": "#173bab",
+                      "surface-container-lowest": "#0e0e0e",
+                      "inverse-primary": "#576500",
+                      "inverse-on-surface": "#313030",
+                      "error-container": "#93000a",
+                      "tertiary-fixed": "#d3e4fe",
+                      "on-secondary-fixed": "#001453",
+                      "on-background": "#e5e2e1",
+                      "surface-container-high": "#2a2a2a",
+                      "on-error-container": "#ffdad6",
+                      "inverse-surface": "#e5e2e1",
+                      "surface-dim": "#131313",
+                      "primary-container": "#d2f000",
+                      "surface-container-low": "#1c1b1b",
+                      "on-error": "#690005",
+                      "on-surface-variant": "#c6c9ab",
+                      "surface-container": "#201f1f",
+                      "surface-bright": "#3a3939",
+                      "primary": "#ffffff",
+                      "on-secondary": "#002584",
+                      "surface-container-highest": "#353534",
+                      "tertiary-fixed-dim": "#b7c8e1",
+                      "secondary-fixed-dim": "#b8c4ff",
+                      "on-tertiary-fixed-variant": "#38485d",
+                      "on-primary-fixed-variant": "#414c00",
+                      "error": "#ffb4ab",
+                      "surface-tint": "#b8d300",
+                      "primary-fixed": "#d2f000",
+                      "secondary-container": "#173bab",
+                      "on-primary-fixed": "#191e00",
+                      "tertiary-container": "#d3e4fe",
+                      "surface": "#131313",
+                      "on-tertiary": "#213145",
+                      "on-tertiary-container": "#56657c",
+                      "primary-fixed-dim": "#b8d300",
+                      "on-primary-container": "#5d6b00",
+                      "background": "#131313",
+                      "on-surface": "#e5e2e1",
+                      "outline": "#909378",
+                      "on-secondary-container": "#a0b1ff",
+                      "surface-variant": "#353534",
+                      "secondary": "#b8c4ff",
+                      "on-tertiary-fixed": "#0b1c30"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "container-margin": "20px",
+                      "md": "16px",
+                      "lg": "24px",
+                      "gutter": "12px",
+                      "xs": "4px",
+                      "xl": "40px",
+                      "unit": "4px",
+                      "sm": "8px"
+              },
+              "fontFamily": {
+                      "headline-lg-mobile": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "label-caps": ["JetBrains Mono"],
+                      "label-sm": ["Inter"],
+                      "display-lg": ["Inter"],
+                      "data-display": ["JetBrains Mono"],
+                      "headline-md": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                      "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "500"}],
+                      "label-sm": ["11px", {"lineHeight": "1", "fontWeight": "500"}],
+                      "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800"}],
+                      "data-display": ["24px", {"lineHeight": "1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                      "headline-md": ["20px", {"lineHeight": "1.4", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+      </script>
+</head>
+<body class="bg-surface text-on-surface font-body-lg overflow-hidden flex h-screen">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 bottom-0 z-40 flex flex-col py-xl bg-surface-container-low dark:bg-surface-container-lowest h-screen w-64 border-r border-outline-variant">
+<div class="px-lg mb-xl">
+<h1 class="font-display-lg text-display-lg text-primary-fixed italic leading-none">OSMIO</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant mt-xs tracking-[0.2em]">MISSION CONTROL</p>
+</div>
+<div class="flex flex-col gap-unit">
+<a class="flex items-center gap-md py-sm transition-all duration-150 hover:text-primary-fixed hover:bg-surface-container text-on-surface-variant pl-md" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<a class="flex items-center gap-md py-sm transition-all duration-150 hover:text-primary-fixed hover:bg-surface-container text-on-surface-variant pl-md" href="#">
+<span class="material-symbols-outlined">fitness_center</span>
+<span class="font-label-caps text-label-caps">Training</span>
+</a>
+<!-- Active State -->
+<a class="flex items-center gap-md py-sm transition-all duration-150 text-primary-fixed border-l-4 border-primary-fixed bg-surface-container-high pl-md" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="font-label-caps text-label-caps">Analytics</span>
+</a>
+<a class="flex items-center gap-md py-sm transition-all duration-150 hover:text-primary-fixed hover:bg-surface-container text-on-surface-variant pl-md" href="#">
+<span class="material-symbols-outlined">restaurant</span>
+<span class="font-label-caps text-label-caps">Nutrition</span>
+</a>
+</div>
+<div class="mt-auto px-lg">
+<button class="w-full bg-primary-fixed text-on-primary py-md font-label-caps text-label-caps font-bold active:scale-95 transition-transform">
+                LOG SESSION
+            </button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 ml-64 overflow-y-auto custom-scrollbar bg-surface relative">
+<!-- TopAppBar Context -->
+<div class="sticky top-0 z-30 w-full h-16 flex items-center justify-between px-lg bg-surface/80 backdrop-blur-xl border-b border-outline-variant">
+<div class="flex items-center gap-md">
+<h2 class="font-headline-md text-headline-md text-on-surface uppercase tracking-tight">Analytics</h2>
+<div class="h-4 w-px bg-outline-variant"></div>
+<span class="font-label-caps text-label-caps text-primary-fixed">FUERZA</span>
+</div>
+<div class="flex items-center gap-lg">
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary-fixed cursor-pointer transition-colors">calendar_today</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary-fixed cursor-pointer transition-colors">settings</span>
+<div class="w-8 h-8 bg-surface-container-highest rounded-full border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A cinematic, high-contrast close-up portrait of a professional fighter in a dimly lit, industrial gym setting. The lighting is dramatic, highlighting the sweat and intense focus on their face with sharp neon green rim lights. The aesthetic is gritty yet polished, evoking a sense of high-performance athlete discipline and technological precision. Dark charcoal and deep obsidian tones dominate the background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBeq4oC2hB08kZSRwlf0p3B5znb6RkPUds68I6LMKyGS3fXrLe6Fi5ij92t8Q986FuBqokwefYnBjSyCPkZ30Dz35E_54boU7RMflGNMHMaOwhbF94DisfOKKTk8h8QkzWyIdlhjGXXBRMefmplVg5mxB0ZrTOUWu1QiY-J2N_pRk0li1ZbV61o_id4wNcFcvW6guAYDhZ33jczURn6MfyhO-g-5etcjbzQC_RBoO_wA8iiE_3XLjnSCw"/>
+</div>
+</div>
+</div>
+<!-- Content Canvas -->
+<div class="p-lg max-w-[1440px] mx-auto flex flex-col gap-xl">
+<!-- Internal Tabs -->
+<div class="flex items-center gap-xl border-b border-outline-variant">
+<button class="pb-sm px-xs font-label-caps text-label-caps text-primary-fixed border-b-2 border-primary-fixed transition-all">FUERZA</button>
+<button class="pb-sm px-xs font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface transition-all">CARGA DE COMBATE</button>
+<button class="pb-sm px-xs font-label-caps text-label-caps text-on-surface-variant hover:text-on-surface transition-all">CONSISTENCIA</button>
+</div>
+<!-- Dashboard Content -->
+<div class="grid grid-cols-12 gap-lg">
+<!-- 1. Personal Records Grid (Bento Style) -->
+<div class="col-span-12">
+<div class="flex items-end justify-between mb-md">
+<div>
+<p class="font-label-caps text-label-caps text-primary-fixed opacity-60 mb-xs">STRENGTH MATRIX</p>
+<h3 class="font-headline-md text-headline-md text-on-surface uppercase italic">Personal Records</h3>
+</div>
+<div class="flex items-center gap-sm bg-surface-container px-sm py-xs border border-outline-variant">
+<span class="material-symbols-outlined text-[14px] text-primary-fixed" style="font-variation-settings: 'FILL' 1;">history</span>
+<span class="font-label-caps text-[10px] text-on-surface-variant uppercase">Updated 2h ago</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<!-- Squat PR -->
+<div class="bg-surface-container p-md border border-outline-variant relative overflow-hidden group">
+<div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-[120px]">fitness_center</span>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface-variant block mb-sm">SENTADILLA (BACK SQUAT)</span>
+<div class="flex items-baseline gap-xs mb-xs">
+<span class="font-data-display text-[42px] text-primary-fixed font-bold leading-none">185.0</span>
+<span class="font-label-caps text-label-caps text-primary-fixed">KG</span>
+</div>
+<div class="flex items-center gap-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">calendar_month</span>
+<span class="font-label-caps text-[10px]">OCT 24, 2023</span>
+</div>
+</div>
+<!-- Bench Press PR -->
+<div class="bg-surface-container p-md border border-outline-variant relative overflow-hidden group">
+<div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-[120px]">fitness_center</span>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface-variant block mb-sm">PRESS DE BANCA</span>
+<div class="flex items-baseline gap-xs mb-xs">
+<span class="font-data-display text-[42px] text-primary-fixed font-bold leading-none">127.5</span>
+<span class="font-label-caps text-label-caps text-primary-fixed">KG</span>
+</div>
+<div class="flex items-center gap-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">calendar_month</span>
+<span class="font-label-caps text-[10px]">NOV 02, 2023</span>
+</div>
+</div>
+<!-- Deadlift PR -->
+<div class="bg-surface-container p-md border border-outline-variant relative overflow-hidden group">
+<div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-[120px]">fitness_center</span>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface-variant block mb-sm">PESO MUERTO</span>
+<div class="flex items-baseline gap-xs mb-xs">
+<span class="font-data-display text-[42px] text-primary-fixed font-bold leading-none">220.0</span>
+<span class="font-label-caps text-label-caps text-primary-fixed">KG</span>
+</div>
+<div class="flex items-center gap-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">calendar_month</span>
+<span class="font-label-caps text-[10px]">OCT 12, 2023</span>
+</div>
+</div>
+</div>
+</div>
+<!-- 2. Progression Line Chart & 3. Exercise Selector -->
+<div class="col-span-12 lg:col-span-8">
+<div class="bg-surface-container border border-outline-variant p-lg h-full flex flex-col">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-md mb-lg">
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-xs">PERFORMANCE TRACKING</p>
+<h3 class="font-headline-md text-headline-md text-on-surface uppercase">Progression Analysis</h3>
+</div>
+<!-- Custom Dropdown -->
+<div class="relative group">
+<button class="bg-surface border border-outline-variant px-md py-sm flex items-center justify-between gap-xl min-w-[200px] hover:border-primary-fixed transition-colors">
+<span class="font-label-caps text-label-caps">SENTADILLA</span>
+<span class="material-symbols-outlined text-primary-fixed">expand_more</span>
+</button>
+<div class="absolute top-full left-0 right-0 mt-xs bg-surface-container-high border border-outline-variant z-10 hidden group-hover:block">
+<div class="p-sm hover:bg-primary-fixed hover:text-on-primary cursor-pointer font-label-caps text-[10px]">PRESS DE BANCA</div>
+<div class="p-sm hover:bg-primary-fixed hover:text-on-primary cursor-pointer font-label-caps text-[10px]">PESO MUERTO</div>
+<div class="p-sm hover:bg-primary-fixed hover:text-on-primary cursor-pointer font-label-caps text-[10px]">PRESS MILITAR</div>
+</div>
+</div>
+</div>
+<!-- Progression Graph Simulation -->
+<div class="flex-1 relative min-h-[300px] w-full mt-md">
+<div class="absolute inset-0 flex flex-col justify-between pointer-events-none">
+<div class="border-t border-outline-variant/30 w-full h-px"></div>
+<div class="border-t border-outline-variant/30 w-full h-px"></div>
+<div class="border-t border-outline-variant/30 w-full h-px"></div>
+<div class="border-t border-outline-variant/30 w-full h-px"></div>
+<div class="border-t border-outline-variant w-full h-px"></div>
+</div>
+<!-- Graph Lines (SVG Implementation) -->
+<svg class="w-full h-full relative z-10" viewbox="0 0 800 300">
+<defs>
+<lineargradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#D2F000" stop-opacity="0.3"></stop>
+<stop offset="100%" stop-color="#D2F000" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<path d="M0,280 L100,260 L200,265 L300,230 L400,225 L500,200 L600,180 L700,165 L800,140 V300 H0 Z" fill="url(#chartGradient)"></path>
+<path d="M0,280 L100,260 L200,265 L300,230 L400,225 L500,200 L600,180 L700,165 L800,140" fill="none" stroke="#D2F000" stroke-width="1.5"></path>
+<!-- Data Points -->
+<rect fill="#D2F000" height="4" width="4" x="98" y="258"></rect>
+<rect fill="#D2F000" height="4" width="4" x="198" y="263"></rect>
+<rect fill="#D2F000" height="4" width="4" x="298" y="228"></rect>
+<rect fill="#D2F000" height="4" width="4" x="398" y="223"></rect>
+<rect fill="#D2F000" height="4" width="4" x="498" y="198"></rect>
+<rect fill="#D2F000" height="4" width="4" x="598" y="178"></rect>
+<rect fill="#D2F000" height="4" width="4" x="698" y="163"></rect>
+<rect fill="#D2F000" height="4" width="4" x="796" y="138"></rect>
+</svg>
+<div class="flex justify-between mt-sm">
+<span class="font-label-caps text-[9px] text-on-surface-variant">JUL</span>
+<span class="font-label-caps text-[9px] text-on-surface-variant">AUG</span>
+<span class="font-label-caps text-[9px] text-on-surface-variant">SEP</span>
+<span class="font-label-caps text-[9px] text-on-surface-variant">OCT</span>
+<span class="font-label-caps text-[9px] text-on-surface-variant">NOV</span>
+</div>
+</div>
+</div>
+</div>
+<!-- 4. Volumen Total Semanal Bar Chart -->
+<div class="col-span-12 lg:col-span-4">
+<div class="bg-surface-container border border-outline-variant p-lg h-full">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-xs">LOAD INTENSITY</p>
+<h3 class="font-headline-md text-headline-md text-on-surface uppercase mb-xl">Volumen Semanal</h3>
+<div class="flex flex-col gap-lg h-[300px]">
+<div class="flex items-end justify-between flex-1 gap-xs">
+<!-- Bar 1 -->
+<div class="flex flex-col items-center flex-1 group">
+<div class="w-full bg-outline-variant/30 h-full relative">
+<div class="absolute bottom-0 w-full bg-primary-fixed opacity-40 group-hover:opacity-100 transition-all" style="height: 65%;"></div>
+</div>
+<span class="font-label-caps text-[8px] mt-xs text-on-surface-variant">W38</span>
+</div>
+<!-- Bar 2 -->
+<div class="flex flex-col items-center flex-1 group">
+<div class="w-full bg-outline-variant/30 h-full relative">
+<div class="absolute bottom-0 w-full bg-primary-fixed opacity-40 group-hover:opacity-100 transition-all" style="height: 72%;"></div>
+</div>
+<span class="font-label-caps text-[8px] mt-xs text-on-surface-variant">W39</span>
+</div>
+<!-- Bar 3 -->
+<div class="flex flex-col items-center flex-1 group">
+<div class="w-full bg-outline-variant/30 h-full relative">
+<div class="absolute bottom-0 w-full bg-primary-fixed opacity-40 group-hover:opacity-100 transition-all" style="height: 58%;"></div>
+</div>
+<span class="font-label-caps text-[8px] mt-xs text-on-surface-variant">W40</span>
+</div>
+<!-- Bar 4 -->
+<div class="flex flex-col items-center flex-1 group">
+<div class="w-full bg-outline-variant/30 h-full relative">
+<div class="absolute bottom-0 w-full bg-primary-fixed opacity-40 group-hover:opacity-100 transition-all" style="height: 85%;"></div>
+</div>
+<span class="font-label-caps text-[8px] mt-xs text-on-surface-variant">W41</span>
+</div>
+<!-- Bar 5 -->
+<div class="flex flex-col items-center flex-1 group">
+<div class="w-full bg-outline-variant/30 h-full relative">
+<div class="absolute bottom-0 w-full bg-primary-fixed opacity-40 group-hover:opacity-100 transition-all" style="height: 78%;"></div>
+</div>
+<span class="font-label-caps text-[8px] mt-xs text-on-surface-variant">W42</span>
+</div>
+<!-- Bar 6 -->
+<div class="flex flex-col items-center flex-1 group">
+<div class="w-full bg-outline-variant/30 h-full relative">
+<div class="absolute bottom-0 w-full bg-primary-fixed opacity-40 group-hover:opacity-100 transition-all" style="height: 92%;"></div>
+</div>
+<span class="font-label-caps text-[8px] mt-xs text-on-surface-variant">W43</span>
+</div>
+<!-- Bar 7 -->
+<div class="flex flex-col items-center flex-1 group">
+<div class="w-full bg-outline-variant/30 h-full relative">
+<div class="absolute bottom-0 w-full bg-primary-fixed opacity-40 group-hover:opacity-100 transition-all" style="height: 98%;"></div>
+</div>
+<span class="font-label-caps text-[8px] mt-xs text-on-surface-variant">W44</span>
+</div>
+<!-- Bar 8 (Active/Current) -->
+<div class="flex flex-col items-center flex-1 group">
+<div class="w-full bg-outline-variant/30 h-full relative">
+<div class="absolute bottom-0 w-full bg-primary-fixed opacity-100 neon-glow" style="height: 45%;"></div>
+</div>
+<span class="font-label-caps text-[8px] mt-xs text-primary-fixed">NOW</span>
+</div>
+</div>
+<div class="pt-md border-t border-outline-variant flex justify-between items-baseline">
+<span class="font-label-caps text-label-caps text-on-surface-variant">TOTAL TONNAGE</span>
+<div class="flex items-baseline gap-xs">
+<span class="font-data-display text-headline-md text-primary-fixed font-bold">24,402</span>
+<span class="font-label-caps text-[10px] text-primary-fixed">KG</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Data Strip (Data Density) -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-gutter mb-xl">
+<div class="bg-surface-container-low border-l-2 border-primary-fixed p-sm">
+<span class="font-label-caps text-[10px] text-on-surface-variant block uppercase">Intensity Avg</span>
+<span class="font-data-display text-body-lg text-primary-fixed">84.2%</span>
+</div>
+<div class="bg-surface-container-low border-l-2 border-primary-fixed p-sm">
+<span class="font-label-caps text-[10px] text-on-surface-variant block uppercase">Total Reps (Mo)</span>
+<span class="font-data-display text-body-lg text-primary-fixed">1,240</span>
+</div>
+<div class="bg-surface-container-low border-l-2 border-primary-fixed p-sm">
+<span class="font-label-caps text-[10px] text-on-surface-variant block uppercase">Est. Squat 1RM</span>
+<span class="font-data-display text-body-lg text-primary-fixed">192.5 KG</span>
+</div>
+<div class="bg-surface-container-low border-l-2 border-primary-fixed p-sm">
+<span class="font-label-caps text-[10px] text-on-surface-variant block uppercase">Weekly Load Δ</span>
+<span class="font-data-display text-body-lg text-primary-fixed text-primary-fixed">+4.2%</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Micro-interaction Script -->
+<script>
+        // Simple hover effect for chart bars
+        const bars = document.querySelectorAll('.group .bg-primary-fixed');
+        bars.forEach(bar => {
+            bar.parentElement.addEventListener('mouseenter', () => {
+                bar.classList.add('scale-x-105');
+            });
+            bar.parentElement.addEventListener('mouseleave', () => {
+                bar.classList.remove('scale-x-105');
+            });
+        });
+    </script>
+</body></html>

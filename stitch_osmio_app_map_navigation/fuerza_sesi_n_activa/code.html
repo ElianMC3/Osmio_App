@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OSMIO | Fuerza Training Log</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .inner-glow:active {
+            box-shadow: inset 0 0 8px 2px rgba(223, 255, 0, 0.3);
+        }
+        .neon-border-focus:focus-within {
+            border-color: #d2f000;
+            box-shadow: 0 0 0 1px #d2f000;
+        }
+        input:focus {
+            outline: none;
+        }
+        /* Custom Scrollbar for Tactical Feel */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #131313;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #353534;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #d2f000;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error": "#690005",
+                        "error-container": "#93000a",
+                        "on-secondary-fixed": "#001453",
+                        "inverse-primary": "#576500",
+                        "on-tertiary": "#213145",
+                        "tertiary-fixed-dim": "#b7c8e1",
+                        "on-secondary-container": "#a0b1ff",
+                        "tertiary-container": "#d3e4fe",
+                        "primary": "#ffffff",
+                        "outline-variant": "#454932",
+                        "surface": "#131313",
+                        "on-surface": "#e5e2e1",
+                        "primary-fixed": "#d2f000",
+                        "on-primary-fixed-variant": "#414c00",
+                        "on-primary-container": "#5d6b00",
+                        "on-error-container": "#ffdad6",
+                        "primary-container": "#d2f000",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface-container-low": "#1c1b1b",
+                        "on-secondary": "#002584",
+                        "surface-bright": "#3a3939",
+                        "secondary-fixed-dim": "#b8c4ff",
+                        "on-secondary-fixed-variant": "#173bab",
+                        "primary-fixed-dim": "#b8d300",
+                        "tertiary-fixed": "#d3e4fe",
+                        "surface-variant": "#353534",
+                        "surface-dim": "#131313",
+                        "secondary-fixed": "#dde1ff",
+                        "on-tertiary-fixed": "#0b1c30",
+                        "surface-container-highest": "#353534",
+                        "inverse-on-surface": "#313030",
+                        "secondary": "#b8c4ff",
+                        "on-surface-variant": "#c6c9ab",
+                        "surface-tint": "#b8d300",
+                        "error": "#ffb4ab",
+                        "background": "#131313",
+                        "tertiary": "#ffffff",
+                        "inverse-surface": "#e5e2e1",
+                        "outline": "#909378",
+                        "on-tertiary-container": "#56657c",
+                        "on-primary-fixed": "#191e00",
+                        "on-tertiary-fixed-variant": "#38485d",
+                        "secondary-container": "#173bab",
+                        "surface-container": "#201f1f",
+                        "on-primary": "#2c3400",
+                        "on-background": "#e5e2e1"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "lg": "24px",
+                        "xl": "40px",
+                        "unit": "4px",
+                        "md": "16px",
+                        "gutter": "12px",
+                        "container-margin": "20px",
+                        "sm": "8px",
+                        "xs": "4px"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["JetBrains Mono"],
+                        "headline-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "data-display": ["JetBrains Mono"],
+                        "display-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "500"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-sm": ["11px", {"lineHeight": "1", "fontWeight": "500"}],
+                        "data-display": ["24px", {"lineHeight": "1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800"}],
+                        "headline-md": ["20px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-lg min-h-screen">
+<!-- TopAppBar (From JSON) -->
+<header class="fixed top-0 w-full z-50 backdrop-blur-xl bg-surface/80 border-b border-surface-variant flex justify-between items-center px-container-margin h-16 w-full max-w-[1440px] left-1/2 -translate-x-1/2">
+<div class="font-data-display text-data-display text-primary tracking-tighter uppercase">OSMIO</div>
+<div class="hidden md:flex gap-md">
+<nav class="flex gap-md items-center">
+<a class="font-label-caps text-label-caps text-primary border-b-2 border-primary py-1 uppercase" href="#">Dashboard</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors py-1 uppercase" href="#">Training</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors py-1 uppercase" href="#">Analytics</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-colors">calendar_today</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-colors">settings</span>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-surface-variant">
+<img class="w-full h-full object-cover" data-alt="A gritty, high-contrast close-up portrait of a focused combat athlete in a dimly lit industrial gym. Dramatic side-lighting highlights facial features and sweat, emphasizing the tactical and intense atmosphere of the OSMIO brand. Deep blacks and sharp textures align with the dark-mode aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB__ZpQF8wH-tosME7lVNHmTb3poBZkWD5IkrePCyL489gF5dN7QvpiWn0juAQ2Bu0VDiiPPY0O8N97bsQZVqr39vGyIBH48rcOvVdCz2cRd374DU1ta0V3rw-aPVdMPksk5yKegTT4v_CpiKKBGF0l-riwoR0sN1Wn4K5WimWwAOZYGnrMbo_zezvQ6OqIBx2DTocoejgkX164ccBYN35aHrz8VnuoWYqyWrbVxQap2crvXjYSMMUH6g"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar (From JSON - Hidden on mobile) -->
+<aside class="h-screen w-64 fixed left-0 top-0 hidden lg:flex flex-col bg-surface-container border-r border-surface-variant py-lg z-40">
+<div class="px-md mb-xl">
+<div class="font-data-display text-data-display text-primary uppercase">OSMIO</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant mt-xs">Combat Intel</div>
+</div>
+<nav class="flex-grow flex flex-col">
+<a class="flex items-center gap-md font-label-caps text-label-caps text-on-surface-variant px-4 py-3 hover:bg-surface-bright transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                DASHBOARD
+            </a>
+<a class="flex items-center gap-md font-label-caps text-label-caps text-on-surface-variant px-4 py-3 hover:bg-surface-bright transition-all" href="#">
+<span class="material-symbols-outlined">fitness_center</span>
+                TRAINING
+            </a>
+<a class="flex items-center gap-md font-label-caps text-label-caps text-on-surface-variant px-4 py-3 hover:bg-surface-bright transition-all" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+                ANALYTICS
+            </a>
+<a class="flex items-center gap-md font-label-caps text-label-caps text-primary border-l-4 border-primary bg-surface-container-high px-4 py-3 active:inner-glow" href="#">
+<span class="material-symbols-outlined">add_box</span>
+                LOG SESSION
+            </a>
+</nav>
+<div class="px-md mb-md">
+<button class="w-full bg-primary-container text-on-primary-container font-label-caps text-label-caps py-md rounded-lg uppercase font-bold tracking-widest hover:opacity-90 transition-opacity">
+                LOG WORKOUT
+            </button>
+</div>
+<div class="mt-auto border-t border-surface-variant pt-md">
+<a class="flex items-center gap-md font-label-caps text-label-caps text-on-surface-variant px-4 py-3 hover:bg-surface-bright transition-all" href="#">
+<span class="material-symbols-outlined">help</span>
+                SUPPORT
+            </a>
+<a class="flex items-center gap-md font-label-caps text-label-caps text-on-surface-variant px-4 py-3 hover:bg-surface-bright transition-all" href="#">
+<span class="material-symbols-outlined">logout</span>
+                SIGN OUT
+            </a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="pt-24 pb-32 px-container-margin lg:pl-[280px] lg:pr-xl max-w-[1440px] mx-auto grid grid-cols-1 xl:grid-cols-12 gap-xl">
+<!-- Header Section -->
+<div class="xl:col-span-12 flex flex-col md:flex-row md:items-end justify-between gap-md mb-sm">
+<div>
+<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary uppercase tracking-tight">Sesión de Fuerza</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant mt-xs" id="current-date">CARGANDO FECHA...</p>
+</div>
+<div class="flex items-center gap-sm">
+<div class="bg-surface-container-high px-md py-sm rounded-lg border border-surface-variant">
+<span class="font-label-caps text-label-caps text-on-surface-variant block">STATUS</span>
+<span class="font-data-display text-primary uppercase text-sm">EN PROGRESO</span>
+</div>
+</div>
+</div>
+<!-- Exercise Log Area -->
+<div class="xl:col-span-8 space-y-md">
+<!-- Exercise Card: Back Squat -->
+<section class="bg-surface-container-low border border-surface-variant rounded-lg overflow-hidden group">
+<header class="p-md flex items-center justify-between border-b border-surface-variant cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary-fixed">fitness_center</span>
+<div>
+<h2 class="font-headline-md text-headline-md text-primary uppercase">Back Squat</h2>
+<p class="font-label-sm text-label-sm text-on-surface-variant">PIERNAS / COMPUESTO</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant transition-transform group-open:rotate-180">expand_more</span>
+</header>
+<div class="p-md bg-surface-container-lowest/50">
+<table class="w-full text-left border-separate border-spacing-y-2">
+<thead>
+<tr class="font-label-caps text-label-caps text-on-surface-variant">
+<th class="pb-xs pl-md w-12">SET</th>
+<th class="pb-xs">KG</th>
+<th class="pb-xs">REPS</th>
+<th class="pb-xs">RPE</th>
+<th class="pb-xs text-center w-12">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+</th>
+</tr>
+</thead>
+<tbody id="squat-sets">
+<!-- Set Row Template -->
+<tr class="bg-surface-container h-12 hover:bg-surface-container-high transition-colors group/row">
+<td class="text-center font-data-display text-on-surface-variant border-l-2 border-transparent group-focus-within/row:border-primary-fixed">1</td>
+<td>
+<input class="bg-transparent w-full text-primary font-data-display text-center border-none focus:ring-0" type="number" value="100"/>
+</td>
+<td>
+<input class="bg-transparent w-full text-primary font-data-display text-center border-none focus:ring-0" type="number" value="5"/>
+</td>
+<td>
+<input class="bg-transparent w-full text-primary font-data-display text-center border-none focus:ring-0" type="number" value="8"/>
+</td>
+<td class="text-center">
+<input checked="" class="w-5 h-5 rounded-sm bg-surface-variant border-surface-variant text-primary-fixed focus:ring-primary-fixed/20 checked:bg-primary-fixed" type="checkbox"/>
+</td>
+</tr>
+<tr class="bg-surface-container h-12 hover:bg-surface-container-high transition-colors group/row">
+<td class="text-center font-data-display text-on-surface-variant border-l-2 border-transparent group-focus-within/row:border-primary-fixed">2</td>
+<td>
+<input class="bg-transparent w-full text-primary font-data-display text-center border-none focus:ring-0" type="number" value="100"/>
+</td>
+<td>
+<input class="bg-transparent w-full text-primary font-data-display text-center border-none focus:ring-0" type="number" value="5"/>
+</td>
+<td>
+<input class="bg-transparent w-full text-primary font-data-display text-center border-none focus:ring-0" type="number" value="8.5"/>
+</td>
+<td class="text-center">
+<input class="w-5 h-5 rounded-sm bg-surface-variant border-surface-variant text-primary-fixed focus:ring-primary-fixed/20 checked:bg-primary-fixed" type="checkbox"/>
+</td>
+</tr>
+</tbody>
+</table>
+<button class="mt-md w-full py-sm font-label-caps text-label-caps text-on-surface-variant hover:text-primary-fixed border border-dashed border-surface-variant hover:border-primary-fixed transition-all rounded uppercase">
+                        + Agregar Set
+                    </button>
+</div>
+</section>
+<!-- Exercise Card: Bench Press -->
+<section class="bg-surface-container-low border border-surface-variant rounded-lg overflow-hidden group">
+<header class="p-md flex items-center justify-between border-b border-surface-variant cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary-fixed">fitness_center</span>
+<div>
+<h2 class="font-headline-md text-headline-md text-primary uppercase">Bench Press</h2>
+<p class="font-label-sm text-label-sm text-on-surface-variant">EMPUJE / COMPUESTO</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">expand_more</span>
+</header>
+<div class="p-md bg-surface-container-lowest/50">
+<table class="w-full text-left border-separate border-spacing-y-2">
+<thead>
+<tr class="font-label-caps text-label-caps text-on-surface-variant">
+<th class="pb-xs pl-md w-12">SET</th>
+<th class="pb-xs">KG</th>
+<th class="pb-xs">REPS</th>
+<th class="pb-xs">RPE</th>
+<th class="pb-xs text-center w-12">DONE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="bg-surface-container h-12 hover:bg-surface-container-high transition-colors group/row">
+<td class="text-center font-data-display text-on-surface-variant">1</td>
+<td><input class="bg-transparent w-full text-primary font-data-display text-center border-none focus:ring-0" placeholder="0" type="number"/></td>
+<td><input class="bg-transparent w-full text-primary font-data-display text-center border-none focus:ring-0" placeholder="0" type="number"/></td>
+<td><input class="bg-transparent w-full text-primary font-data-display text-center border-none focus:ring-0" placeholder="0" type="number"/></td>
+<td class="text-center"><input class="w-5 h-5 rounded-sm bg-surface-variant border-surface-variant text-primary-fixed" type="checkbox"/></td>
+</tr>
+</tbody>
+</table>
+<button class="mt-md w-full py-sm font-label-caps text-label-caps text-on-surface-variant hover:text-primary-fixed border border-dashed border-surface-variant hover:border-primary-fixed transition-all rounded uppercase">
+                        + Agregar Set
+                    </button>
+</div>
+</section>
+<!-- Global Action -->
+<button class="w-full py-xl border-2 border-dashed border-surface-variant bg-surface-container-low/30 hover:bg-surface-container-low hover:border-primary-fixed text-on-surface-variant hover:text-primary-fixed transition-all rounded-lg flex flex-col items-center justify-center gap-sm">
+<span class="material-symbols-outlined text-3xl">add_box</span>
+<span class="font-label-caps text-label-caps uppercase tracking-widest">+ Agregar Ejercicio</span>
+</button>
+</div>
+<!-- Sidebar Stats -->
+<div class="xl:col-span-4 space-y-md">
+<!-- Session Timer Card -->
+<div class="bg-surface-container-high border border-surface-variant rounded-lg p-lg relative overflow-hidden">
+<!-- Decorative background shader for high-performance feel -->
+
+<div class="relative z-10">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Tiempo de Sesión</span>
+<div class="font-display-lg text-display-lg text-primary-fixed mt-xs tabular-nums" id="session-timer">00:42:15</div>
+<div class="mt-xl grid grid-cols-2 gap-md">
+<div class="bg-surface-container rounded p-md border border-surface-variant">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase block mb-xs">VOLUMEN TOTAL</span>
+<div class="font-data-display text-primary text-xl">14,250 <span class="text-xs text-on-surface-variant">KG</span></div>
+</div>
+<div class="bg-surface-container rounded p-md border border-surface-variant">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase block mb-xs">INTENSIDAD</span>
+<div class="font-data-display text-primary text-xl">82% <span class="text-xs text-on-surface-variant">AVG</span></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Volume Chart Card -->
+<div class="bg-surface-container-low border border-surface-variant rounded-lg p-lg">
+<h3 class="font-label-caps text-label-caps text-primary uppercase mb-lg">Distribución de Carga</h3>
+<div class="space-y-md">
+<div>
+<div class="flex justify-between font-label-sm text-label-sm mb-xs">
+<span class="text-on-surface-variant">PIERNA</span>
+<span class="text-primary">6,500 KG</span>
+</div>
+<div class="h-1 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary-fixed w-[45%]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-label-sm text-label-sm mb-xs">
+<span class="text-on-surface-variant">EMPUJE</span>
+<span class="text-primary">4,200 KG</span>
+</div>
+<div class="h-1 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary-fixed w-[28%] opacity-70"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-label-sm text-label-sm mb-xs">
+<span class="text-on-surface-variant">TRACCIÓN</span>
+<span class="text-primary">3,550 KG</span>
+</div>
+<div class="h-1 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary-fixed w-[24%] opacity-40"></div>
+</div>
+</div>
+</div>
+<div class="mt-xl pt-lg border-t border-surface-variant">
+<button class="w-full flex items-center justify-center gap-sm font-label-caps text-label-caps text-primary-fixed hover:bg-primary-fixed/10 py-sm rounded transition-colors">
+<span class="material-symbols-outlined text-sm">analytics</span>
+                        VER HISTORIAL COMPLETO
+                    </button>
+</div>
+</div>
+<!-- Profile Widget -->
+<div class="bg-surface-container border border-surface-variant rounded-lg p-md flex items-center gap-md">
+<div class="w-12 h-12 rounded-lg bg-surface-variant overflow-hidden border border-surface-variant">
+<img class="w-full h-full object-cover grayscale" data-alt="A gritty macro shot of calloused hands wrapping a boxing bandage in a dimly lit training facility. High-contrast monochromatic look with deep shadows, emphasizing hard work and athletic dedication." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_TzvH_80x42Ik9YssdUUJ_Ujh69KAC5t87CkyD6sY1v-kjezJa_zP1YbH9MI0HcjoPsn9xkugxdzlPTXL2RuWjYEvEDoOabIXwMTeoQmt2bT5Skb6gIcQAkQL0gj23ci1j4K66IvinNxu8ZS_v0qf_oiLIfm3KUb_eLGRYfAptDMn6FMbkOpNoTSlK0oOD5TOr6iqYGv6_LgbJwaFInHwliC47G22W7GGo-t4Dz7qpKArdI5CSFlsIA"/>
+</div>
+<div>
+<div class="font-label-caps text-label-caps text-primary">ELITE_LEVEL_3</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">Sig. Sesión: Mañana 08:00</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (From JSON - Only on mobile) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 lg:hidden backdrop-blur-xl bg-surface/90 border-t border-surface-variant flex justify-around items-center px-4 pb-4 h-20">
+<a class="text-on-surface-variant pt-2 flex flex-col items-center gap-1" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="text-primary border-t-2 border-primary pt-2 flex flex-col items-center gap-1 active:scale-110 transition-transform" href="#">
+<span class="material-symbols-outlined">sports_kabaddi</span>
+<span class="font-label-sm text-label-sm">Workouts</span>
+</a>
+<a class="text-on-surface-variant pt-2 flex flex-col items-center gap-1" href="#">
+<span class="material-symbols-outlined">insights</span>
+<span class="font-label-sm text-label-sm">Stats</span>
+</a>
+<a class="text-on-surface-variant pt-2 flex flex-col items-center gap-1" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>
+<script>
+        // Simple Real-time interactivity
+        
+        // Timer Logic
+        let seconds = 2535; // Starting from 42:15 for demo
+        const timerElement = document.getElementById('session-timer');
+        
+        setInterval(() => {
+            seconds++;
+            const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+            const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            timerElement.textContent = `${h}:${m}:${s}`;
+        }, 1000);
+
+        // Current Date
+        const dateEl = document.getElementById('current-date');
+        const options = { day: 'numeric', month: 'long', year: 'numeric' };
+        dateEl.textContent = new Date().toLocaleDateString('es-ES', options).toUpperCase();
+
+        // Highlighting active inputs on container focus
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', () => {
+                input.closest('tr').classList.add('bg-surface-container-highest');
+            });
+            input.addEventListener('blur', () => {
+                input.closest('tr').classList.remove('bg-surface-container-highest');
+            });
+        });
+
+        // Add Set functionality (Simplified Simulation)
+        function addRow(tbodyId) {
+            const tbody = document.getElementById(tbodyId);
+            const rowCount = tbody.rows.length + 1;
+            const newRow = `
+                <tr class="bg-surface-container h-12 hover:bg-surface-container-high transition-colors group/row">
+                    <td class="text-center font-data-display text-on-surface-variant">${rowCount}</td>
+                    <td><input type="number" placeholder="0" class="bg-transparent w-full text-primary font-data-display text-center border-none focus:ring-0"></td>
+                    <td><input type="number" placeholder="0" class="bg-transparent w-full text-primary font-data-display text-center border-none focus:ring-0"></td>
+                    <td><input type="number" placeholder="0" class="bg-transparent w-full text-primary font-data-display text-center border-none focus:ring-0"></td>
+                    <td class="text-center"><input type="checkbox" class="w-5 h-5 rounded-sm bg-surface-variant border-surface-variant text-primary-fixed"></td>
+                </tr>
+            `;
+            tbody.insertAdjacentHTML('beforeend', newRow);
+        }
+    </script>
+</body></html>

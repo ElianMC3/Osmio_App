@@ -1,0 +1,378 @@
+<!DOCTYPE html><html lang="en" class="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;family=JetBrains+Mono:wght@500;600&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet"><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">try{
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#d3e4fe",
+                    "on-secondary-fixed": "#001453",
+                    "inverse-primary": "#576500",
+                    "inverse-on-surface": "#313030",
+                    "error-container": "#93000a",
+                    "on-secondary-fixed-variant": "#173bab",
+                    "surface-container-lowest": "#0e0e0e",
+                    "on-primary": "#2c3400",
+                    "secondary-fixed": "#dde1ff",
+                    "outline-variant": "#454932",
+                    "tertiary": "#ffffff",
+                    "surface-container": "#201f1f",
+                    "surface-bright": "#3a3939",
+                    "primary": "#ffffff",
+                    "on-secondary": "#002584",
+                    "on-error": "#690005",
+                    "on-surface-variant": "#c6c9ab",
+                    "surface-dim": "#131313",
+                    "primary-container": "#d2f000",
+                    "surface-container-low": "#1c1b1b",
+                    "on-background": "#e5e2e1",
+                    "surface-container-high": "#2a2a2a",
+                    "on-error-container": "#ffdad6",
+                    "inverse-surface": "#e5e2e1",
+                    "on-primary-fixed": "#191e00",
+                    "tertiary-container": "#d3e4fe",
+                    "surface": "#131313",
+                    "on-tertiary": "#213145",
+                    "surface-tint": "#b8d300",
+                    "primary-fixed": "#d2f000",
+                    "secondary-container": "#173bab",
+                    "secondary-fixed-dim": "#b8c4ff",
+                    "on-tertiary-fixed-variant": "#38485d",
+                    "on-primary-fixed-variant": "#414c00",
+                    "error": "#ffb4ab",
+                    "surface-container-highest": "#353534",
+                    "tertiary-fixed-dim": "#b7c8e1",
+                    "outline": "#909378",
+                    "on-secondary-container": "#a0b1ff",
+                    "surface-variant": "#353534",
+                    "secondary": "#b8c4ff",
+                    "on-tertiary-fixed": "#0b1c30",
+                    "on-surface": "#e5e2e1",
+                    "on-tertiary-container": "#56657c",
+                    "primary-fixed-dim": "#b8d300",
+                    "on-primary-container": "#5d6b00",
+                    "background": "#131313",
+                    "neon-accent": "#dfff00"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "lg": "24px",
+                    "container-margin": "20px",
+                    "md": "16px",
+                    "sm": "8px",
+                    "gutter": "12px",
+                    "xs": "4px",
+                    "xl": "40px",
+                    "unit": "4px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Inter"],
+                    "label-caps": ["JetBrains Mono"],
+                    "headline-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "data-display": ["JetBrains Mono"],
+                    "label-sm": ["Inter"]
+            }
+          }
+        }
+      }
+    }catch(_e){}</script><meta charset="utf-8"></head><body class="flex min-h-screen">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-surface-container-low border-r border-outline-variant flex flex-col h-screen py-xl px-md z-[60]">
+<div class="mb-xl">
+<h1 class="font-headline-lg text-primary italic text-3xl tracking-tighter">STRYKER_01</h1>
+<p class="font-label-caps text-on-surface-variant text-xs opacity-70">ELITE TIER OPERATOR</p>
+</div>
+<nav class="flex-1 space-y-xs">
+<a href="#" class="flex items-center gap-md p-sm font-label-caps text-on-surface-variant opacity-70 hover:bg-surface-bright hover:text-primary transition-all active:translate-x-1">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="">Dashboard</span>
+</a>
+<a href="#" class="flex items-center gap-md p-sm font-label-caps text-on-surface-variant opacity-70 hover:bg-surface-bright hover:text-primary transition-all active:translate-x-1">
+<span class="material-symbols-outlined">fitness_center</span>
+<span class="">Training</span>
+</a>
+<a href="#" class="flex items-center gap-md p-sm font-label-caps text-on-surface-variant opacity-70 hover:bg-surface-bright hover:text-primary transition-all active:translate-x-1">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="">Analytics</span>
+</a>
+<a href="#" class="flex items-center gap-md p-sm font-label-caps text-on-surface-variant opacity-70 hover:bg-surface-bright hover:text-primary transition-all active:translate-x-1">
+<span class="material-symbols-outlined">groups</span>
+<span class="">Fighters</span>
+</a>
+<!-- Active Profile Tab -->
+
+</nav>
+<div class="mt-auto space-y-md">
+<div class="p-md border border-outline-variant bg-primary/5">
+<p class="font-label-caps text-[10px] text-primary mb-xs">MEMBERSHIP</p>
+<button class="w-full bg-primary-container text-on-primary-container font-label-caps py-xs text-xs hover:brightness-110 active:scale-95 transition-all">GO_LITE</button>
+</div>
+<div class="space-y-xs">
+<a href="#" class="flex items-center gap-md p-sm font-label-caps text-on-surface-variant opacity-70 hover:text-primary"><span class="material-symbols-outlined">help_outline</span> Support</a>
+<a class="flex items-center gap-md p-sm font-label-caps text-primary border-r-4 border-primary bg-primary/10 transition-all active:translate-x-1" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="">Profile</span>
+</a><a href="#" class="flex items-center gap-md p-sm font-label-caps text-on-surface-variant opacity-70 hover:text-error"><span class="material-symbols-outlined">logout</span> Sign Out</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-64 flex flex-col">
+<!-- TopAppBar -->
+<header class="fixed top-0 right-0 left-64 z-50 bg-surface/80 backdrop-blur-xl border-b border-outline-variant flex justify-between items-center px-lg py-sm">
+<div class="flex items-center gap-md">
+<span class="font-label-caps text-headline-md tracking-tighter text-primary">OSMIO</span>
+<span class="h-4 w-px bg-outline-variant"></span>
+<span class="font-label-caps text-xs text-on-surface-variant">SECURE_PROFILE_PORTAL</span>
+</div>
+<div class="flex items-center gap-lg">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary cursor-pointer transition-colors">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary cursor-pointer transition-colors">settings</span>
+</div>
+</div>
+</header>
+<!-- Canvas -->
+<section class="mt-16 p-lg space-y-xl max-w-[1200px] mx-auto w-full">
+<div class="flex items-end justify-between border-b border-outline-variant pb-md">
+<div>
+<h2 class="font-headline-lg text-primary text-3xl uppercase tracking-tighter">Mission Settings</h2>
+<p class="font-label-caps text-xs text-on-surface-variant">ID: 882-ALPHA-OSMIO</p>
+</div>
+<button class="bg-primary-container text-on-primary-container font-label-caps px-lg py-sm text-sm hover:brightness-110 active:scale-95 transition-all flex items-center gap-sm">
+<span class="material-symbols-outlined text-base">save</span> SAVE_CHANGES
+                </button>
+</div>
+<!-- Tactical Grid -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-lg">
+<!-- 1. OPERATOR BIO -->
+<div class="md:col-span-5 tactical-border bg-surface-container p-lg space-y-lg relative overflow-hidden">
+<div class="scanline-overlay absolute inset-0 opacity-20"></div>
+<div class="relative z-10 flex flex-col gap-lg">
+<div class="flex items-center gap-lg">
+<div class="relative group">
+<div class="w-32 h-32 bg-surface-container-high border-2 border-dashed border-outline hover:border-primary transition-all cursor-pointer overflow-hidden">
+<div class="w-full h-full opacity-50 grayscale contrast-125 bg-cover bg-center" data-alt="A gritty tech-noir style photographic portrait of a combat athlete in shadow, lit by neon green highlights, focused and intense expression, cinematic low-key lighting, professional sports photography style." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuACRxn1DqjJ2_79yGn7nNTrvgg-87eDZ6GocupBY67fRXUies6IlLZ1Ofvx8evF7t9M6_0l_cIdeWUAw8Rhc-2K8WqFuP6AoaMoqvax_x7vGPYVxiMq_TeM9wifKSfwNLErPhXzmCHDeDVgf-CRUL0JqNqJb6ptffSRCkuQZakfyKAGhtAxA5lXhRtJskRo3H9l7AKTjM4Q-QOwvi-PuN1MHMXjGHfoJghfVpWwgeWD2OozynbW2x05Tw')"></div>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black/60 transition-opacity">
+<span class="material-symbols-outlined text-primary text-3xl">upload</span>
+</div>
+</div>
+<div class="absolute -bottom-2 -right-2 bg-primary-container text-on-primary-container px-2 py-0.5 font-label-caps text-[10px]">AVATAR_01</div>
+</div>
+<div class="flex-1 space-y-sm">
+<label class="font-label-caps text-[10px] text-on-surface-variant block">CALLSIGN</label>
+<input class="w-full bg-surface-container-highest border border-outline-variant p-sm font-data-display text-primary focus:border-primary outline-none text-sm" type="text" value="STRYKER_01">
+</div>
+</div>
+<div class="grid grid-cols-3 gap-md">
+<div class="space-y-xs">
+<label class="font-label-caps text-[10px] text-on-surface-variant block">WEIGHT</label>
+<div class="relative">
+<input class="w-full bg-surface-container-highest border border-outline-variant p-sm font-data-display text-primary focus:border-primary outline-none text-sm pr-10" type="text" value="84.5">
+<span class="absolute right-2 top-1/2 -translate-y-1/2 font-label-caps text-[10px] text-on-surface-variant">KG</span>
+</div>
+</div>
+<div class="space-y-xs">
+<label class="font-label-caps text-[10px] text-on-surface-variant block">HEIGHT</label>
+<div class="relative">
+<input class="w-full bg-surface-container-highest border border-outline-variant p-sm font-data-display text-primary focus:border-primary outline-none text-sm pr-10" type="text" value="188">
+<span class="absolute right-2 top-1/2 -translate-y-1/2 font-label-caps text-[10px] text-on-surface-variant">CM</span>
+</div>
+</div>
+<div class="space-y-xs">
+<label class="font-label-caps text-[10px] text-on-surface-variant block">AGE</label>
+<input class="w-full bg-surface-container-highest border border-outline-variant p-sm font-data-display text-primary focus:border-primary outline-none text-sm" type="text" value="28">
+</div>
+</div>
+</div>
+</div>
+<!-- 2. COMBAT PARAMETERS -->
+<div class="md:col-span-7 tactical-border bg-surface-container p-lg space-y-lg relative overflow-hidden">
+<div class="scanline-overlay absolute inset-0 opacity-20"></div>
+<div class="relative z-10">
+<div class="flex justify-between items-start mb-lg">
+<h3 class="font-label-caps text-xs text-primary bg-primary/10 px-sm py-xs inline-block">COMBAT_PARAMETERS</h3>
+<div class="text-right">
+<p class="font-label-caps text-[10px] text-on-surface-variant">RANK_STATUS</p>
+<p class="font-data-display text-primary text-xl tracking-widest">LVL 42 APEX</p>
+</div>
+</div>
+<div class="space-y-lg">
+<div>
+<label class="font-label-caps text-[10px] text-on-surface-variant block mb-sm">PRIMARY DISCIPLINE</label>
+<div class="grid grid-cols-3 gap-0 border border-outline-variant p-xs">
+<button class="py-sm font-label-caps text-xs text-on-surface-variant hover:text-primary transition-colors border-r border-outline-variant">STRIKING</button>
+<button class="py-sm font-label-caps text-xs text-on-surface-variant hover:text-primary transition-colors border-r border-outline-variant">GRAPPLING</button>
+<button class="py-sm font-label-caps text-xs text-primary bg-primary-container/10 border-b-2 border-primary">HYBRID</button>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-lg">
+<div>
+<label class="font-label-caps text-[10px] text-on-surface-variant block mb-sm">STANCE_PROTOCOL</label>
+<select class="w-full bg-surface-container-highest border border-outline-variant p-sm font-label-caps text-primary text-xs focus:border-primary outline-none appearance-none">
+<option>ORTHODOX</option>
+<option>SOUTHPAW</option>
+<option>SWITCH</option>
+</select>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex-1">
+<p class="font-label-caps text-[10px] text-on-surface-variant">BIOMETRIC_SYNC</p>
+<div class="w-full h-1 bg-outline-variant mt-xs relative">
+<div class="absolute top-0 left-0 h-full w-4/5 bg-primary shadow-[0_0_8px_#dfff00]"></div>
+</div>
+</div>
+<span class="font-data-display text-primary text-xs mt-4">80%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- 3. MISSION OBJECTIVES -->
+<div class="md:col-span-8 tactical-border bg-surface-container p-lg space-y-lg">
+<h3 class="font-label-caps text-xs text-primary bg-primary/10 px-sm py-xs inline-block mb-md">MISSION_OBJECTIVES</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-xl">
+<div class="space-y-lg">
+<div class="space-y-sm">
+<div class="flex justify-between items-end">
+<label class="font-label-caps text-[10px] text-on-surface-variant">WEEKLY SESSION TARGETS</label>
+<span class="font-data-display text-primary text-lg" id="session-count">06</span>
+</div>
+<input class="w-full" max="14" min="1" oninput="document.getElementById('session-count').innerText = this.value.padStart(2, '0')" type="range" value="6">
+<div class="flex justify-between font-label-caps text-[8px] text-outline">
+<span class="">01 MIN</span>
+<span class="">14 MAX</span>
+</div>
+</div>
+<div class="space-y-sm">
+<label class="font-label-caps text-[10px] text-on-surface-variant block">TARGET INTENSITY (RPE FOCUS)</label>
+<div class="flex gap-xs">
+<button class="flex-1 h-8 bg-surface-container-highest border border-outline-variant hover:border-primary transition-all font-data-display text-xs text-on-surface-variant">7</button>
+<button class="flex-1 h-8 bg-surface-container-highest border border-outline-variant hover:border-primary transition-all font-data-display text-xs text-on-surface-variant">8</button>
+<button class="flex-1 h-8 bg-primary-container border border-primary font-data-display text-xs text-on-primary-container">9</button>
+<button class="flex-1 h-8 bg-surface-container-highest border border-outline-variant hover:border-primary transition-all font-data-display text-xs text-on-surface-variant">10</button>
+</div>
+</div>
+</div>
+<div class="space-y-md p-md bg-surface-container-highest/30 border-l-2 border-primary">
+<p class="font-label-caps text-[10px] text-on-surface-variant">RECOVERY_THRESHOLDS</p>
+<div class="space-y-sm">
+<div class="flex justify-between items-center">
+<span class="font-label-caps text-xs text-primary">MIN_SLEEP</span>
+<input class="w-20 bg-transparent border-b border-outline-variant focus:border-primary outline-none font-data-display text-right text-sm" type="text" value="08:00">
+</div>
+<div class="flex justify-between items-center">
+<span class="font-label-caps text-xs text-primary">HYDRATION_GOAL</span>
+<div class="flex items-center gap-xs">
+<input class="w-12 bg-transparent border-b border-outline-variant focus:border-primary outline-none font-data-display text-right text-sm" type="text" value="4.5">
+<span class="font-label-caps text-[10px] text-outline">LITERS</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- 4. SYSTEM TELEMETRY -->
+<div class="md:col-span-4 tactical-border bg-surface-container-low p-lg space-y-md border border-outline-variant/30">
+<h3 class="font-label-caps text-xs text-primary bg-primary/10 px-sm py-xs inline-block">SYSTEM_TELEMETRY</h3>
+<div class="space-y-md">
+<div class="flex justify-between items-center group cursor-pointer p-sm hover:bg-surface-container-highest transition-colors">
+<span class="font-label-caps text-xs text-on-surface-variant group-hover:text-primary">DATA_UNITS</span>
+<span class="font-label-caps text-xs text-primary underline underline-offset-4">METRIC</span>
+</div>
+<div class="space-y-sm px-sm">
+<span class="font-label-caps text-[10px] text-on-surface-variant block opacity-50 uppercase">Notifications</span>
+<div class="flex justify-between items-center">
+<span class="font-label-caps text-xs text-on-surface">COMBAT_ALERTS</span>
+<div class="w-8 h-4 bg-primary-container relative cursor-pointer">
+<div class="absolute right-0.5 top-0.5 w-3 h-3 bg-on-primary-container"></div>
+</div>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-label-caps text-xs text-on-surface">HYDRATION_REMINDERS</span>
+<div class="w-8 h-4 bg-outline-variant relative cursor-pointer">
+<div class="absolute left-0.5 top-0.5 w-3 h-3 bg-surface-container"></div>
+</div>
+</div>
+</div>
+<div class="pt-sm px-sm">
+<label class="font-label-caps text-[10px] text-on-surface-variant block opacity-50 mb-sm">UI_LANGUAGE</label>
+<div class="flex gap-md">
+<label class="flex items-center gap-sm cursor-pointer">
+<input checked="" class="hidden peer" name="lang" type="radio">
+<div class="w-3 h-3 border border-primary rounded-full flex items-center justify-center peer-checked:bg-primary"></div>
+<span class="font-label-caps text-xs text-primary">ENGLISH</span>
+</label>
+<label class="flex items-center gap-sm cursor-pointer">
+<input class="hidden peer" name="lang" type="radio">
+<div class="w-3 h-3 border border-outline-variant rounded-full flex items-center justify-center peer-checked:bg-primary"></div>
+<span class="font-label-caps text-xs text-on-surface-variant">SPANISH</span>
+</label>
+</div>
+</div>
+</div>
+<div class="pt-lg">
+<button class="w-full bg-transparent border border-outline-variant text-on-surface-variant font-label-caps py-sm text-xs hover:border-primary hover:text-primary transition-all active:scale-95">UPDATE_INTEL</button>
+</div>
+</div>
+</div>
+<!-- Bottom Disclaimer/Status -->
+<div class="flex justify-between items-center font-label-caps text-[10px] text-outline px-sm">
+<div class="flex gap-lg">
+<span class="">SERVER: OSC_NODE_09</span>
+<span class="">LATENCY: 12ms</span>
+</div>
+<span class="">© 2024 OSMIO TACTICAL SYSTEMS</span>
+</div>
+</section>
+</main>
+<!-- Floating Atmosphere -->
+<div class="fixed inset-0 pointer-events-none z-[-1] opacity-5">
+
+</div>
+<script>
+        // Micro-interactions for buttons
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mouseenter', () => {
+                // Future implementation: Play subtle tech beep sound
+            });
+        });
+
+        // Simple tab behavior for Discipline selector
+        const disciplineBtns = document.querySelectorAll('.grid-cols-3 button');
+        disciplineBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                disciplineBtns.forEach(b => {
+                    b.classList.remove('text-primary', 'bg-primary-container/10', 'border-b-2', 'border-primary');
+                    b.classList.add('text-on-surface-variant');
+                });
+                btn.classList.add('text-primary', 'bg-primary-container/10', 'border-b-2', 'border-primary');
+                btn.classList.remove('text-on-surface-variant');
+            });
+        });
+
+        // Toggle logic for simple switches
+        document.querySelectorAll('.w-8.h-4').forEach(toggle => {
+            toggle.addEventListener('click', () => {
+                const isActive = toggle.classList.contains('bg-primary-container');
+                if(isActive) {
+                    toggle.classList.remove('bg-primary-container');
+                    toggle.classList.add('bg-outline-variant');
+                    toggle.querySelector('div').classList.remove('right-0.5', 'bg-on-primary-container');
+                    toggle.querySelector('div').classList.add('left-0.5', 'bg-surface-container');
+                } else {
+                    toggle.classList.add('bg-primary-container');
+                    toggle.classList.remove('bg-outline-variant');
+                    toggle.querySelector('div').classList.add('right-0.5', 'bg-on-primary-container');
+                    toggle.querySelector('div').classList.remove('left-0.5', 'bg-surface-container');
+                }
+            });
+        });
+    </script>
+
+</body></html>
