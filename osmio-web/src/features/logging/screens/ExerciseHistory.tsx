@@ -12,7 +12,7 @@ export default function ExerciseHistory() {
   const navigate = useNavigate()
 
   return (
-    <div className="min-h-screen bg-[#050705] p-6">
+    <div className="min-h-screen p-6">
       <header className="mb-6">
         <GreenButton
           onClick={() => navigate(-1)}

@@ -114,7 +114,7 @@ export default function StrengthActiveSession() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-[#050705] pb-32">
+    <div className="min-h-screen pb-32">
       <main className="px-5 pt-6 space-y-5">
         {/* Header */}
         <div className="space-y-3">

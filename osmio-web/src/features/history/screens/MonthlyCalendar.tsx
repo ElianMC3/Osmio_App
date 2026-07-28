@@ -102,7 +102,7 @@ function DayDetailPanel({ day, year, month, onClose }: DayDetailPanelProps) {
           ))
         ) : (
           <div className="flex-1 flex items-center justify-center border border-dashed border-green/20 p-lg opacity-40">
-            <span className="font-label-caps text-[10px]">SIN SESIONES REGISTRADAS</span>
+            <span className="font-label-caps text-[15px] text-on-surface">SIN SESIONES REGISTRADAS</span>
           </div>
         )}
         <GreenButton
@@ -158,7 +158,7 @@ export default function MonthlyCalendar() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050705] pb-20">
+    <div className="min-h-screen pb-20">
       {/* Header */}
       <header className="sticky top-0 z-30 flex items-center gap-md px-md h-14 bg-panel/80 backdrop-blur-xl border-b border-green/20">
         <button
@@ -172,7 +172,7 @@ export default function MonthlyCalendar() {
           <h1 className="font-headline-md text-headline-md text-text-green leading-tight">
             Historial - Calendario
           </h1>
-          <span className="font-label-caps text-[10px] text-text-muted">
+          <span className="font-label-caps text-[12px] text-text-muted">
             Registro de entrenamientos
           </span>
         </div>

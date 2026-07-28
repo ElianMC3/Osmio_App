@@ -50,7 +50,7 @@ export default function ConsistencyMap() {
   ]
 
   return (
-    <div className="min-h-screen bg-[#050705] pb-20">
+    <div className="min-h-screen pb-20">
       {/* Header */}
       <header className="sticky top-0 z-30 flex items-center gap-md px-md h-14 bg-panel/80 backdrop-blur-xl border-b border-green/20">
         <button

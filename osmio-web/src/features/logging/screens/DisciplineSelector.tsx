@@ -61,7 +61,7 @@ export default function DisciplineSelector() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050705] pb-32">
+    <div className="min-h-screen pb-32">
       <main className="px-5 pt-6 space-y-6">
         <div className="space-y-2">
           <p className="font-label-caps text-[12px] leading-none tracking-[0.1em] text-text-muted flex items-center gap-1">

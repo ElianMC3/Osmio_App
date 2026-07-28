@@ -52,16 +52,17 @@ export const GreenCard = forwardRef<HTMLDivElement, GreenCardProps>(
           ${interactiveClasses}
           ${glassClasses}
           relative overflow-hidden
-          ${effects ? 'group' : ''}
           ${className}
         `}
         {...props}
       >
         {effects && (
           <span
-            className="absolute inset-0 pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+            className="absolute left-0 right-0 pointer-events-none z-10"
             style={{
-              background: 'linear-gradient(180deg, transparent, rgba(199,217,136,0.03), transparent)',
+              top: '-60px',
+              height: '50px',
+              background: 'linear-gradient(180deg, transparent, rgba(199,217,136,0.28), transparent)',
               animation: 'greenScanMove 4s infinite linear',
             }}
           />

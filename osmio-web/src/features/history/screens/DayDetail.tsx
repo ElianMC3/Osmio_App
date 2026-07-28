@@ -65,7 +65,7 @@ export default function DayDetail() {
     : '24 OCT 2023'
 
   return (
-    <div className="min-h-screen bg-[#050705] pb-20">
+    <div className="min-h-screen pb-20">
       {/* Header */}
       <header className="sticky top-0 z-30 flex items-center justify-between px-md h-14 bg-panel/80 backdrop-blur-xl border-b border-green/20">
         <div className="flex items-center gap-md">
