@@ -1,5 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { GreenCard } from '@/design-system/components/GreenCard'
+import { GreenButton } from '@/design-system/components/GreenButton'
+import { GreenProgress } from '@/design-system/components/GreenProgress'
+import { GreenTag } from '@/design-system/components/GreenTag'
 type Chip = 'technical' | 'physical' | 'sparring'
 
 const weeklyBars = [
@@ -23,28 +27,28 @@ export default function StrengthAnalysis() {
   const [activeChip, setActiveChip] = useState<Chip>('physical')
 
   return (
-    <div className="min-h-screen bg-surface pb-20">
+    <div className="min-h-screen bg-[#050705] pb-20">
       {/* Header */}
-      <header className="sticky top-0 z-30 flex items-center gap-md px-md h-14 bg-surface/80 backdrop-blur-xl border-b border-outline-variant">
+      <header className="sticky top-0 z-30 flex items-center gap-md px-md h-14 bg-panel/80 backdrop-blur-xl border-b border-green/20">
         <button
           onClick={() => navigate(-1)}
           aria-label="Volver"
-          className="material-symbols-outlined text-on-surface-variant hover:text-primary-fixed transition-colors duration-200 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer"
+          className="material-symbols-outlined text-text-muted hover:text-green transition-colors duration-200 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green cursor-pointer"
         >
           arrow_back
         </button>
         <div className="flex flex-col">
-          <h1 className="font-headline-md text-headline-md text-on-surface leading-tight">
+          <h1 className="font-headline-md text-headline-md text-text-green leading-tight">
             Análisis - Fuerza
           </h1>
-          <span className="font-label-caps text-[10px] text-on-surface-variant">
+          <span className="font-label-caps text-[10px] text-text-muted">
             Jun 30 – Jul 06, 2026
           </span>
         </div>
       </header>
 
       {/* Tab Navigation */}
-      <div className="flex items-center border-b border-outline-variant px-md">
+      <div className="flex items-center border-b border-green/20 px-md">
         {([
           { key: 'fuerza', label: 'Fuerza', path: '/analysis/strength' },
           { key: 'carga', label: 'Carga de Combate', path: '/analysis/combat' },
@@ -53,10 +57,10 @@ export default function StrengthAnalysis() {
           <button
             key={tab.key}
             onClick={() => navigate(tab.path)}
-            className={`pb-sm px-md font-label-caps text-label-caps transition-all duration-200 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer ${
+            className={`pb-sm px-md font-label-caps text-label-caps transition-all duration-200 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green cursor-pointer ${
               tab.key === 'fuerza'
-                ? 'text-primary-fixed border-b-2 border-primary-fixed'
-                : 'text-on-surface-variant hover:text-on-surface'
+                ? 'text-green border-b-2 border-green'
+                : 'text-text-muted hover:text-text-green'
             }`}
           >
             {tab.label}
@@ -72,99 +76,99 @@ export default function StrengthAnalysis() {
             { key: 'physical', label: 'Physical' },
             { key: 'sparring', label: 'Sparring' },
           ] as const).map((chip) => (
-            <button
+            <GreenButton
               key={chip.key}
+              variant={activeChip === chip.key ? 'primary' : 'default'}
+              size="sm"
+              effects
               onClick={() => setActiveChip(chip.key)}
-              className={`px-md py-xs font-label-caps text-label-caps border transition-all duration-200 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer ${
-                activeChip === chip.key
-                  ? 'bg-primary-fixed/10 border-primary-fixed text-primary-fixed'
-                  : 'border-outline-variant text-on-surface-variant hover:text-on-surface'
-              }`}
             >
               {chip.label}
-            </button>
+            </GreenButton>
           ))}
         </div>
 
         {/* Summary Cards Row */}
         <div className="grid grid-cols-3 gap-sm">
-          <div className="bg-surface-container-low border-l-2 border-primary-fixed p-sm">
-            <span className="font-label-caps text-[9px] text-on-surface-variant block uppercase">
+          <GreenCard variant="default" padding="sm" effects>
+            <span className="font-label-caps text-[9px] text-text-muted block uppercase">
               % vs Semana Ant.
             </span>
-            <span className="font-data-display text-[18px] text-primary-fixed">
+            <span className="font-label-caps text-[18px] text-green">
               +12.4%
             </span>
-          </div>
-          <div className="bg-surface-container-low border-l-2 border-secondary p-sm">
-            <span className="font-label-caps text-[9px] text-on-surface-variant block uppercase">
+          </GreenCard>
+          <GreenCard variant="default" padding="sm" effects>
+            <span className="font-label-caps text-[9px] text-text-muted block uppercase">
               Vol. Promedio Día
             </span>
-            <span className="font-data-display text-[18px] text-secondary">
+            <span className="font-label-caps text-[18px] text-green-dim">
               3,486
             </span>
-          </div>
-          <div className="bg-surface-container-low border-l-2 border-tertiary p-sm">
-            <span className="font-label-caps text-[9px] text-on-surface-variant block uppercase">
+          </GreenCard>
+          <GreenCard variant="default" padding="sm" effects>
+            <span className="font-label-caps text-[9px] text-text-muted block uppercase">
               Diferencia
             </span>
-            <span className="font-data-display text-[18px] text-tertiary">
+            <span className="font-label-caps text-[18px] text-acid">
               +420
             </span>
-          </div>
+          </GreenCard>
         </div>
 
         {/* PR Cards */}
         <div>
-          <p className="font-label-caps text-label-caps text-primary-fixed/60 mb-xs">
+          <p className="font-label-caps text-label-caps text-green/60 mb-xs">
             STRENGTH MATRIX
           </p>
-          <h2 className="font-headline-md text-headline-md text-on-surface uppercase italic mb-md">
+          <h2 className="font-headline-md text-headline-md text-text-green uppercase italic mb-md">
             Personal Records
           </h2>
           <div className="grid grid-cols-3 gap-sm">
             {prCards.map((pr) => (
-              <div
+              <GreenCard
                 key={pr.exercise}
-                className="bg-surface-container p-sm border border-outline-variant relative overflow-hidden group"
+                variant="default"
+                padding="sm"
+                effects
               >
-                <span className="font-label-caps text-[9px] text-on-surface-variant block mb-xs">
+                <span className="font-label-caps text-[9px] text-text-muted block mb-xs">
                   {pr.exercise}
                 </span>
                 <div className="flex items-baseline gap-xs mb-xs">
-                  <span className="font-data-display text-[28px] text-primary-fixed font-bold leading-none">
+                  <span className="font-label-caps text-[28px] text-green font-bold leading-none">
                     {pr.value}
                   </span>
-                  <span className="font-label-caps text-[9px] text-primary-fixed">
+                  <span className="font-label-caps text-[9px] text-green">
                     {pr.unit}
                   </span>
                 </div>
-                <div className="flex items-center gap-xs text-on-surface-variant">
+                <div className="flex items-center gap-xs text-text-muted">
                   <span className="material-symbols-outlined text-[12px]">calendar_month</span>
                   <span className="font-label-caps text-[8px]">{pr.date}</span>
                 </div>
-              </div>
+              </GreenCard>
             ))}
           </div>
         </div>
 
         {/* Bar Chart */}
-        <div className="bg-surface-container border border-outline-variant p-md">
-          <p className="font-label-caps text-label-caps text-on-surface-variant mb-xs">
+        <GreenCard padding="md" effects>
+          <p className="font-label-caps text-label-caps text-text-muted mb-xs">
             LOAD INTENSITY
           </p>
-          <h3 className="font-headline-md text-headline-md text-on-surface uppercase mb-lg">
+          <h3 className="font-headline-md text-headline-md text-text-green uppercase mb-lg">
             Volumen Semanal
           </h3>
           <div className="flex items-end justify-between gap-xs h-40">
             {weeklyBars.map((bar, i) => (
               <div key={bar.label} className="flex flex-col items-center flex-1 group">
-                <div className="w-full bg-outline-variant/30 h-full relative">
+                <div className="w-full bg-green/10 h-full relative">
                   <div
                     className={`absolute bottom-0 w-full transition-all ${
                       i === weeklyBars.length - 1
-                        ? 'bg-primary-fixed neon-glow'
-                        : 'bg-primary-fixed/40 group-hover:opacity-100 opacity-60'
+                        ? 'bg-green shadow-[0_0_8px_rgba(199,217,136,0.5)]'
+                        : 'bg-green/40 group-hover:opacity-100 opacity-60'
                     }`}
                     style={{ height: `${bar.height}%` }}
                   />
@@ -172,8 +176,8 @@ export default function StrengthAnalysis() {
                 <span
                   className={`font-label-caps text-[8px] mt-xs ${
                     i === weeklyBars.length - 1
-                      ? 'text-primary-fixed'
-                      : 'text-on-surface-variant'
+                      ? 'text-green'
+                      : 'text-text-muted'
                   }`}
                 >
                   {bar.label}
@@ -181,45 +185,45 @@ export default function StrengthAnalysis() {
               </div>
             ))}
           </div>
-          <div className="pt-md border-t border-outline-variant flex justify-between items-baseline mt-md">
-            <span className="font-label-caps text-label-caps text-on-surface-variant">
+          <div className="pt-md border-t border-green/20 flex justify-between items-baseline mt-md">
+            <span className="font-label-caps text-label-caps text-text-muted">
               TOTAL TONNAGE
             </span>
             <div className="flex items-baseline gap-xs">
-              <span className="font-data-display text-headline-md text-primary-fixed font-bold">
+              <span className="font-label-caps text-headline-md text-green font-bold">
                 24,402
               </span>
-              <span className="font-label-caps text-[10px] text-primary-fixed">KG</span>
+              <span className="font-label-caps text-[10px] text-green">KG</span>
             </div>
           </div>
-        </div>
+        </GreenCard>
 
         {/* Stats Row */}
         <div className="grid grid-cols-3 gap-sm">
-          <div className="bg-surface-container-low border-l-2 border-primary-fixed p-sm">
-            <span className="font-label-caps text-[9px] text-on-surface-variant block uppercase">
+          <GreenCard variant="default" padding="sm" effects>
+            <span className="font-label-caps text-[9px] text-text-muted block uppercase">
               Total Volume
             </span>
-            <span className="font-data-display text-[18px] text-primary-fixed">
+            <span className="font-label-caps text-[18px] text-green">
               24,402 KG
             </span>
-          </div>
-          <div className="bg-surface-container-low border-l-2 border-primary-fixed p-sm">
-            <span className="font-label-caps text-[9px] text-on-surface-variant block uppercase">
+          </GreenCard>
+          <GreenCard variant="default" padding="sm" effects>
+            <span className="font-label-caps text-[9px] text-text-muted block uppercase">
               Sessions
             </span>
-            <span className="font-data-display text-[18px] text-primary-fixed">
+            <span className="font-label-caps text-[18px] text-green">
               18
             </span>
-          </div>
-          <div className="bg-surface-container-low border-l-2 border-primary-fixed p-sm">
-            <span className="font-label-caps text-[9px] text-on-surface-variant block uppercase">
+          </GreenCard>
+          <GreenCard variant="default" padding="sm" effects>
+            <span className="font-label-caps text-[9px] text-text-muted block uppercase">
               PRs
             </span>
-            <span className="font-data-display text-[18px] text-primary-fixed">
+            <span className="font-label-caps text-[18px] text-green">
               3
             </span>
-          </div>
+          </GreenCard>
         </div>
       </div>
 

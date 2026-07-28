@@ -1,16 +1,20 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { GreenCard } from '@/design-system/components/GreenCard'
+import { GreenButton } from '@/design-system/components/GreenButton'
+import { GreenProgress } from '@/design-system/components/GreenProgress'
+import { GreenTag } from '@/design-system/components/GreenTag'
 type Period = '1w' | '1m' | '3m'
 
 const dayLabels = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
 function getHeatColor(level: number): string {
   switch (level) {
-    case 0: return 'bg-surface-container-highest'
-    case 1: return 'bg-primary-container'
-    case 2: return 'bg-primary-fixed-dim'
-    case 3: return 'bg-primary-fixed'
-    default: return 'bg-surface-container-highest'
+    case 0: return 'bg-panel'
+    case 1: return 'bg-green/20'
+    case 2: return 'bg-green-dim'
+    case 3: return 'bg-green'
+    default: return 'bg-panel'
   }
 }
 
@@ -46,28 +50,28 @@ export default function ConsistencyMap() {
   ]
 
   return (
-    <div className="min-h-screen bg-surface pb-20">
+    <div className="min-h-screen bg-[#050705] pb-20">
       {/* Header */}
-      <header className="sticky top-0 z-30 flex items-center gap-md px-md h-14 bg-surface/80 backdrop-blur-xl border-b border-outline-variant">
+      <header className="sticky top-0 z-30 flex items-center gap-md px-md h-14 bg-panel/80 backdrop-blur-xl border-b border-green/20">
         <button
           onClick={() => navigate(-1)}
           aria-label="Volver"
-          className="material-symbols-outlined text-on-surface-variant hover:text-primary-fixed transition-colors duration-200 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer"
+          className="material-symbols-outlined text-text-muted hover:text-green transition-colors duration-200 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green cursor-pointer"
         >
           arrow_back
         </button>
         <div className="flex flex-col">
-          <h1 className="font-headline-md text-headline-md text-on-surface leading-tight">
+          <h1 className="font-headline-md text-headline-md text-text-green leading-tight">
             Análisis - Mapa de Consistencia
           </h1>
-          <span className="font-label-caps text-[10px] text-on-surface-variant">
+          <span className="font-label-caps text-[10px] text-text-muted">
             Tu actividad reciente
           </span>
         </div>
       </header>
 
       {/* Tab Navigation */}
-      <div className="flex items-center border-b border-outline-variant px-md">
+      <div className="flex items-center border-b border-green/20 px-md">
         {([
           { key: 'fuerza', label: 'Fuerza', path: '/analysis/strength' },
           { key: 'carga', label: 'Carga de Combate', path: '/analysis/combat' },
@@ -76,10 +80,10 @@ export default function ConsistencyMap() {
           <button
             key={tab.key}
             onClick={() => navigate(tab.path)}
-            className={`pb-sm px-md font-label-caps text-label-caps transition-all duration-200 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer ${
+            className={`pb-sm px-md font-label-caps text-label-caps transition-all duration-200 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green cursor-pointer ${
               tab.key === 'consistencia'
-                ? 'text-primary-fixed border-b-2 border-primary-fixed'
-                : 'text-on-surface-variant hover:text-on-surface'
+                ? 'text-green border-b-2 border-green'
+                : 'text-text-muted hover:text-text-green'
             }`}
           >
             {tab.label}
@@ -95,44 +99,42 @@ export default function ConsistencyMap() {
             { key: '1m', label: '1 Mes' },
             { key: '3m', label: '3 Meses' },
           ] as const).map((p) => (
-            <button
+            <GreenButton
               key={p.key}
+              variant={activePeriod === p.key ? 'primary' : 'default'}
+              size="sm"
+              effects
               onClick={() => setActivePeriod(p.key)}
-              className={`px-md py-xs font-label-caps text-label-caps border transition-all duration-200 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer ${
-                activePeriod === p.key
-                  ? 'bg-primary-fixed text-on-primary border-primary-fixed font-bold'
-                  : 'border-outline-variant text-on-surface-variant hover:text-on-surface'
-              }`}
             >
               {p.label}
-            </button>
+            </GreenButton>
           ))}
         </div>
 
         {/* Current Period Info */}
-        <p className="font-label-caps text-[10px] text-on-surface-variant uppercase tracking-widest">
+        <p className="font-label-caps text-[10px] text-text-muted uppercase tracking-widest">
           Período actual: {activePeriod === '1w' ? 'Última semana' : activePeriod === '1m' ? 'Último mes' : 'Últimos 3 meses'}
         </p>
 
         {/* Heatmap */}
-        <div className="bg-surface-container-low border border-outline-variant p-md">
+        <GreenCard padding="md" effects>
           <div className="flex items-center justify-between mb-md">
             <div className="flex items-center gap-sm">
-              <span className="material-symbols-outlined text-primary-fixed">calendar_view_month</span>
-              <h3 className="font-label-caps text-on-surface">VOLUMEN DE ENTRENAMIENTO</h3>
+              <span className="material-symbols-outlined text-green">calendar_view_month</span>
+              <h3 className="font-label-caps text-text-green">VOLUMEN DE ENTRENAMIENTO</h3>
             </div>
             <div className="flex items-center gap-xs">
-              <span className="font-label-caps text-[8px] text-on-surface-variant mr-xs">MENOS</span>
+              <span className="font-label-caps text-[8px] text-text-muted mr-xs">MENOS</span>
               {[
-                'bg-surface-container-highest',
-                'bg-primary-container',
-                'bg-primary-fixed-dim',
-                'bg-primary-fixed',
-                'bg-primary-fixed',
+                'bg-panel',
+                'bg-green/20',
+                'bg-green-dim',
+                'bg-green',
+                'bg-green',
               ].map((color, i) => (
                 <div key={i} className={`w-2.5 h-2.5 ${color}`} />
               ))}
-              <span className="font-label-caps text-[8px] text-on-surface-variant ml-xs">MÁS</span>
+              <span className="font-label-caps text-[8px] text-text-muted ml-xs">MÁS</span>
             </div>
           </div>
 
@@ -144,7 +146,7 @@ export default function ConsistencyMap() {
                   {dayLabels.map((label, i) => (
                     <div
                       key={label}
-                      className="h-3 flex items-center text-[8px] font-label-caps text-on-surface-variant"
+                      className="h-3 flex items-center text-[8px] font-label-caps text-text-muted"
                     >
                       {i % 2 === 0 ? label : ''}
                     </div>
@@ -172,45 +174,49 @@ export default function ConsistencyMap() {
               </div>
             </div>
           </div>
-        </div>
+        </GreenCard>
 
         {/* Streak Cards */}
         <div className="grid grid-cols-2 gap-sm">
-          <div className="bg-surface-container border border-outline-variant p-md flex flex-col justify-center relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-sm opacity-20 group-hover:opacity-100 transition-opacity">
-              <span className="material-symbols-outlined text-primary-fixed text-[32px]">local_fire_department</span>
+          <GreenCard variant="default" padding="md" effects>
+            <div className="flex flex-col justify-center relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-sm opacity-20 group-hover:opacity-100 transition-opacity">
+                <span className="material-symbols-outlined text-green text-[32px]">local_fire_department</span>
+              </div>
+              <span className="font-label-caps text-text-muted mb-xs">RACHA ACTUAL</span>
+              <div className="flex items-baseline gap-xs">
+                <span className="font-label-caps text-[36px] text-green leading-none">14</span>
+                <span className="font-headline-md text-text-green">DÍAS</span>
+              </div>
+              <p className="text-[10px] text-text-muted mt-xs">
+                Nivel: <span className="text-green">Alto</span>
+              </p>
             </div>
-            <span className="font-label-caps text-on-surface-variant mb-xs">RACHA ACTUAL</span>
-            <div className="flex items-baseline gap-xs">
-              <span className="font-data-display text-[36px] text-primary-fixed leading-none">14</span>
-              <span className="font-headline-md text-on-surface">DÍAS</span>
-            </div>
-            <p className="text-[10px] text-on-surface-variant mt-xs">
-              Nivel: <span className="text-primary-fixed">Alto</span>
-            </p>
-          </div>
+          </GreenCard>
 
-          <div className="bg-surface-container border border-outline-variant border-l-4 border-l-primary-fixed p-md flex flex-col justify-center">
-            <span className="font-label-caps text-on-surface-variant mb-xs">MEJOR MARCA</span>
-            <div className="flex items-baseline gap-xs">
-              <span className="font-data-display text-[36px] text-on-surface leading-none">42</span>
-              <span className="font-headline-md text-on-surface-variant">DÍAS</span>
+          <GreenCard variant="default" padding="md" effects className="border-l-4 border-l-green">
+            <div className="flex flex-col justify-center">
+              <span className="font-label-caps text-text-muted mb-xs">MEJOR MARCA</span>
+              <div className="flex items-baseline gap-xs">
+                <span className="font-label-caps text-[36px] text-text-green leading-none">42</span>
+                <span className="font-headline-md text-text-muted">DÍAS</span>
+              </div>
+              <p className="text-[10px] text-text-muted mt-xs">Octubre 2025</p>
             </div>
-            <p className="text-[10px] text-on-surface-variant mt-xs">Octubre 2025</p>
-          </div>
+          </GreenCard>
         </div>
 
         {/* Compliance Gauge */}
-        <div className="bg-surface-container border border-outline-variant p-md">
+        <GreenCard padding="md" effects>
           <div className="flex justify-between items-center mb-md">
-            <span className="font-label-caps text-on-surface-variant">CUMPLIMIENTO (4 SEMANAS)</span>
-            <span className="material-symbols-outlined text-primary-fixed">track_changes</span>
+            <span className="font-label-caps text-text-muted">CUMPLIMIENTO (4 SEMANAS)</span>
+            <span className="material-symbols-outlined text-green">track_changes</span>
           </div>
           <div className="flex flex-col items-center">
             <div className="relative w-40 h-40 flex items-center justify-center" role="progressbar" aria-valuenow={92} aria-valuemin={0} aria-valuemax={100} aria-label="Cumplimiento: 92%">
               <svg className="w-full h-full transform -rotate-90">
                 <circle
-                  className="text-surface-container-highest"
+                  className="text-panel"
                   cx="80"
                   cy="80"
                   fill="transparent"
@@ -219,7 +225,7 @@ export default function ConsistencyMap() {
                   strokeWidth="10"
                 />
                 <circle
-                  className="text-primary-fixed transition-all duration-1000 ease-out"
+                  className="text-green transition-all duration-1000 ease-out"
                   cx="80"
                   cy="80"
                   fill="transparent"
@@ -232,74 +238,66 @@ export default function ConsistencyMap() {
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="font-data-display text-[36px] text-on-surface leading-none">
+                <span className="font-label-caps text-[36px] text-text-green leading-none">
                   92<span className="text-headline-md">%</span>
                 </span>
-                <span className="font-label-caps text-[9px] text-on-surface-variant mt-xs">
+                <span className="font-label-caps text-[9px] text-text-muted mt-xs">
                   META ALCANZADA
                 </span>
               </div>
             </div>
             <div className="w-full grid grid-cols-2 gap-sm mt-md">
-              <div className="bg-surface-container-low p-sm border border-outline-variant">
-                <p className="font-label-caps text-[8px] text-on-surface-variant">PROX. SESIÓN</p>
-                <p className="font-data-display text-sm">MAÑANA</p>
-              </div>
-              <div className="bg-surface-container-low p-sm border border-outline-variant">
-                <p className="font-label-caps text-[8px] text-on-surface-variant">TENDENCIA</p>
-                <p className="font-data-display text-sm text-primary-fixed">▲ 4%</p>
-              </div>
+              <GreenCard variant="default" padding="sm" effects>
+                <p className="font-label-caps text-[8px] text-text-muted">PROX. SESIÓN</p>
+                <p className="font-label-caps text-sm text-text-green">MAÑANA</p>
+              </GreenCard>
+              <GreenCard variant="default" padding="sm" effects>
+                <p className="font-label-caps text-[8px] text-text-muted">TENDENCIA</p>
+                <p className="font-label-caps text-sm text-green">▲ 4%</p>
+              </GreenCard>
             </div>
           </div>
-        </div>
+        </GreenCard>
 
         {/* Insights Card */}
-        <div className="bg-primary-fixed text-on-primary p-md relative overflow-hidden">
+        <GreenCard variant="glass" padding="md" effects>
           <div className="absolute -right-4 -bottom-4 opacity-10">
             <span className="material-symbols-outlined text-[100px]">psychology</span>
           </div>
           <div className="relative z-10">
             <div className="flex items-center gap-sm mb-md">
-              <span className="material-symbols-outlined">lightbulb</span>
-              <h3 className="font-label-caps font-bold">ANALYSIS_INSIGHT</h3>
+              <span className="material-symbols-outlined text-green">lightbulb</span>
+              <h3 className="font-label-caps font-bold text-green">ANALYSIS_INSIGHT</h3>
             </div>
-            <p className="font-headline-md mb-md italic leading-tight">
+            <p className="font-headline-md mb-md italic leading-tight text-text-green">
               "Llevas un 92% de consistencia en el bloque intensivo."
             </p>
-            <p className="text-sm font-medium opacity-80 border-t border-on-primary/20 pt-md">
+            <p className="text-sm font-medium opacity-80 border-t border-green/20 pt-md text-text-muted">
               Estás superando el promedio de tu categoría por un 12.4%. Mantener este ritmo durante 6 días más activará el multiplicador de rendimiento.
             </p>
           </div>
-        </div>
+        </GreenCard>
 
         {/* Discipline Distribution */}
-        <div className="bg-surface-container border border-outline-variant p-md">
-          <h4 className="font-label-caps text-on-surface mb-md">DISTRIBUCIÓN DE DISCIPLINA</h4>
+        <GreenCard padding="md" effects>
+          <h4 className="font-label-caps text-text-green mb-md">DISTRIBUCIÓN DE DISCIPLINA</h4>
           <div className="space-y-sm">
             {[
-              { label: 'STRIKING', pct: 45, color: 'bg-primary-fixed' },
-              { label: 'GRAPPLING', pct: 35, color: 'bg-secondary-fixed' },
-              { label: 'FUERZA', pct: 20, color: 'bg-tertiary-fixed' },
+              { label: 'STRIKING', pct: 45 },
+              { label: 'GRAPPLING', pct: 35 },
+              { label: 'FUERZA', pct: 20 },
             ].map((item) => (
-              <div key={item.label}>
-                <div className="flex justify-between text-[10px] font-label-caps mb-xs">
-                  <span>{item.label}</span>
-                  <span>{item.pct}%</span>
-                </div>
-                <div className="h-1 w-full bg-surface-container-highest overflow-hidden">
-                  <div className={`h-full ${item.color}`} style={{ width: `${item.pct}%` }} />
-                </div>
-              </div>
+              <GreenProgress key={item.label} value={item.pct} label={item.label} showValue size="sm" effects />
             ))}
           </div>
-        </div>
+        </GreenCard>
 
         {/* Footer Stats */}
-        <div className="grid grid-cols-2 gap-sm pt-md border-t border-outline-variant">
+        <div className="grid grid-cols-2 gap-sm pt-md border-t border-green/20">
           {stats.map((stat) => (
             <div key={stat.label}>
-              <p className="font-label-caps text-[9px] text-on-surface-variant">{stat.label}</p>
-              <p className={`font-data-display text-headline-md ${stat.isError ? 'text-error' : 'text-on-surface'}`}>
+              <p className="font-label-caps text-[9px] text-text-muted">{stat.label}</p>
+              <p className={`font-label-caps text-headline-md ${stat.isError ? 'text-error' : 'text-text-green'}`}>
                 {stat.value}
               </p>
             </div>

@@ -5,13 +5,13 @@ export default function SplashWelcome() {
   const navigate = useNavigate()
 
   return (
-    <div className="relative min-h-screen bg-surface-dim flex items-center justify-center overflow-hidden">
+    <div className="fixed inset-0 w-full h-full bg-surface-dim flex flex-col overflow-hidden">
       {/* Tactical grid background */}
       <div
-        className="fixed inset-0 z-0 opacity-40"
+        className="absolute inset-0 z-0 pointer-events-none"
         style={{
           backgroundImage:
-            'linear-gradient(to right, rgba(var(--color-outline-variant) / 0.15) 1px, transparent 1px), linear-gradient(to bottom, rgba(var(--color-outline-variant) / 0.15) 1px, transparent 1px)',
+            'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
           backgroundSize: '40px 40px',
         }}
       />
@@ -19,97 +19,107 @@ export default function SplashWelcome() {
       {/* Scanline overlay */}
       <div className="scanline absolute inset-0 z-10 pointer-events-none" />
 
-      {/* Corner decorations (desktop) */}
-      <div className="fixed top-8 left-8 hidden lg:block z-30">
-        <div className="w-8 h-8 border-t border-l border-primary-fixed/40" />
+      {/* Corner decorations */}
+      <div className="absolute top-6 left-6 z-30 pointer-events-none">
+        <div className="w-8 h-8 border-t-2 border-l-2 border-primary-fixed/50" />
       </div>
-      <div className="fixed top-8 right-8 hidden lg:block z-30">
-        <div className="w-8 h-8 border-t border-r border-primary-fixed/40" />
+      <div className="absolute top-6 right-6 z-30 pointer-events-none">
+        <div className="w-8 h-8 border-t-2 border-r-2 border-primary-fixed/50" />
       </div>
-      <div className="fixed bottom-8 left-8 hidden lg:block z-30">
-        <div className="w-8 h-8 border-b border-l border-primary-fixed/40" />
+      <div className="absolute bottom-6 left-6 z-30 pointer-events-none">
+        <div className="w-8 h-8 border-b-2 border-l-2 border-primary-fixed/50" />
       </div>
-      <div className="fixed bottom-8 right-8 hidden lg:block z-30">
-        <div className="w-8 h-8 border-b border-r border-primary-fixed/40" />
+      <div className="absolute bottom-6 right-6 z-30 pointer-events-none">
+        <div className="w-8 h-8 border-b-2 border-r-2 border-primary-fixed/50" />
       </div>
 
-      <main className="relative z-20 w-full max-w-[1440px] px-5 h-full flex flex-col items-center justify-between py-10 lg:py-40">
-        {/* Identity Header (Desktop) */}
-        <div className="hidden lg:flex w-full justify-between items-start">
-          <div className="flex flex-col gap-1">
-            <span className="font-mono text-xs text-primary-fixed tracking-widest uppercase">
-              Combat OS v2.4
+      {/* Top status bar */}
+      <header className="relative z-20 w-full flex justify-between items-center px-8 py-4 border-b border-outline-variant/20 flex-shrink-0">
+        <div className="flex flex-col gap-0.5">
+          <span className="font-mono text-xs text-primary-fixed tracking-widest uppercase font-bold">
+            OSMIO COMBAT OS v2.4
+          </span>
+          <span className="font-mono text-[11px] text-on-surface-variant opacity-60">SYSTEM STATUS: ONLINE</span>
+        </div>
+        <div className="text-right hidden sm:flex flex-col gap-0.5">
+          <span className="font-mono text-xs text-on-surface-variant uppercase">BIOMETRIC INTEL</span>
+          <span className="font-mono text-[11px] text-primary-fixed opacity-80">READY FOR LINK</span>
+        </div>
+      </header>
+
+      {/* Main Hero — takes all remaining vertical space, only logo + brand */}
+      <main className="relative z-20 flex-1 flex flex-col items-center justify-center text-center px-6 gap-8 overflow-hidden">
+        {/* Ambient glow behind logo */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary-fixed/10 blur-[120px] rounded-full pointer-events-none" />
+
+        {/* Animated Brand Emblem */}
+        <div className="relative group flex-shrink-0">
+          <div className="absolute -inset-8 bg-primary-fixed/15 blur-3xl opacity-70 group-hover:opacity-100 transition-opacity duration-1000" />
+          <div className="w-40 h-40 sm:w-52 sm:h-52 lg:w-64 lg:h-64 rounded-full border-2 border-primary-fixed/40 bg-surface-container/50 backdrop-blur-xl flex items-center justify-center relative shadow-2xl">
+            <span className="text-7xl sm:text-8xl lg:text-9xl font-extrabold text-primary-fixed tracking-tighter neon-glow flicker select-none">
+              O
             </span>
-            <span className="font-mono text-sm text-white opacity-40">SYSTEM: ONLINE</span>
-          </div>
-          <div className="text-right flex flex-col gap-1">
-            <span className="font-mono text-xs text-on-surface-variant uppercase">
-              Biometric Link
-            </span>
-            <span className="font-mono text-sm text-white opacity-40">WAITING...</span>
           </div>
         </div>
 
-        {/* Central Branding */}
-        <div className="flex flex-col items-center text-center max-w-2xl">
-          {/* Logo */}
-          <div className="relative mb-8 group">
-            <div className="absolute -inset-4 bg-primary-fixed/10 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-            <div className="w-48 h-48 lg:w-64 lg:h-64 flex items-center justify-center relative">
-              <span className="text-8xl lg:text-9xl font-extrabold text-primary-fixed tracking-tighter neon-glow flicker select-none">
-                O
-              </span>
-            </div>
-          </div>
-
-          {/* Tagline */}
-          <div className="space-y-4">
-            <h1 className="text-[24px] leading-[1.2] font-bold lg:text-[32px] lg:leading-[1.2] lg:tracking-[-0.02em] text-white tracking-tight">
-              OSMIO
-            </h1>
-            <p className="text-base leading-relaxed max-w-md mx-auto border-l-2 border-primary-fixed pl-4 text-left italic opacity-80 text-on-surface-variant">
-              "El cuaderno de un peleador, con esteroides tecnológicos"
-            </p>
-          </div>
-        </div>
-
-        {/* CTA Section */}
-        <div className="w-full max-w-xs flex flex-col gap-4">
-          <Button
-            fullWidth
-            size="lg"
-            onClick={() => navigate('/setup')}
-            className="rounded-none justify-center gap-2"
-          >
-            EMPEZAR
-            <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
-          </Button>
-          <button
-            onClick={() => navigate('/setup')}
-            aria-label="Ya tengo cuenta, iniciar sesión"
-            className="w-full bg-transparent text-primary-fixed font-mono text-xs uppercase tracking-[0.2em] py-4 flex items-center justify-center gap-2 border border-primary-fixed/30 hover:border-primary-fixed hover:bg-primary-fixed/5 transition-all duration-200 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-          >
-            YA TENGO CUENTA
-          </button>
-
-          {/* Metadata Footer */}
-          <div className="mt-8 flex flex-col items-center gap-2 opacity-30">
-            <div className="w-12 h-px bg-on-surface-variant" />
-            <span className="font-mono text-[11px] leading-none uppercase tracking-widest text-on-surface-variant">
-              Tactical Minimalism UI
-            </span>
-          </div>
+        {/* Brand title + tagline only */}
+        <div className="flex flex-col items-center gap-3">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight uppercase leading-none">
+            OSMIO
+          </h1>
+          <p className="font-mono text-sm sm:text-base text-primary-fixed tracking-[0.3em] uppercase font-semibold whitespace-nowrap">
+            Fighter Intelligence System
+          </p>
         </div>
       </main>
 
+      {/* CTA Footer — quote + buttons + metadata */}
+      <footer className="relative z-20 w-full flex-shrink-0 flex flex-col items-center border-t border-outline-variant/20 px-8 pt-6 pb-8 gap-5">
+        {/* Single unified column, wide enough to not word-wrap */}
+        <div className="w-full max-w-xl flex flex-col gap-5">
+          {/* Quote */}
+          <p className="text-sm sm:text-base leading-relaxed border-l-2 border-primary-fixed pl-4 text-left italic text-on-surface-variant opacity-85">
+            "El cuaderno de un peleador, con esteroides tecnológicos."
+          </p>
+
+          {/* Buttons */}
+          <div className="flex flex-col gap-3">
+            <Button
+              fullWidth
+              size="lg"
+              onClick={() => navigate('/setup')}
+              className="rounded-none justify-center gap-2 font-mono uppercase tracking-wider text-sm py-4"
+            >
+              EMPEZAR CONFIGURACIÓN
+              <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+            </Button>
+
+            <button
+              onClick={() => navigate('/dashboard')}
+              aria-label="Ir directamente al Dashboard"
+              className="w-full bg-surface-container-high/60 text-primary-fixed font-mono text-xs uppercase tracking-[0.2em] py-3.5 flex items-center justify-center gap-2 border border-primary-fixed/30 hover:border-primary-fixed hover:bg-primary-fixed/10 transition-all duration-200 active:scale-[0.98] cursor-pointer"
+            >
+              IR AL DASHBOARD
+            </button>
+          </div>
+        </div>
+
+        {/* Metadata */}
+        <div className="flex flex-col items-center gap-1.5 opacity-40">
+          <div className="w-16 h-px bg-outline-variant" />
+          <span className="font-mono text-[10px] uppercase tracking-widest text-on-surface-variant whitespace-nowrap">
+            Tactical Minimal UI • Build 2026
+          </span>
+        </div>
+      </footer>
+
       <style>{`
         .neon-glow {
-          filter: drop-shadow(0 0 10px var(--color-primary-fixed));
-          opacity: 0.4;
+          filter: drop-shadow(0 0 24px var(--color-primary-fixed)) drop-shadow(0 0 60px var(--color-primary-fixed));
+          opacity: 0.9;
         }
         .scanline {
-          background: linear-gradient(to bottom, transparent, var(--color-primary-fixed), transparent);
-          opacity: 0.03;
+          background: linear-gradient(to bottom, transparent 40%, rgba(200,230,0,0.04) 50%, transparent 60%);
           animation: scanline 8s linear infinite;
         }
         @keyframes scanline {
@@ -121,7 +131,7 @@ export default function SplashWelcome() {
         }
         @keyframes flicker {
           0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100% { opacity: 1; }
-          20%, 21.999%, 63%, 63.999%, 65%, 69.999% { opacity: 0.8; }
+          20%, 21.999%, 63%, 63.999%, 65%, 69.999% { opacity: 0.85; }
         }
       `}</style>
     </div>

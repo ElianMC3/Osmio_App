@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Search } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { GreenCard } from '../../../design-system/components/GreenCard'
+import { GreenButton } from '../../../design-system/components/GreenButton'
 
 const exercises = [
   { id: 1, name: 'Press Banca', category: 'Pecho' },
@@ -22,33 +23,46 @@ export default function ExercisePicker() {
   )
 
   return (
-    <div className="min-h-screen bg-gray-950 p-6">
+    <div className="min-h-screen bg-[#050705] p-6">
       <header className="mb-6">
-        <button onClick={() => navigate(-1)} className="text-gray-400 text-sm mb-2 cursor-pointer">← Volver</button>
-        <h1 className="text-2xl font-bold text-white">Seleccionar ejercicio</h1>
+        <GreenButton
+          onClick={() => navigate(-1)}
+          variant="ghost"
+          size="sm"
+          effects={true}
+          className="mb-2"
+        >
+          ← Volver
+        </GreenButton>
+        <h1 className="text-2xl font-bold text-text-green">Seleccionar ejercicio</h1>
       </header>
 
       <div className="relative mb-4">
-        <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+        <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-[18px]">
+          search
+        </span>
         <input
           type="text"
           placeholder="Buscar ejercicio..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full bg-gray-800 border border-gray-700 rounded-lg py-2.5 pl-10 pr-4 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"
+          className="w-full bg-panel border border-green/25 rounded-lg py-2.5 pl-10 pr-4 text-text-green placeholder:text-text-muted placeholder:opacity-50 focus:outline-none focus:border-green"
         />
       </div>
 
       <div className="space-y-1">
         {filtered.map((ex) => (
-          <button
+          <GreenCard
             key={ex.id}
+            variant="interactive"
+            padding="sm"
+            effects={true}
             onClick={() => navigate('/logging/strength')}
-            className="w-full flex justify-between items-center py-3 px-4 rounded-lg hover:bg-gray-800 transition-colors cursor-pointer"
+            className="flex justify-between items-center cursor-pointer"
           >
-            <span className="text-white">{ex.name}</span>
-            <span className="text-xs text-gray-500 bg-gray-800 px-2 py-1 rounded">{ex.category}</span>
-          </button>
+            <span className="text-text-green">{ex.name}</span>
+            <span className="text-xs text-text-muted bg-green/10 px-2 py-1 rounded">{ex.category}</span>
+          </GreenCard>
         ))}
       </div>
     </div>
