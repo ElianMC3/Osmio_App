@@ -2,7 +2,36 @@ export interface Exercise {
   id: number
   name: string
   category: string
-  type: 'strength' | 'cardio'
+  type?: 'strength' | 'cardio'
+  bodyPart?: string
+  equipment?: string
+  muscleGroup?: string
+  target?: string
+  secondaryMuscles?: string[]
+  instructions?: { es?: string; en?: string }
+  image?: string
+  gifUrl?: string
+}
+
+export interface RoutineExercise {
+  id: string
+  routineId: string
+  exerciseId: number
+  position: number
+  targetSets: number
+  targetRepsMin: number
+  targetRepsMax: number
+  currentWeight: number
+  restSeconds: number
+  notes: string
+  exercise?: Exercise
+}
+
+export interface Routine {
+  id: string
+  name: string
+  description: string
+  exercises: RoutineExercise[]
 }
 
 export interface SetEntry {

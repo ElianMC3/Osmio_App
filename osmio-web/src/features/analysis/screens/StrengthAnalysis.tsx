@@ -1,30 +1,68 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { GreenCard } from '@/design-system/components/GreenCard'
 import { GreenButton } from '@/design-system/components/GreenButton'
-import { GreenProgress } from '@/design-system/components/GreenProgress'
-import { GreenTag } from '@/design-system/components/GreenTag'
-type Chip = 'technical' | 'physical' | 'sparring'
-
-const weeklyBars = [
-  { label: 'L', height: 65 },
-  { label: 'M', height: 80 },
-  { label: 'X', height: 55 },
-  { label: 'J', height: 90 },
-  { label: 'V', height: 72 },
-  { label: 'S', height: 45 },
-  { label: 'D', height: 30 },
-]
-
-const prCards = [
-  { exercise: 'SENTADILLA (BACK SQUAT)', value: '185.0', unit: 'KG', date: 'OCT 24, 2023' },
-  { exercise: 'PRESS DE BANCA', value: '127.5', unit: 'KG', date: 'NOV 02, 2023' },
-  { exercise: 'PESO MUERTO', value: '220.0', unit: 'KG', date: 'OCT 12, 2023' },
-]
+import { analyticsApi } from '@/services/api/analytics.api'
+import { useProgression } from '../../strength/hooks/useProgression'
+import type { ProgressionRecommendation } from '../../strength/lib/progression'
+import type { StrengthAnalytics } from '@/services/api/analytics.api'
 
 export default function StrengthAnalysis() {
   const navigate = useNavigate()
-  const [activeChip, setActiveChip] = useState<Chip>('physical')
+  const [data, setData] = useState<StrengthAnalytics | null>(null)
+  const [activeChip, setActiveChip] = useState<'technical' | 'physical' | 'sparring'>('physical')
+  const { routines, recommendations, loading: progressionLoading } = useProgression()
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const result = await analyticsApi.getStrengthAnalytics()
+        setData(result)
+      } catch (e) {
+        console.error('Error loading strength analytics:', e)
+      }
+    }
+    fetchData()
+  }, [])
+
+  const weeklyBars = ['L', 'M', 'X', 'J', 'V', 'S', 'D'].map((label, i) => {
+    const vol = data?.volumeByWeek[i]
+    return { label, height: vol ? Math.min(Math.round(vol.load / 500), 100) : 0 }
+  })
+
+  const totalVolume = data?.volumeByWeek.reduce((s, w) => s + w.load, 0) ?? 0
+  const prCount = data?.prs.length ?? 0
+  const avgDaily = weeklyBars.length > 0 ? Math.round(totalVolume / weeklyBars.length) : 0
+  const weeks = data?.volumeByWeek ?? []
+  const prevVolume = weeks.length > 1 ? weeks[weeks.length - 2].load : 0
+  const lastVolume = weeks.length > 0 ? weeks[weeks.length - 1].load : 0
+  const changePct = prevVolume > 0 ? Math.round(((lastVolume - prevVolume) / prevVolume) * 100) : 0
+  const changeLabel = changePct >= 0 ? `+${changePct}%` : `${changePct}%`
+
+  const prCards = (data?.prs ?? []).slice(0, 3).map((pr) => ({
+    exercise: pr.exercise.toUpperCase(),
+    value: pr.weight,
+    unit: 'KG',
+    date: new Date(pr.date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase(),
+  }))
+
+  const weekLabel = data?.volumeByWeek.length ? `Semana ${data.volumeByWeek.length}` : '—'
+
+  const recList: { name: string; rec: ProgressionRecommendation }[] = []
+  for (const r of routines) {
+    for (const rex of r.exercises) {
+      const rec = recommendations.get(rex.id)
+      if (rec) recList.push({ name: rex.exercise?.name ?? `#${rex.exerciseId}`, rec })
+      if (recList.length >= 4) break
+    }
+    if (recList.length >= 4) break
+  }
+
+  const recBadge = (action: string, weight: number): { label: string; className: string } => {
+    if (action === 'increase') return { label: `SUBIR A ${weight} KG`, className: 'text-green' }
+    if (action === 'deload') return { label: `DESCARGAR A ${weight} KG`, className: 'text-acid' }
+    return { label: `MANTENER ${weight} KG`, className: 'text-text-muted' }
+  }
 
   return (
     <div className="min-h-screen pb-20">
@@ -42,7 +80,7 @@ export default function StrengthAnalysis() {
             Análisis - Fuerza
           </h1>
           <span className="font-label-caps text-[10px] text-text-muted">
-            Jun 30 – Jul 06, 2026
+            {weekLabel}
           </span>
         </div>
       </header>
@@ -89,32 +127,34 @@ export default function StrengthAnalysis() {
         </div>
 
         {/* Summary Cards Row */}
-        <div className="grid grid-cols-3 gap-sm">
-          <GreenCard variant="default" padding="sm" effects>
-            <span className="font-label-caps text-[9px] text-text-muted block uppercase">
-              % vs Semana Ant.
-            </span>
-            <span className="font-label-caps text-[18px] text-green">
-              +12.4%
-            </span>
-          </GreenCard>
-          <GreenCard variant="default" padding="sm" effects>
-            <span className="font-label-caps text-[9px] text-text-muted block uppercase">
-              Vol. Promedio Día
-            </span>
-            <span className="font-label-caps text-[18px] text-green-dim">
-              3,486
-            </span>
-          </GreenCard>
-          <GreenCard variant="default" padding="sm" effects>
-            <span className="font-label-caps text-[9px] text-text-muted block uppercase">
-              Diferencia
-            </span>
-            <span className="font-label-caps text-[18px] text-acid">
-              +420
-            </span>
-          </GreenCard>
-        </div>
+        {data && (
+          <div className="grid grid-cols-3 gap-sm">
+            <GreenCard variant="default" padding="sm" effects>
+              <span className="font-label-caps text-[9px] text-text-muted block uppercase">
+                % vs Semana Ant.
+              </span>
+              <span className="font-label-caps text-[18px] text-green">
+                {changeLabel}
+              </span>
+            </GreenCard>
+            <GreenCard variant="default" padding="sm" effects>
+              <span className="font-label-caps text-[9px] text-text-muted block uppercase">
+                Vol. Promedio Día
+              </span>
+              <span className="font-label-caps text-[18px] text-green-dim">
+                {avgDaily.toLocaleString()}
+              </span>
+            </GreenCard>
+            <GreenCard variant="default" padding="sm" effects>
+              <span className="font-label-caps text-[9px] text-text-muted block uppercase">
+                Diferencia
+              </span>
+              <span className="font-label-caps text-[18px] text-acid">
+                {changePct >= 0 ? '+' : ''}{changePct}
+              </span>
+            </GreenCard>
+          </div>
+        )}
 
         {/* PR Cards */}
         <div>
@@ -125,7 +165,7 @@ export default function StrengthAnalysis() {
             Personal Records
           </h2>
           <div className="grid grid-cols-3 gap-sm">
-            {prCards.map((pr) => (
+            {prCards.length > 0 ? prCards.map((pr) => (
               <GreenCard
                 key={pr.exercise}
                 variant="default"
@@ -148,7 +188,48 @@ export default function StrengthAnalysis() {
                   <span className="font-label-caps text-[8px]">{pr.date}</span>
                 </div>
               </GreenCard>
-            ))}
+            )) : (
+              <div className="col-span-3 font-label-caps text-sm text-text-muted opacity-40 text-center py-6">
+                SIN PRs REGISTRADOS
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Progression Recommendations */}
+        <div>
+          <p className="font-label-caps text-label-caps text-green/60 mb-xs">
+            PROGRESSION ENGINE
+          </p>
+          <h2 className="font-headline-md text-headline-md text-text-green uppercase italic mb-md">
+            Recomendaciones de Peso
+          </h2>
+          <div className="space-y-sm">
+            {progressionLoading ? (
+              <div className="font-label-caps text-sm text-text-muted opacity-40 text-center py-6">CARGANDO…</div>
+            ) : recList.length > 0 ? (
+              recList.map((item) => {
+                const badge = recBadge(item.rec.action, item.rec.suggestedWeight)
+                return (
+                  <GreenCard key={item.name} variant="default" padding="sm" effects>
+                    <div className="flex items-center justify-between gap-3 flex-wrap">
+                      <div className="min-w-0">
+                        <p className="font-label-caps text-xs text-text-green font-bold truncate">{item.name}</p>
+                        <p className="font-label-caps text-[9px] text-text-muted">
+                          {item.rec.targetSets} × {item.rec.targetRepsMin}-{item.rec.targetRepsMax} · actual {item.rec.currentWeight} kg
+                        </p>
+                      </div>
+                      <span className={`font-label-caps text-xs ${badge.className}`}>{badge.label}</span>
+                    </div>
+                    <p className="font-label-sm text-[11px] text-text-muted leading-relaxed mt-xs">{item.rec.reason}</p>
+                  </GreenCard>
+                )
+              })
+            ) : (
+              <div className="font-label-caps text-sm text-text-muted opacity-40 text-center py-6">
+                SIN RUTINA CONFIGURADA
+              </div>
+            )}
           </div>
         </div>
 
@@ -191,7 +272,7 @@ export default function StrengthAnalysis() {
             </span>
             <div className="flex items-baseline gap-xs">
               <span className="font-label-caps text-headline-md text-green font-bold">
-                24,402
+                {totalVolume.toLocaleString()}
               </span>
               <span className="font-label-caps text-[10px] text-green">KG</span>
             </div>
@@ -205,15 +286,15 @@ export default function StrengthAnalysis() {
               Total Volume
             </span>
             <span className="font-label-caps text-[18px] text-green">
-              24,402 KG
+              {totalVolume.toLocaleString()} KG
             </span>
           </GreenCard>
           <GreenCard variant="default" padding="sm" effects>
             <span className="font-label-caps text-[9px] text-text-muted block uppercase">
-              Sessions
+              Weeks
             </span>
             <span className="font-label-caps text-[18px] text-green">
-              18
+              {data?.volumeByWeek.length ?? 0}
             </span>
           </GreenCard>
           <GreenCard variant="default" padding="sm" effects>
@@ -221,7 +302,7 @@ export default function StrengthAnalysis() {
               PRs
             </span>
             <span className="font-label-caps text-[18px] text-green">
-              3
+              {prCount}
             </span>
           </GreenCard>
         </div>

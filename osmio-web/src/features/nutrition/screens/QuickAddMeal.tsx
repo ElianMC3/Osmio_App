@@ -1,6 +1,8 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useNutritionStore } from '../../../store/nutritionStore'
+import { useState, useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { nutritionApi } from '@/services/api/nutrition.api'
+import { useAuth } from '../../../shared/hooks/useAuth'
+import { findFoodMatch } from '@/shared/data/foodDatabase'
 
 interface FoodEntry {
   id: number
@@ -23,13 +25,58 @@ const initialFoods: FoodEntry[] = [
 
 export default function QuickAddMeal() {
   const navigate = useNavigate()
-  const addMealToStore = useNutritionStore((state) => state.addMeal)
+  const { date: paramDate } = useParams()
+  const { user } = useAuth()
+  const today = new Date().toISOString().split('T')[0]
+  const date = paramDate || today
+  const storageKey = `osmio.customFoods.${user?.id ?? 'guest'}`
+
+  const loadCustomFoods = (): FoodEntry[] => {
+    try {
+      const raw = localStorage.getItem(storageKey)
+      const parsed = raw ? JSON.parse(raw) : []
+      return Array.isArray(parsed) ? parsed : []
+    } catch {
+      return []
+    }
+  }
+
+  const persistCustomFoods = (list: FoodEntry[]) => {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(list))
+    } catch {
+      // almacenamiento no disponible
+    }
+  }
+
   const [selectedMeal, setSelectedMeal] = useState<MealType>('Almuerzo')
   const [searchQuery, setSearchQuery] = useState('')
-  const [foods, setFoods] = useState<FoodEntry[]>(initialFoods)
+  const [customFoods, setCustomFoods] = useState<FoodEntry[]>(loadCustomFoods)
+  const [removedInitials, setRemovedInitials] = useState<number[]>([])
   const [customName, setCustomName] = useState('')
   const [customKcal, setCustomKcal] = useState('')
+  const [customPortion, setCustomPortion] = useState('100')
+  const [customProtein, setCustomProtein] = useState('')
+  const [customCarbs, setCustomCarbs] = useState('')
+  const [customFat, setCustomFat] = useState('')
+  const [manualMacros, setManualMacros] = useState(false)
   const [showAddForm, setShowAddForm] = useState(false)
+
+  const matchedFood = findFoodMatch(customName)
+
+  useEffect(() => {
+    if (manualMacros || !matchedFood) return
+    const pct = (parseFloat(customPortion) || 100) / 100
+    setCustomKcal(String(Math.round(matchedFood.kcalPer100g * pct)))
+    setCustomProtein(String((matchedFood.proteinPer100g * pct).toFixed(1)))
+    setCustomCarbs(String((matchedFood.carbsPer100g * pct).toFixed(1)))
+    setCustomFat(String((matchedFood.fatPer100g * pct).toFixed(1)))
+  }, [matchedFood, customPortion, manualMacros])
+
+  const foods = [
+    ...initialFoods.filter((f) => !removedInitials.includes(f.id)),
+    ...customFoods,
+  ]
 
   const totalKcal = foods.reduce((sum, f) => sum + f.kcal, 0)
   const totalProtein = foods.reduce((sum, f) => sum + f.protein, 0)
@@ -42,40 +89,59 @@ export default function QuickAddMeal() {
   const targetFat = 25
 
   const removeFood = (id: number) => {
-    setFoods((prev) => prev.filter((f) => f.id !== id))
+    if (customFoods.some((f) => f.id === id)) {
+      const next = customFoods.filter((f) => f.id !== id)
+      setCustomFoods(next)
+      persistCustomFoods(next)
+    } else {
+      setRemovedInitials((prev) => [...prev, id])
+    }
   }
 
   const handleAddCustomFood = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!customName || !customKcal) return
-    const kcalNum = parseInt(customKcal, 10) || 100
+    if (!customName) return
+    const proteinNum = parseFloat(customProtein) || 0
+    const carbsNum = parseFloat(customCarbs) || 0
+    const fatNum = parseFloat(customFat) || 0
+    const kcalNum = parseInt(customKcal, 10) || Math.round(proteinNum * 4 + carbsNum * 4 + fatNum * 9)
     const newFood: FoodEntry = {
       id: Date.now(),
       name: customName,
-      portion: '1 porción',
-      protein: Math.round(kcalNum * 0.08),
-      carbs: Math.round(kcalNum * 0.12),
-      fat: Math.round(kcalNum * 0.03),
+      portion: `${customPortion || 100}g`,
+      protein: proteinNum,
+      carbs: carbsNum,
+      fat: fatNum,
       kcal: kcalNum,
     }
-    setFoods((prev) => [...prev, newFood])
+    const next = [...customFoods, newFood]
+    setCustomFoods(next)
+    persistCustomFoods(next)
     setCustomName('')
     setCustomKcal('')
+    setCustomPortion('100')
+    setCustomProtein('')
+    setCustomCarbs('')
+    setCustomFat('')
+    setManualMacros(false)
     setShowAddForm(false)
   }
 
-  const handleSaveMeal = () => {
+  const handleSaveMeal = async () => {
     if (foods.length === 0) return
-    addMealToStore({
-      id: Date.now().toString(),
-      name: `${selectedMeal}: ${foods.map((f) => f.name).join(', ')}`,
-      calories: totalKcal,
-      protein: totalProtein,
-      carbs: totalCarbs,
-      fat: totalFat,
-      timestamp: new Date().toISOString(),
-    })
-    navigate('/nutrition')
+    try {
+      await nutritionApi.addMeal(date, {
+        name: `${selectedMeal}: ${foods.map((f) => f.name).join(', ')}`,
+        calories: totalKcal,
+        protein: totalProtein,
+        carbs: totalCarbs,
+        fat: totalFat,
+        timestamp: new Date().toISOString(),
+      })
+      navigate('/nutrition')
+    } catch (e) {
+      console.error('Error saving meal:', e)
+    }
   }
 
   const filteredFoods = foods.filter((f) =>
@@ -178,18 +244,82 @@ export default function QuickAddMeal() {
               type="text"
               placeholder="Nombre del alimento (ej. Pechuga de Pavo)"
               value={customName}
-              onChange={(e) => setCustomName(e.target.value)}
+              onChange={(e) => {
+                setCustomName(e.target.value)
+                setManualMacros(false)
+              }}
               className="bg-surface-dim border border-outline-variant p-3 rounded-xl text-sm text-on-surface focus:outline-none focus:border-primary-fixed"
               required
             />
             <input
               type="number"
-              placeholder="Calorías aproximadas (kcal)"
-              value={customKcal}
-              onChange={(e) => setCustomKcal(e.target.value)}
+              placeholder="Porción (g)"
+              value={customPortion}
+              onChange={(e) => setCustomPortion(e.target.value)}
               className="bg-surface-dim border border-outline-variant p-3 rounded-xl text-sm text-on-surface focus:outline-none focus:border-primary-fixed"
-              required
+              min="1"
             />
+          </div>
+
+          {matchedFood && (
+            <div className="flex items-center gap-2 text-xs bg-primary-fixed/10 border border-primary-fixed/30 text-primary-fixed rounded-lg px-3 py-2">
+              <span className="material-symbols-outlined text-[16px]">check_circle</span>
+              <span>
+                Detectado: <strong>{matchedFood.name}</strong> · 100g → {matchedFood.kcalPer100g} kcal · P {matchedFood.proteinPer100g}g · C {matchedFood.carbsPer100g}g · G {matchedFood.fatPer100g}g
+              </span>
+            </div>
+          )}
+
+          <div>
+            <label className="font-label-caps text-[10px] text-on-surface-variant uppercase tracking-wider block mb-2">
+              Macros ({matchedFood ? 'calculados para la porción, editables' : 'completar por alimento'})
+            </label>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <input
+                type="number"
+                placeholder="Calorías (kcal)"
+                value={customKcal}
+                onChange={(e) => {
+                  setCustomKcal(e.target.value)
+                  setManualMacros(true)
+                }}
+                className="bg-surface-dim border border-outline-variant p-3 rounded-xl text-sm text-on-surface focus:outline-none focus:border-primary-fixed"
+                min="0"
+              />
+              <input
+                type="number"
+                placeholder="Proteína (g)"
+                value={customProtein}
+                onChange={(e) => {
+                  setCustomProtein(e.target.value)
+                  setManualMacros(true)
+                }}
+                className="bg-surface-dim border border-outline-variant p-3 rounded-xl text-sm text-on-surface focus:outline-none focus:border-primary-fixed"
+                min="0"
+              />
+              <input
+                type="number"
+                placeholder="Carbos (g)"
+                value={customCarbs}
+                onChange={(e) => {
+                  setCustomCarbs(e.target.value)
+                  setManualMacros(true)
+                }}
+                className="bg-surface-dim border border-outline-variant p-3 rounded-xl text-sm text-on-surface focus:outline-none focus:border-primary-fixed"
+                min="0"
+              />
+              <input
+                type="number"
+                placeholder="Grasas (g)"
+                value={customFat}
+                onChange={(e) => {
+                  setCustomFat(e.target.value)
+                  setManualMacros(true)
+                }}
+                className="bg-surface-dim border border-outline-variant p-3 rounded-xl text-sm text-on-surface focus:outline-none focus:border-primary-fixed"
+                min="0"
+              />
+            </div>
           </div>
           <div className="flex justify-end gap-3 pt-2">
             <button type="button" onClick={() => setShowAddForm(false)} className="px-4 py-2 text-xs font-label-caps text-on-surface-variant hover:text-on-surface">Cancelar</button>

@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useNutritionStore } from '../../../store/nutritionStore'
+import { nutritionApi } from '@/services/api/nutrition.api'
+import type { DailyNutrition } from '@/shared/types/nutrition.types'
 
 const quickAddPresets = [
   { icon: 'blender', name: 'Batido Proteico 1-Tap', kcal: 320, protein: 35, carbs: 20, fat: 5 },
@@ -10,37 +12,53 @@ const quickAddPresets = [
 
 export default function NutritionDashboard() {
   const navigate = useNavigate()
-  const { todayMeals, calorieGoal, addMeal } = useNutritionStore()
+  const [nutrition, setNutrition] = useState<DailyNutrition | null>(null)
 
-  // Calculate totals from store or fallback baseline
-  const loggedKcal = todayMeals.reduce((sum, m) => sum + m.calories, 0)
-  const loggedProtein = todayMeals.reduce((sum, m) => sum + m.protein, 0)
-  const loggedCarbs = todayMeals.reduce((sum, m) => sum + m.carbs, 0)
-  const loggedFat = todayMeals.reduce((sum, m) => sum + m.fat, 0)
+  const today = new Date().toISOString().split('T')[0]
 
-  const baselineKcal = 1200
-  const consumed = loggedKcal > 0 ? loggedKcal : baselineKcal
-  const target = calorieGoal || 2847
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const data = await nutritionApi.getDayNutrition(today)
+        setNutrition(data)
+      } catch (e) {
+        console.error('Error loading nutrition:', e)
+      }
+    }
+    fetchData()
+  }, [today])
+
+  const meals = nutrition?.meals ?? []
+  const consumed = meals.reduce((s, m) => s + m.calories, 0)
+  const target = nutrition?.goal.calories ?? 2400
   const remaining = Math.max(target - consumed, 0)
   const calPercent = Math.min((consumed / target) * 100, 100)
 
-  const protein = { current: loggedProtein > 0 ? loggedProtein : 168, goal: 200 }
-  const carbs = { current: loggedCarbs > 0 ? loggedCarbs : 312, goal: 350 }
-  const fats = { current: loggedFat > 0 ? loggedFat : 78, goal: 90 }
+  const protein = { current: meals.reduce((s, m) => s + m.protein, 0), goal: nutrition?.goal.protein ?? 180 }
+  const carbs = { current: meals.reduce((s, m) => s + m.carbs, 0), goal: nutrition?.goal.carbs ?? 280 }
+  const fats = { current: meals.reduce((s, m) => s + m.fat, 0), goal: nutrition?.goal.fat ?? 75 }
 
   const circumference = 2 * Math.PI * 54
   const strokeDashoffset = circumference - (calPercent / 100) * circumference
 
-  const handleQuickAddPreset = (preset: typeof quickAddPresets[0]) => {
-    addMeal({
-      id: Date.now().toString(),
-      name: preset.name,
-      calories: preset.kcal,
-      protein: preset.protein,
-      carbs: preset.carbs,
-      fat: preset.fat,
-      timestamp: new Date().toISOString(),
-    })
+  const handleQuickAddPreset = async (preset: typeof quickAddPresets[0]) => {
+    try {
+      await nutritionApi.addMeal(today, {
+        name: preset.name,
+        calories: preset.kcal,
+        protein: preset.protein,
+        carbs: preset.carbs,
+        fat: preset.fat,
+        timestamp: new Date().toISOString(),
+      })
+      setNutrition((prev) => prev ? {
+        ...prev,
+        meals: [...prev.meals, { id: Date.now().toString(), name: preset.name, calories: preset.kcal, protein: preset.protein, carbs: preset.carbs, fat: preset.fat, timestamp: new Date().toISOString() }],
+        totals: { calories: prev.totals.calories + preset.kcal, protein: prev.totals.protein + preset.protein, carbs: prev.totals.carbs + preset.carbs, fat: prev.totals.fat + preset.fat },
+      } : null)
+    } catch (e) {
+      console.error('Error adding meal:', e)
+    }
   }
 
   return (
@@ -232,14 +250,14 @@ export default function NutritionDashboard() {
       </div>
 
       {/* Registered Today List */}
-      {todayMeals.length > 0 && (
+      {meals.length > 0 && (
         <div className="space-y-4 pt-4">
           <h3 className="font-label-caps text-sm text-on-surface uppercase tracking-wider flex items-center gap-2">
             <span className="w-2.5 h-2.5 bg-tertiary-fixed inline-block" />
-            Registradas Hoy ({todayMeals.length})
+            Registradas Hoy ({meals.length})
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {todayMeals.map((m) => (
+            {meals.map((m) => (
               <div key={m.id} className="bg-surface-container/50 border border-outline-variant/30 rounded-2xl p-4 flex justify-between items-center">
                 <div>
                   <p className="font-label-caps text-sm text-on-surface font-bold">{m.name}</p>

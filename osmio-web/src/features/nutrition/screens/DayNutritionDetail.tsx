@@ -1,77 +1,56 @@
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-
-interface FoodItem {
-  name: string
-  portion: string
-  protein: number
-  carbs: number
-  fat: number
-  kcal: number
-}
-
-interface MealSection {
-  name: string
-  time: string
-  accentColor: string
-  borderColor: string
-  icon: string
-  items: FoodItem[]
-}
-
-const mealSections: MealSection[] = [
-  {
-    name: 'Desayuno',
-    time: '07:30',
-    accentColor: 'text-primary-fixed',
-    borderColor: 'border-primary-fixed',
-    icon: 'wb_sunny',
-    items: [
-      { name: 'Avena con proteína', portion: '80g + 30g', protein: 30, carbs: 55, fat: 8, kcal: 420 },
-      { name: 'Banana', portion: '1 unidad', protein: 1, carbs: 27, fat: 0, kcal: 105 },
-    ],
-  },
-  {
-    name: 'Almuerzo',
-    time: '13:15',
-    accentColor: 'text-secondary',
-    borderColor: 'border-secondary',
-    icon: 'lunch_dining',
-    items: [
-      { name: 'Pollo con arroz jazmín', portion: '200g + 150g', protein: 45, carbs: 60, fat: 10, kcal: 498 },
-      { name: 'Ensalada verde', portion: '100g', protein: 2, carbs: 5, fat: 0, kcal: 25 },
-    ],
-  },
-  {
-    name: 'Cena',
-    time: '19:45',
-    accentColor: 'text-tertiary-fixed-dim',
-    borderColor: 'border-tertiary-fixed-dim',
-    icon: 'dinner_dining',
-    items: [
-      { name: 'Salmón al horno', portion: '180g', protein: 40, carbs: 0, fat: 12, kcal: 280 },
-      { name: 'Camote asado', portion: '150g', protein: 2, carbs: 45, fat: 0, kcal: 190 },
-      { name: 'Espárragos', portion: '100g', protein: 2, carbs: 4, fat: 0, kcal: 20 },
-    ],
-  },
-]
+import { nutritionApi } from '@/services/api/nutrition.api'
+import type { DailyNutrition } from '@/shared/types/nutrition.types'
 
 export default function DayNutritionDetail() {
   const { date } = useParams()
   const navigate = useNavigate()
+  const [nutrition, setNutrition] = useState<DailyNutrition | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  const targetCalories = 2700
-  const consumedCalories = 1842
+  useEffect(() => {
+    if (!date) { setLoading(false); return }
+    const day = date
+    async function fetchData() {
+      try {
+        const data = await nutritionApi.getDayNutrition(day)
+        setNutrition(data)
+      } catch (e) {
+        console.error('Error loading nutrition detail:', e)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [date])
+
+  const consumedCalories = nutrition?.totals.calories ?? 0
+  const targetCalories = nutrition?.goal.calories ?? 2400
   const remaining = targetCalories - consumedCalories
   const calPercent = Math.min((consumedCalories / targetCalories) * 100, 100)
 
-  const protein = { current: 165, goal: 180 }
-  const carbs = { current: 210, goal: 280 }
-  const fats = { current: 45, goal: 75 }
+  const protein = { current: nutrition?.totals.protein ?? 0, goal: nutrition?.goal.protein ?? 180 }
+  const carbs = { current: nutrition?.totals.carbs ?? 0, goal: nutrition?.goal.carbs ?? 280 }
+  const fats = { current: nutrition?.totals.fat ?? 0, goal: nutrition?.goal.fat ?? 75 }
 
   const circumference = 2 * Math.PI * 70
   const strokeDashoffset = circumference - (calPercent / 100) * circumference
 
   const displayDate = date || 'Hoy'
+
+  // Group meals by name prefix (up to first colon) as sections
+  const mealSections = nutrition
+    ? nutrition.meals.reduce((acc, meal) => {
+        const sectionName = meal.name.includes(':') ? meal.name.split(':')[0].trim() : 'Comida'
+        if (!acc[sectionName]) acc[sectionName] = []
+        acc[sectionName].push(meal)
+        return acc
+      }, {} as Record<string, typeof nutrition.meals>)
+    : {}
+
+  const sectionColors = ['text-primary-fixed border-primary-fixed', 'text-secondary border-secondary', 'text-tertiary-fixed-dim border-tertiary-fixed-dim']
+  const sectionIcons = ['wb_sunny', 'lunch_dining', 'dinner_dining']
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-12">
@@ -196,32 +175,44 @@ export default function DayNutritionDetail() {
           Cronograma de Comidas del Día
         </h3>
         <div className="space-y-4">
-          {mealSections.map((meal) => {
-            const mealTotalKcal = meal.items.reduce((s, i) => s + i.kcal, 0)
+          {loading ? (
+            <div className="flex justify-center py-10">
+              <p className="font-label-caps text-sm text-text-muted animate-pulse">Cargando…</p>
+            </div>
+          ) : Object.keys(mealSections).length === 0 ? (
+            <div className="bg-surface-container/50 border border-outline-variant/30 rounded-2xl p-6 text-center">
+              <p className="font-label-caps text-sm text-on-surface-variant">Sin comidas registradas</p>
+            </div>
+          ) : Object.entries(mealSections).map(([sectionName, meals], idx) => {
+            const colorIdx = idx % sectionColors.length
+            const colors = sectionColors[colorIdx]
+            const [textColor, borderColor] = colors.split(' ')
+            const icon = sectionIcons[colorIdx]
+            const totalKcal = meals.reduce((s, m) => s + m.calories, 0)
+            const time = meals[0]?.timestamp ? new Date(meals[0].timestamp).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : '—'
+
             return (
-              <div key={meal.name} className="bg-surface-container/50 backdrop-blur-xl border border-outline-variant/30 rounded-2xl overflow-hidden shadow-sm">
-                {/* Meal header */}
-                <div className={`border-l-4 ${meal.borderColor} p-5`}>
+              <div key={sectionName} className="bg-surface-container/50 backdrop-blur-xl border border-outline-variant/30 rounded-2xl overflow-hidden shadow-sm">
+                <div className={`border-l-4 ${borderColor} p-5`}>
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <div className={`w-9 h-9 rounded-xl bg-surface-container-high border border-outline-variant/30 flex items-center justify-center ${meal.accentColor}`}>
-                        <span className="material-symbols-outlined text-[20px]">{meal.icon}</span>
+                      <div className={`w-9 h-9 rounded-xl bg-surface-container-high border border-outline-variant/30 flex items-center justify-center ${textColor}`}>
+                        <span className="material-symbols-outlined text-[20px]">{icon}</span>
                       </div>
                       <div>
-                        <span className={`font-label-caps text-base font-bold block ${meal.accentColor}`}>{meal.name}</span>
-                        <span className="font-label-sm text-xs text-on-surface-variant">Hora: {meal.time}</span>
+                        <span className={`font-label-caps text-base font-bold block ${textColor}`}>{sectionName}</span>
+                        <span className="font-label-sm text-xs text-on-surface-variant">Hora: {time}</span>
                       </div>
                     </div>
-                    <span className="font-data-display text-lg text-on-surface font-bold">{mealTotalKcal} kcal</span>
+                    <span className="font-data-display text-lg text-on-surface font-bold">{totalKcal} kcal</span>
                   </div>
 
-                  {/* Food items list */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {meal.items.map((item) => (
-                      <div key={item.name} className="bg-surface-container-low/60 border border-outline-variant/30 rounded-xl p-3 flex items-center justify-between">
+                    {meals.map((item) => (
+                      <div key={item.id} className="bg-surface-container-low/60 border border-outline-variant/30 rounded-xl p-3 flex items-center justify-between">
                         <div className="flex-1 min-w-0 pr-2">
                           <p className="font-body-lg text-sm font-bold text-on-surface truncate">{item.name}</p>
-                          <p className="font-label-sm text-xs text-on-surface-variant">{item.portion}</p>
+                          <p className="font-label-sm text-xs text-on-surface-variant">{item.timestamp ? new Date(item.timestamp).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : ''}</p>
                         </div>
                         <div className="flex items-center gap-1.5">
                           <span className="font-label-caps text-[9px] text-primary-fixed bg-primary-fixed/10 px-1.5 py-0.5 rounded">P:{item.protein}g</span>
@@ -233,13 +224,12 @@ export default function DayNutritionDetail() {
                   </div>
                 </div>
 
-                {/* Add food button */}
                 <button
                   onClick={() => navigate('/nutrition/quick-add')}
                   className="w-full py-3 bg-surface-container-high/40 border-t border-outline-variant/30 flex items-center justify-center gap-2 text-on-surface-variant hover:text-primary-fixed hover:bg-primary-fixed/10 transition-all cursor-pointer font-label-caps text-xs font-bold"
                 >
                   <span className="material-symbols-outlined text-[18px]">add</span>
-                  AÑADIR OTRO ALIMENTO A {meal.name.toUpperCase()}
+                  AÑADIR OTRO ALIMENTO A {sectionName.toUpperCase()}
                 </button>
               </div>
             )

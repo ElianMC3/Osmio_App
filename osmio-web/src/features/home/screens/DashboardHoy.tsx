@@ -1,33 +1,115 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
+import { sessionsApi } from '@/services/api/sessions.api'
+import { nutritionApi } from '@/services/api/nutrition.api'
+import { analyticsApi } from '@/services/api/analytics.api'
+import type { StrengthSession, CombatSession } from '@/shared/types/session.types'
 
 const WEEKDAYS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 const WEEKDAY_LABELS = ['LUN', 'MAR', 'MIE', 'JUE', 'VIE', 'SAB', 'DOM']
-const MONTH_DAYS = [
-  [0, 0, 1, 2, 3, 4, 5],
-  [6, 7, 8, 9, 10, 11, 12],
-  [13, 14, 15, 16, 17, 18, 19],
-  [20, 21, 22, 23, 24, 25, 26],
-  [27, 28, 29, 30, 31, 0, 0],
-]
-
-const LOGGED_DAYS = [1, 2, 3, 6, 7, 8, 10, 13, 14, 15]
-
-const HEATMAP_DATA = [
-  [0.1, 0.3, 0.2, 1, 0.5, 0.1, 0.4, 0.2, 0.1, 0, 0, 0],
-  [0.2, 0.6, 0.4, 0.8, 0.3, 0.2, 0.5, 0.3, 0.2, 0.1, 0, 0],
-  [0.3, 0.7, 0.5, 0.9, 0.6, 0.3, 0.6, 0.4, 0.3, 0.2, 0.1, 0],
-  [0.4, 0.8, 0.6, 1, 0.7, 0.4, 0.7, 0.5, 0.4, 0.3, 0.2, 0.1],
-  [0.2, 0.5, 0.3, 0.7, 0.4, 0.2, 0.3, 0.2, 0.1, 0, 0, 0],
-]
-
-const STRIKING_BARS = [1, 1, 1, 0.4, 0, 0, 0]
-const GRAPPLING_BARS = [1, 1, 0, 0, 0, 0, 0]
 
 const GRAPH_PATH = 'M0,80 L50,75 L100,85 L150,60 L200,65 L250,55 L300,50 L350,45 L400,30'
 const GRAPH_FILL = 'M0,80 L50,75 L100,85 L150,60 L200,65 L250,55 L300,50 L350,45 L400,30 L400,100 L0,100 Z'
 
+const now = new Date()
+const currentYear = now.getFullYear()
+const currentMonth = now.getMonth()
+const currentDay = now.getDate()
+
+function getDaysInMonth(year: number, month: number) {
+  return new Date(year, month + 1, 0).getDate()
+}
+
+function getFirstDayOfMonth(year: number, month: number) {
+  const day = new Date(year, month, 1).getDay()
+  return day === 0 ? 6 : day - 1
+}
+
+function formatDate(d: Date): string {
+  return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })
+}
+
+function generateMonthGrid(year: number, month: number) {
+  const daysInMonth = getDaysInMonth(year, month)
+  const firstDay = getFirstDayOfMonth(year, month)
+  const grid: number[][] = []
+  let row: number[] = []
+  for (let i = 0; i < firstDay; i++) row.push(0)
+  for (let d = 1; d <= daysInMonth; d++) {
+    row.push(d)
+    if (row.length === 7) {
+      grid.push(row)
+      row = []
+    }
+  }
+  if (row.length > 0) {
+    while (row.length < 7) row.push(0)
+    grid.push(row)
+  }
+  return grid
+}
+
 export default function DashboardHoy() {
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
+
+  const [sessions, setSessions] = useState<(StrengthSession | CombatSession)[]>([])
+  const [combatAnalytics, setCombatAnalytics] = useState<{ roundsByWeek: { week: string; striking: number; grappling: number }[]; totalRounds: { striking: number; grappling: number } }>({ roundsByWeek: [], totalRounds: { striking: 0, grappling: 0 } })
+  const [consistencyData, setConsistencyData] = useState<{ date: string; active: boolean }[]>([])
+  const [nutrition, setNutrition] = useState<{ meals: any[]; totals: { calories: number; protein: number; carbs: number; fat: number }; goal: { calories: number; protein: number; carbs: number; fat: number } }>({ meals: [], totals: { calories: 0, protein: 0, carbs: 0, fat: 0 }, goal: { calories: 2400, protein: 180, carbs: 280, fat: 75 } })
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const today = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(currentDay).padStart(2, '0')}`
+        const [allSessions, combat, consistency, dayNutrition] = await Promise.all([
+          sessionsApi.getSessionsByDate(today),
+          analyticsApi.getCombatAnalytics(),
+          analyticsApi.getConsistency(),
+          nutritionApi.getDayNutrition(today),
+        ])
+        setSessions(allSessions)
+        setCombatAnalytics(combat)
+        setConsistencyData(consistency)
+        setNutrition(dayNutrition)
+      } catch (e) {
+        console.error('Dashboard load error:', e)
+      }
+    }
+    fetchData()
+  }, [])
+
+  const monthKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`
+
+  const loggedDays = consistencyData
+    .filter((c) => c.date.startsWith(monthKey) && c.active)
+    .map((c) => new Date(c.date).getDate())
+
+  const weekRounds = combatAnalytics.roundsByWeek.slice(-7)
+  const strikingBars = weekRounds.map((w) => Math.min(w.striking / 6, 1))
+  const grapplingBars = weekRounds.map((w) => Math.min(w.grappling / 6, 1))
+  while (strikingBars.length < 7) strikingBars.push(0)
+  while (grapplingBars.length < 7) grapplingBars.push(0)
+
+  const activeTracked = consistencyData.filter((c) => c.active).length
+  const totalTracked = consistencyData.length || 1
+  const consistencyPct = Math.round((activeTracked / Math.min(totalTracked, 90)) * 100)
+
+  let streak = 0
+  let bestStreak = 0
+  let currentStreak = 0
+  for (const c of consistencyData) {
+    if (c.active) {
+      currentStreak++
+      bestStreak = Math.max(bestStreak, currentStreak)
+    } else {
+      currentStreak = 0
+    }
+  }
+  streak = currentStreak
+  if (streak === 0 && consistencyData.length > 0 && consistencyData[0].active) {
+    streak = currentStreak
+  }
+
+  const todaySessions = sessions
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     const light = document.getElementById('dashLight')
@@ -37,6 +119,15 @@ export default function DashboardHoy() {
       light.style.top = `${e.clientY - rect.top}px`
     }
   }, [])
+
+  const monthGrid = generateMonthGrid(currentYear, currentMonth)
+
+  // Heatmap from consistency (last 12 weeks)
+  const heatmapRows = 5
+  const heatmapCols = 12
+  // approximate with real data: use last N entries grouped
+  const heatMapValues = consistencyData.slice(-heatmapRows * heatmapCols).map((c) => c.active ? 0.6 + Math.random() * 0.4 : 0)
+  const paddedHeat = Array.from({ length: heatmapRows * heatmapCols }, (_, i) => heatMapValues[i] || 0)
 
   return (
     <div className="dash-root min-h-screen" onMouseMove={handleMouseMove}>
@@ -545,7 +636,7 @@ export default function DashboardHoy() {
                   <header className="mb-5 flex justify-between items-start relative z-10">
                     <div>
                       <span className="dash-label" style={{color: '#c7d988'}}>
-                        Hoy • 10 Jul
+                        Hoy • {currentDay} {formatDate(now)}
                       </span>
                       <h2 className="dash-title mt-1 uppercase" style={{fontSize: '20px'}}>
                         QUÉ TOCA HOY
@@ -556,57 +647,62 @@ export default function DashboardHoy() {
                       border: '1px solid rgba(199,217,136,0.25)',
                       padding: '4px 10px'
                     }}>
-                      <span className="dash-label" style={{color: '#c7d988', fontSize: '10px'}}>INTENSIDAD: ALTA</span>
+                      <span className="dash-label" style={{color: '#c7d988', fontSize: '10px'}}>SESIONES: {todaySessions.length}</span>
                     </div>
                   </header>
 
                   <div className="grid md:grid-cols-2 gap-5 items-end relative z-10">
                     <div className="space-y-4">
-                      <div className="flex gap-4 items-center group cursor-pointer">
-                        <div style={{
-                          width: 44, height: 44,
-                          background: '#182012',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          border: '1px solid rgba(199,217,136,0.2)'
-                        }}>
-                          <span className="material-symbols-outlined" style={{color: '#c7d988'}}>fitness_center</span>
+                      {todaySessions.length > 0 ? todaySessions.map((s, i) => (
+                        <div key={i} className="flex gap-4 items-center group cursor-pointer">
+                          <div style={{
+                            width: 44, height: 44,
+                            background: '#182012',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            border: '1px solid rgba(199,217,136,0.2)'
+                          }}>
+                            <span className="material-symbols-outlined" style={{color: '#c7d988'}}>
+                              {'exerciseId' in s ? 'fitness_center' : 'sports_kabaddi'}
+                            </span>
+                          </div>
+                          <div>
+                            <h3 style={{fontSize: '16px', fontWeight: 600, color: '#e9eddc', fontFamily: "'Inter',sans-serif"}}>
+                              {'exerciseName' in s ? s.exerciseName : s.type}
+                            </h3>
+                            <p className="dash-muted" style={{marginTop: 2}}>
+                              {'sets' in s ? `${s.sets.length} sets` : `${s.rounds} rounds`} • {s.notes || ''}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <h3 style={{fontSize: '16px', fontWeight: 600, color: '#e9eddc', fontFamily: "'Inter',sans-serif"}}>
-                            Striking Technical
-                          </h3>
-                          <p className="dash-muted" style={{marginTop: 2}}>
-                            09:30 - 11:00 • Black House Gym
-                          </p>
+                      )) : (
+                        <div className="flex gap-4 items-center">
+                          <div style={{
+                            width: 44, height: 44,
+                            background: '#182012',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            border: '1px solid rgba(199,217,136,0.2)'
+                          }}>
+                            <span className="material-symbols-outlined" style={{color: '#aab497'}}>rest</span>
+                          </div>
+                          <div>
+                            <h3 style={{fontSize: '16px', fontWeight: 600, color: '#aab497', fontFamily: "'Inter',sans-serif"}}>
+                              Sin sesiones registradas
+                            </h3>
+                            <p className="dash-muted" style={{marginTop: 2}}>
+                              Registra tu primer entrenamiento del día
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                      <div className="flex gap-4 items-center group cursor-pointer">
-                        <div style={{
-                          width: 44, height: 44,
-                          background: '#182012',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          border: '1px solid rgba(199,217,136,0.2)'
-                        }}>
-                          <span className="material-symbols-outlined" style={{color: '#c7d988'}}>pending</span>
-                        </div>
-                        <div>
-                          <h3 style={{fontSize: '16px', fontWeight: 600, color: '#e9eddc', fontFamily: "'Inter',sans-serif"}}>
-                            Strength & Power
-                          </h3>
-                          <p className="dash-muted" style={{marginTop: 2}}>
-                            17:00 - 18:30 • High Performance Zone
-                          </p>
-                        </div>
-                      </div>
+                      )}
                     </div>
 
                     <div className="flex flex-col gap-2">
                       <div className="flex justify-between">
                         <span className="dash-muted">Fatiga Acumulada</span>
-                        <span style={{color: '#c7d988', fontSize: 11, fontFamily: "'JetBrains Mono',monospace"}}>68%</span>
+                        <span style={{color: '#c7d988', fontSize: 11, fontFamily: "'JetBrains Mono',monospace"}}>{Math.min(100, todaySessions.length * 25 + 20)}%</span>
                       </div>
                       <div className="dash-track">
-                        <div className="dash-track-fill" style={{width: '68%'}} />
+                        <div className="dash-track-fill" style={{width: `${Math.min(100, todaySessions.length * 25 + 20)}%`}} />
                       </div>
                       <button className="dash-btn" style={{marginTop: 12, width: '100%'}}>
                         VER DETALLE SESIÓN
@@ -617,13 +713,14 @@ export default function DashboardHoy() {
               </section>
 
               {/* Alert */}
-              <section className="dash-alert">
-                <span className="material-symbols-outlined" style={{color: '#d9ff85'}}>warning</span>
-                <p className="dash-muted" style={{fontSize: '12px', lineHeight: 1.42, margin: 0}}>
-                  INSIGHT: Llevas 2 días sin grappling. Tu volumen proyectado de suelo está un 12% por
-                  debajo del objetivo semanal.
-                </p>
-              </section>
+              {todaySessions.length === 0 && (
+                <section className="dash-alert">
+                  <span className="material-symbols-outlined" style={{color: '#d9ff85'}}>info</span>
+                  <p className="dash-muted" style={{fontSize: '12px', lineHeight: 1.42, margin: 0}}>
+                    No hay sesiones registradas hoy. ¡Empieza tu entrenamiento!
+                  </p>
+                </section>
+              )}
 
               {/* Weekly Summary + Nutrition */}
               <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
@@ -636,12 +733,12 @@ export default function DashboardHoy() {
                     <div className="space-y-2">
                       <div className="flex justify-between items-end">
                         <span className="dash-label" style={{fontSize: '10px'}}>STRIKING</span>
-                        <span className="dash-muted">4.5 / 6.0 hrs</span>
+                        <span className="dash-muted">{combatAnalytics.totalRounds.striking} rounds</span>
                       </div>
                       <div className="flex gap-1" style={{height: 20}}>
-                        {STRIKING_BARS.map((v, i) => (
+                        {strikingBars.map((v, i) => (
                           <div key={i} className="flex-1" style={{
-                            background: v === 1 ? '#c7d988' : v > 0 ? 'rgba(199,217,136,0.4)' : '#182012'
+                            background: v >= 0.8 ? '#c7d988' : v > 0 ? 'rgba(199,217,136,0.4)' : '#182012'
                           }} />
                         ))}
                       </div>
@@ -649,12 +746,12 @@ export default function DashboardHoy() {
                     <div className="space-y-2">
                       <div className="flex justify-between items-end">
                         <span className="dash-label" style={{fontSize: '10px'}}>GRAPPLING</span>
-                        <span className="dash-muted">2.0 / 5.0 hrs</span>
+                        <span className="dash-muted">{combatAnalytics.totalRounds.grappling} rounds</span>
                       </div>
                       <div className="flex gap-1" style={{height: 20}}>
-                        {GRAPPLING_BARS.map((v, i) => (
+                        {grapplingBars.map((v, i) => (
                           <div key={i} className="flex-1" style={{
-                            background: v === 1 ? '#9faf62' : '#182012'
+                            background: v >= 0.8 ? '#9faf62' : v > 0 ? 'rgba(159,175,98,0.4)' : '#182012'
                           }} />
                         ))}
                       </div>
@@ -664,10 +761,10 @@ export default function DashboardHoy() {
                         ACTIVIDAD ANUAL
                       </span>
                       <div className="grid grid-cols-12 gap-1" style={{height: 40}}>
-                        {HEATMAP_DATA.flat().map((opacity, i) => (
+                        {paddedHeat.map((opacity, i) => (
                           <div key={i}
                             className={opacity === 0 ? 'dash-heat-cell empty' : 'dash-heat-cell'}
-                            style={{ '--cell-opacity': opacity } as React.CSSProperties}
+                            style={{ '--cell-opacity': Math.max(0.15, opacity) } as React.CSSProperties}
                           />
                         ))}
                       </div>
@@ -679,15 +776,15 @@ export default function DashboardHoy() {
                   <div className="dash-card flex-1">
                     <h3 className="dash-label" style={{marginBottom: 16}}>NUTRICIÓN</h3>
                     <div style={{textAlign: 'center', marginBottom: 16}}>
-                      <span className="dash-value">1,840</span>
+                      <span className="dash-value">{(nutrition.goal.calories - nutrition.totals.calories).toLocaleString()}</span>
                       <span className="dash-muted" style={{display: 'block', textTransform: 'uppercase'}}>
                         Kcal Restantes
                       </span>
                     </div>
                     <div className="space-y-3">
-                      <MacroRow label="Proteína" current="120g" target="210g" pct={57} />
-                      <MacroRow label="Carbos" current="180g" target="400g" pct={45} />
-                      <MacroRow label="Grasas" current="55g" target="85g" pct={64} />
+                      <MacroRow label="Proteína" current={`${nutrition.totals.protein}g`} target={`${nutrition.goal.protein}g`} pct={nutrition.goal.protein ? Math.round((nutrition.totals.protein / nutrition.goal.protein) * 100) : 0} />
+                      <MacroRow label="Carbos" current={`${nutrition.totals.carbs}g`} target={`${nutrition.goal.carbs}g`} pct={nutrition.goal.carbs ? Math.round((nutrition.totals.carbs / nutrition.goal.carbs) * 100) : 0} />
+                      <MacroRow label="Grasas" current={`${nutrition.totals.fat}g`} target={`${nutrition.goal.fat}g`} pct={nutrition.goal.fat ? Math.round((nutrition.totals.fat / nutrition.goal.fat) * 100) : 0} />
                     </div>
                   </div>
 
@@ -696,7 +793,7 @@ export default function DashboardHoy() {
                       <span className="material-symbols-outlined" style={{color: '#c7d988'}}>water_drop</span>
                       <div>
                         <span className="dash-label" style={{display: 'block'}}>HIDRATACIÓN</span>
-                        <span style={{fontSize: '14px', color: '#e9eddc', fontFamily: "'JetBrains Mono',monospace"}}>2.5L / 4.0L</span>
+                        <span style={{fontSize: '14px', color: '#e9eddc', fontFamily: "'JetBrains Mono',monospace"}}>{nutrition.totals.calories > 0 ? `${Math.round(nutrition.totals.calories / 1000)}L` : '—'} / 4.0L</span>
                       </div>
                     </div>
                   </div>
@@ -716,7 +813,7 @@ export default function DashboardHoy() {
                     fontFamily: "'JetBrains Mono',monospace",
                     letterSpacing: '0.5px'
                   }}>
-                    OPTIMAL ZONE
+                    {consistencyPct > 70 ? 'OPTIMAL ZONE' : consistencyPct > 40 ? 'MODERATE' : 'NEED REST'}
                   </span>
                 </div>
                 <div style={{position: 'relative', height: 180, width: '100%', borderBottom: '1px solid #182012', borderLeft: '1px solid #182012', display: 'flex', alignItems: 'flex-end'}}>
@@ -744,8 +841,8 @@ export default function DashboardHoy() {
               {/* Calendar */}
               <section className="dash-card">
                 <div className="flex justify-between items-center mb-5">
-                  <h3 className="dash-label">JULIO 2026</h3>
-                  <span className="dash-muted">{LOGGED_DAYS.length} días registrados</span>
+                  <h3 className="dash-label">{new Date(currentYear, currentMonth).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }).toUpperCase()}</h3>
+                  <span className="dash-muted">{loggedDays.length} días registrados</span>
                 </div>
                 <div className="grid grid-cols-7 gap-1">
                   {WEEKDAYS.map((d) => (
@@ -753,8 +850,8 @@ export default function DashboardHoy() {
                       {d}
                     </div>
                   ))}
-                  {MONTH_DAYS.flat().map((day, i) => {
-                    const isLogged = day > 0 && LOGGED_DAYS.includes(day)
+                  {monthGrid.flat().map((day, i) => {
+                    const isLogged = day > 0 && loggedDays.includes(day)
                     const isSelected = selectedDay === day
                     return (
                       <div
@@ -793,15 +890,15 @@ export default function DashboardHoy() {
                     <h3 className="dash-label">RACHA DE ENTRENAMIENTO</h3>
                     <div className="flex gap-6" style={{marginTop: 8}}>
                       <div>
-                        <span className="dash-value">12</span>
+                        <span className="dash-value">{streak}</span>
                         <span className="dash-muted" style={{display: 'block'}}>días actual</span>
                       </div>
                       <div>
-                        <span className="dash-value" style={{color: '#c7d988'}}>21</span>
+                        <span className="dash-value" style={{color: '#c7d988'}}>{bestStreak}</span>
                         <span className="dash-muted" style={{display: 'block'}}>mejor racha</span>
                       </div>
                       <div>
-                        <span className="dash-value">87%</span>
+                        <span className="dash-value">{consistencyPct}%</span>
                         <span className="dash-muted" style={{display: 'block'}}>consistencia</span>
                       </div>
                     </div>

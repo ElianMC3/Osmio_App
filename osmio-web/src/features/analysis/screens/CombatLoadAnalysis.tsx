@@ -1,23 +1,45 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { GreenCard } from '@/design-system/components/GreenCard'
-import { GreenButton } from '@/design-system/components/GreenButton'
 import { GreenProgress } from '@/design-system/components/GreenProgress'
-import { GreenTag } from '@/design-system/components/GreenTag'
-type TimeRange = '7d' | '4w' | '3m'
-
-const weeklyData = [
-  { label: 'SEM 01', striking: 160, grappling: 120 },
-  { label: 'SEM 02', striking: 224, grappling: 96 },
-  { label: 'SEM 03', striking: 128, grappling: 192 },
-  { label: 'SEM 04', striking: 256, grappling: 64 },
-]
-
-const maxRounds = Math.max(...weeklyData.map((d) => d.striking + d.grappling))
+import { analyticsApi } from '@/services/api/analytics.api'
+import type { CombatAnalytics } from '@/services/api/analytics.api'
 
 export default function CombatLoadAnalysis() {
   const navigate = useNavigate()
-  const [timeRange, setTimeRange] = useState<TimeRange>('4w')
+  const [data, setData] = useState<CombatAnalytics | null>(null)
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const result = await analyticsApi.getCombatAnalytics()
+        setData(result)
+      } catch (e) {
+        console.error('Error loading combat analytics:', e)
+      }
+    }
+    fetchData()
+  }, [])
+
+  const weeklyData = (data?.roundsByWeek ?? []).slice(-4).map((w, i) => ({
+    label: `SEM ${String(i + 1).padStart(2, '0')}`,
+    striking: w.striking,
+    grappling: w.grappling,
+  }))
+
+  const maxRounds = Math.max(1, ...weeklyData.map((d) => d.striking + d.grappling))
+  const totalRounds = (data?.totalRounds.striking ?? 0) + (data?.totalRounds.grappling ?? 0)
+  const avgPerDay = weeklyData.length > 0 ? Math.round(totalRounds / (weeklyData.length * 7)) : 0
+  const roundsByWeek = data?.roundsByWeek ?? []
+  const prev = roundsByWeek.length > 1 ? roundsByWeek[roundsByWeek.length - 2] : null
+  const prevStriking = prev?.striking ?? 0
+  const prevGrappling = prev?.grappling ?? 0
+  const prevTotal = prevStriking + prevGrappling
+  const changePct = prevTotal > 0 ? Math.round(((totalRounds - prevTotal) / prevTotal) * 100) : 0
+  const strikingTotal = data?.totalRounds.striking ?? 0
+  const grapplingTotal = data?.totalRounds.grappling ?? 0
+  const strikingPct = totalRounds > 0 ? Math.round((strikingTotal / totalRounds) * 100) : 50
+  const grapplingPct = totalRounds > 0 ? Math.round((grapplingTotal / totalRounds) * 100) : 50
 
   return (
     <div className="min-h-screen pb-20">
@@ -62,25 +84,6 @@ export default function CombatLoadAnalysis() {
       </div>
 
       <div className="p-md space-y-lg">
-        {/* Time Range Selector */}
-        <div className="flex gap-xs">
-          {([
-            { key: '7d', label: '7 Días' },
-            { key: '4w', label: 'Últimas 4 Semanas' },
-            { key: '3m', label: '3 Meses' },
-          ] as const).map((opt) => (
-            <GreenButton
-              key={opt.key}
-              variant={timeRange === opt.key ? 'primary' : 'default'}
-              size="sm"
-              effects
-              onClick={() => setTimeRange(opt.key)}
-            >
-              {opt.label}
-            </GreenButton>
-          ))}
-        </div>
-
         {/* Summary Cards */}
         <div className="grid grid-cols-3 gap-sm">
           <GreenCard variant="default" padding="sm" effects>
@@ -88,7 +91,7 @@ export default function CombatLoadAnalysis() {
               % vs Semana Ant.
             </span>
             <span className="font-label-caps text-[18px] text-green">
-              +18%
+              {changePct >= 0 ? '+' : ''}{changePct}%
             </span>
           </GreenCard>
           <GreenCard variant="default" padding="sm" effects>
@@ -96,7 +99,7 @@ export default function CombatLoadAnalysis() {
               Promedio/Día
             </span>
             <span className="font-label-caps text-[18px] text-green-dim">
-              10.2
+              {avgPerDay}
             </span>
           </GreenCard>
           <GreenCard variant="default" padding="sm" effects>
@@ -104,7 +107,7 @@ export default function CombatLoadAnalysis() {
               Diferencia
             </span>
             <span className="font-label-caps text-[18px] text-acid">
-              +6.4
+              {changePct !== 0 ? (changePct >= 0 ? '+' : '') + changePct : '—'}
             </span>
           </GreenCard>
         </div>
@@ -162,26 +165,26 @@ export default function CombatLoadAnalysis() {
               Total Rounds
             </span>
             <span className="font-label-caps text-[18px] text-green">
-              142
+              {totalRounds}
             </span>
             <span className="font-label-caps text-[8px] text-green-dim">
-              +12% vs prev.
+              {changePct >= 0 ? '+' : ''}{changePct}% vs prev.
             </span>
           </GreenCard>
           <GreenCard variant="default" padding="sm" effects>
             <span className="font-label-caps text-[9px] text-text-muted block uppercase">
-              Sessions
+              Weeks
             </span>
             <span className="font-label-caps text-[18px] text-green">
-              28
+              {data?.roundsByWeek.length ?? 0}
             </span>
           </GreenCard>
           <GreenCard variant="default" padding="sm" effects>
             <span className="font-label-caps text-[9px] text-text-muted block uppercase">
-              PRs
+              Striking
             </span>
             <span className="font-label-caps text-[18px] text-green">
-              2
+              {strikingTotal}
             </span>
           </GreenCard>
         </div>
@@ -196,33 +199,33 @@ export default function CombatLoadAnalysis() {
               <div className="flex justify-between items-end mb-xs">
                 <div>
                   <span className="font-label-sm text-label-sm text-text-muted block uppercase">
-                    Sparring Duro
+                    Striking
                   </span>
                   <span className="font-label-caps text-data-display text-text-green">
-                    42 <span className="text-xs font-normal">Rnds</span>
+                    {strikingTotal} <span className="text-xs font-normal">Rnds</span>
                   </span>
                 </div>
-                <span className="font-label-caps text-label-caps text-green">29.5%</span>
+                <span className="font-label-caps text-label-caps text-green">{strikingPct}%</span>
               </div>
-              <GreenProgress value={29.5} size="sm" effects />
+              <GreenProgress value={strikingPct} size="sm" effects />
             </div>
             <div>
               <div className="flex justify-between items-end mb-xs">
                 <div>
                   <span className="font-label-sm text-label-sm text-text-muted block uppercase">
-                    Drills Técnicos
+                    Grappling
                   </span>
                   <span className="font-label-caps text-data-display text-text-green">
-                    100 <span className="text-xs font-normal">Rnds</span>
+                    {grapplingTotal} <span className="text-xs font-normal">Rnds</span>
                   </span>
                 </div>
-                <span className="font-label-caps text-label-caps text-green-dim">70.5%</span>
+                <span className="font-label-caps text-label-caps text-green-dim">{grapplingPct}%</span>
               </div>
-              <GreenProgress value={70.5} size="sm" effects />
+              <GreenProgress value={grapplingPct} size="sm" effects />
             </div>
           </div>
           <div className="mt-md p-sm border-l-2 border-green/20 bg-panel/50 italic text-sm text-text-muted">
-            "Tu volumen de grappling ha aumentado un 18% esta semana, enfocando la carga en rounds de alta intensidad."
+            {data ? `Carga total: ${totalRounds} rounds (Striking ${strikingPct}% / Grappling ${grapplingPct}%)` : 'Cargando datos...'}
           </div>
         </GreenCard>
 
@@ -237,8 +240,8 @@ export default function CombatLoadAnalysis() {
                 <p className="font-label-caps text-label-caps text-text-muted">
                   INTENSIDAD PICO
                 </p>
-                <p className="font-headline-md text-headline-md text-text-green">9.2 / 10</p>
-                <p className="font-label-sm text-label-sm text-error">Sesión del Jueves</p>
+                <p className="font-headline-md text-headline-md text-text-green">—</p>
+                <p className="font-label-sm text-label-sm text-text-muted">Registra sesiones para ver datos</p>
               </div>
             </div>
           </GreenCard>
@@ -249,13 +252,13 @@ export default function CombatLoadAnalysis() {
               </div>
               <div>
                 <p className="font-label-caps text-label-caps text-text-muted">
-                  DURACIÓN PROMEDIO
+                  TOTAL ROUNDS
                 </p>
                 <p className="font-headline-md text-headline-md text-text-green">
-                  5:00 <span className="text-xs text-text-muted">MIN/RND</span>
+                  {totalRounds} <span className="text-xs text-text-muted">RNDS</span>
                 </p>
                 <p className="font-label-sm text-label-sm text-green-dim">
-                  Intervalos Estándar
+                  {data?.roundsByWeek.length ?? 0} semanas registradas
                 </p>
               </div>
             </div>
@@ -267,13 +270,13 @@ export default function CombatLoadAnalysis() {
               </div>
               <div>
                 <p className="font-label-caps text-label-caps text-text-muted">
-                  RECUPERACIÓN INTER-ROUND
+                  PROMEDIO/SEMANA
                 </p>
                 <p className="font-headline-md text-headline-md text-text-green">
-                  1:00 <span className="text-xs text-text-muted">MIN</span>
+                  {data?.roundsByWeek.length ? Math.round(totalRounds / data.roundsByWeek.length) : 0} <span className="text-xs text-text-muted">RNDS</span>
                 </p>
                 <p className="font-label-sm text-label-sm text-green-dim">
-                  Consistente
+                  Últimas {data?.roundsByWeek.length || 0} semanas
                 </p>
               </div>
             </div>

@@ -1,44 +1,16 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { GreenCard } from '@/design-system/components/GreenCard'
 import { GreenButton } from '@/design-system/components/GreenButton'
 import { GreenTag } from '@/design-system/components/GreenTag'
 import { GreenProgress } from '@/design-system/components/GreenProgress'
+import { sessionsApi } from '@/services/api/sessions.api'
+import type { StrengthSession, CombatSession } from '@/shared/types/session.types'
 const WEEKDAYS = ['LUN', 'MAR', 'MIE', 'JUE', 'VIE', 'SAB', 'DOM']
 const MONTH_NAMES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
 ]
-
-const trainingDays: Record<string, number[]> = {
-  '2026-07': [1, 2, 4, 5, 7, 8, 9, 11, 12, 14, 15, 16, 18, 19, 21, 22, 23, 25, 26, 28, 29],
-  '2026-06': [1, 3, 4, 6, 7, 10, 11, 13, 14, 17, 18, 20, 21, 24, 25, 27, 28],
-  '2026-08': [2, 3, 5, 6, 9, 10, 12, 13, 16, 17, 19, 20, 23, 24, 26, 27],
-}
-
-const disciplineMap: Record<number, string[]> = {
-  1: ['striking'],
-  2: ['grappling', 'fuerza'],
-  4: ['striking'],
-  5: ['fuerza'],
-  7: ['grappling'],
-  8: ['striking', 'grappling'],
-  9: ['fuerza'],
-  11: ['striking'],
-  12: ['grappling'],
-  14: ['fuerza'],
-  15: ['striking'],
-  16: ['grappling', 'fuerza'],
-  18: ['striking'],
-  19: ['grappling'],
-  21: ['fuerza'],
-  22: ['striking', 'grappling'],
-  23: ['fuerza'],
-  25: ['striking'],
-  26: ['grappling'],
-  28: ['fuerza', 'striking'],
-  29: ['grappling'],
-}
 
 const dotColors: Record<string, string> = {
   striking: 'bg-green',
@@ -60,11 +32,11 @@ interface DayDetailPanelProps {
   year: number
   month: number
   onClose: () => void
+  disciplines: string[]
 }
 
-function DayDetailPanel({ day, year, month, onClose }: DayDetailPanelProps) {
+function DayDetailPanel({ day, year, month, onClose, disciplines }: DayDetailPanelProps) {
   const navigate = useNavigate()
-  const disciplines = disciplineMap[day] || []
   const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
 
   return (
@@ -124,11 +96,63 @@ export default function MonthlyCalendar() {
   const [year, setYear] = useState(now.getFullYear())
   const [month, setMonth] = useState(now.getMonth())
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
+  const [allSessions, setAllSessions] = useState<(StrengthSession | CombatSession)[]>([])
 
-  const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`
+  useEffect(() => {
+    async function fetchSessions() {
+      try {
+        const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`
+        const [strength, combat] = await Promise.all([
+          sessionsApi.getStrengthSessions(),
+          sessionsApi.getCombatSessions(),
+        ])
+        const filtered = [...strength, ...combat].filter((s) => s.date.startsWith(monthKey))
+        setAllSessions(filtered)
+      } catch (e) {
+        console.error('Error loading sessions:', e)
+        setAllSessions([])
+      }
+    }
+    fetchSessions()
+  }, [year, month])
+
+  const days = useMemo(() => {
+    const daySet = new Set<number>()
+    for (const s of allSessions) {
+      const d = new Date(s.date).getDate()
+      daySet.add(d)
+    }
+    return Array.from(daySet).sort()
+  }, [allSessions])
+
+  const disciplineMap = useMemo(() => {
+    const map: Record<number, string[]> = {}
+    for (const s of allSessions) {
+      const d = new Date(s.date).getDate()
+      if (!map[d]) map[d] = []
+      if ('exerciseName' in s) {
+        if (!map[d].includes('fuerza')) map[d].push('fuerza')
+      } else {
+        if (!map[d].includes(s.type)) map[d].push(s.type)
+      }
+    }
+    return map
+  }, [allSessions])
+
+  const monthlyTotals = useMemo(() => {
+    let rounds = 0
+    let totalKg = 0
+    for (const s of allSessions) {
+      if ('rounds' in s) rounds += s.rounds
+      if ('sets' in s) {
+        for (const set of s.sets) totalKg += set.weight * set.reps
+      }
+    }
+    return { rounds, tonnage: totalKg }
+  }, [allSessions])
+
   const daysInMonth = getDaysInMonth(year, month)
   const firstDay = getFirstDayOfMonth(year, month)
-  const days = trainingDays[monthKey] || []
 
   const calendarCells = useMemo(() => {
     const cells: (number | null)[] = []
@@ -271,6 +295,7 @@ export default function MonthlyCalendar() {
             year={year}
             month={month}
             onClose={() => setSelectedDay(null)}
+            disciplines={disciplineMap[selectedDay] ?? []}
           />
         )}
 
@@ -280,24 +305,24 @@ export default function MonthlyCalendar() {
             <span className="font-label-caps text-label-caps text-text-muted opacity-60">
               MONTHLY TOTALS:
             </span>
-            <div className="flex items-center gap-lg">
-              <div className="flex items-center gap-sm">
-                <span className="font-label-caps text-[9px] text-text-muted">ROUNDS</span>
-                <span className="font-label-caps text-green">142</span>
-              </div>
-              <div className="flex items-center gap-sm">
-                <span className="font-label-caps text-[9px] text-text-muted">TONNAGE</span>
-                <span className="font-label-caps text-green">12.8T</span>
-              </div>
-              <div className="flex items-center gap-sm">
-                <span className="font-label-caps text-[9px] text-text-muted">KCAL</span>
-                <span className="font-label-caps text-green">24,502</span>
+              <div className="flex items-center gap-lg">
+                <div className="flex items-center gap-sm">
+                  <span className="font-label-caps text-[9px] text-text-muted">ROUNDS</span>
+                  <span className="font-label-caps text-green">{monthlyTotals.rounds}</span>
+                </div>
+                <div className="flex items-center gap-sm">
+                  <span className="font-label-caps text-[9px] text-text-muted">TONNAGE</span>
+                  <span className="font-label-caps text-green">{(monthlyTotals.tonnage / 1000).toFixed(1)}T</span>
+                </div>
+                <div className="flex items-center gap-sm">
+                  <span className="font-label-caps text-[9px] text-text-muted">SESIONES</span>
+                  <span className="font-label-caps text-green">{allSessions.length}</span>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="flex items-center gap-sm mt-sm">
-            <GreenProgress value={72} label="GOAL" showValue={true} size="sm" effects={true} />
-          </div>
+            <div className="flex items-center gap-sm mt-sm">
+              <GreenProgress value={days.length > 0 ? Math.round((days.length / daysInMonth) * 100) : 0} label="GOAL" showValue={true} size="sm" effects={true} />
+            </div>
         </div>
       </div>
 

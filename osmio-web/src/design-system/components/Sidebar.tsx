@@ -10,6 +10,7 @@ interface SidebarItem {
 const sidebarItems: SidebarItem[] = [
   { icon: 'dashboard', label: 'Dashboard', path: '/dashboard' },
   { icon: 'fitness_center', label: 'Entrenamiento', path: '/logging' },
+  { icon: 'assignment', label: 'Mi Rutina', path: '/strength/routine' },
   { icon: 'monitoring', label: 'Análisis', path: '/analysis/strength' },
   { icon: 'restaurant', label: 'Nutrición', path: '/nutrition' },
   { icon: 'calendar_month', label: 'Historial', path: '/history' },

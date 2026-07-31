@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { GreenCard } from '../../../design-system/components/GreenCard'
 import { GreenButton } from '../../../design-system/components/GreenButton'
-import { GreenProgress } from '../../../design-system/components/GreenProgress'
 import { GreenTag } from '../../../design-system/components/GreenTag'
+import { sessionsApi } from '@/services/api/sessions.api'
+import { routinesApi } from '@/services/api/routines.api'
 
 interface SetData {
   weight: number
@@ -21,7 +22,7 @@ interface ExerciseData {
 
 const defaultExercises: ExerciseData[] = [
   {
-    id: '1',
+    id: '43',
     name: 'Back Squat',
     category: 'PIERNAS / COMPUESTO',
     sets: [
@@ -30,7 +31,7 @@ const defaultExercises: ExerciseData[] = [
     ],
   },
   {
-    id: '2',
+    id: '25',
     name: 'Bench Press',
     category: 'EMPUJE / COMPUESTO',
     sets: [{ weight: 0, reps: 0, restTime: 180, done: false }],
@@ -58,11 +59,15 @@ function formatRest(seconds: number): string {
 
 export default function StrengthActiveSession() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const { trainingType, routineId } = (location.state ?? {}) as { trainingType?: string; routineId?: string }
   const [elapsed, setElapsed] = useState(0)
-  const [exercises, setExercises] = useState<ExerciseData[]>(defaultExercises)
+  const [exercises, setExercises] = useState<ExerciseData[]>([])
+  const [currentRoutineId, setCurrentRoutineId] = useState<string | undefined>(routineId)
   const [showTimer, setShowTimer] = useState(true)
   const [showNotes, setShowNotes] = useState(false)
   const [notes, setNotes] = useState('')
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -70,6 +75,42 @@ export default function StrengthActiveSession() {
     }, 1000)
     return () => clearInterval(interval)
   }, [])
+
+  useEffect(() => {
+    let active = true
+    async function loadExercises() {
+      try {
+        const routines = await routinesApi.getRoutines()
+        const routine = routines.find((r) => r.id === routineId) ?? routines[0] ?? null
+        if (!routine || routine.exercises.length === 0) {
+          if (active) setExercises(defaultExercises)
+          return
+        }
+        if (active) {
+          setCurrentRoutineId(routine.id)
+          setExercises(
+            routine.exercises.map((rex) => ({
+              id: String(rex.exerciseId),
+              name: rex.exercise?.name ?? `#${rex.exerciseId}`,
+              category: (rex.exercise?.category ?? '').toUpperCase() || 'EJERCICIO',
+              sets: Array.from({ length: Math.max(1, rex.targetSets) }, () => ({
+                weight: rex.currentWeight,
+                reps: rex.targetRepsMax,
+                restTime: rex.restSeconds,
+                done: false,
+              })),
+            }))
+          )
+        }
+      } catch {
+        if (active) setExercises(defaultExercises)
+      }
+    }
+    loadExercises()
+    return () => {
+      active = false
+    }
+  }, [routineId])
 
   const totalVolume = exercises.reduce((vol, ex) => {
     return (
@@ -112,6 +153,30 @@ export default function StrengthActiveSession() {
       }),
     )
   }, [])
+
+  const finishSession = async () => {
+    setSaving(true)
+    try {
+      const date = new Date().toISOString().split('T')[0]
+      const trainingTag = (trainingType ?? '').toUpperCase()
+      for (const ex of exercises) {
+        const doneSets = ex.sets.filter((s) => s.done && (s.weight > 0 || s.reps > 0))
+        if (doneSets.length === 0) continue
+        await sessionsApi.createStrengthSession({
+          date,
+          exerciseId: Number(ex.id),
+          exerciseName: ex.name,
+          sets: doneSets.map((s) => ({ reps: s.reps, weight: s.weight, rpe: 7 })),
+          notes: `${trainingTag ? `[${trainingTag}] ` : ''}${notes}`.trim(),
+        })
+      }
+      navigate(-1)
+    } catch (e) {
+      console.error('Error saving strength session:', e)
+    } finally {
+      setSaving(false)
+    }
+  }
 
   return (
     <div className="min-h-screen pb-32">
@@ -171,6 +236,7 @@ export default function StrengthActiveSession() {
               TIMER
             </GreenButton>
             <GreenButton
+              onClick={() => navigate('/strength/routine')}
               aria-label="Ver pesos"
               variant="default"
               size="sm"
@@ -226,7 +292,16 @@ export default function StrengthActiveSession() {
                   </GreenTag>
                 </div>
               </div>
-              <span className="material-symbols-outlined text-text-muted text-[20px]">expand_more</span>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => navigate(`/logging/strength/history?exerciseId=${exercise.id}`)}
+                  aria-label={`Historial de ${exercise.name}`}
+                  className="p-2 text-text-muted hover:text-green rounded-lg transition-colors cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-[18px]">history</span>
+                </button>
+                <span className="material-symbols-outlined text-text-muted text-[20px]">expand_more</span>
+              </div>
             </header>
 
             {/* Set Table */}
@@ -323,6 +398,7 @@ export default function StrengthActiveSession() {
         {/* Add Exercise */}
         <GreenButton
           aria-label="Agregar ejercicio"
+          onClick={() => navigate('/logging/strength/picker', { state: { routineId: currentRoutineId } })}
           variant="default"
           fullWidth
           size="lg"
@@ -335,7 +411,8 @@ export default function StrengthActiveSession() {
 
         {/* Finish Session Button */}
         <GreenButton
-          onClick={() => navigate(-1)}
+          onClick={finishSession}
+          disabled={saving}
           aria-label="Finalizar sesión"
           variant="primary"
           fullWidth
@@ -343,7 +420,7 @@ export default function StrengthActiveSession() {
           effects={true}
           className="h-14"
         >
-          FINALIZAR SESIÓN
+          {saving ? 'GUARDANDO…' : 'FINALIZAR SESIÓN'}
           <span className="material-symbols-outlined text-[20px]">stop_circle</span>
         </GreenButton>
       </main>

@@ -1,0 +1,3 @@
+[submodule "osmio-web/exercises-dataset"]
+	path = osmio-web/exercises-dataset
+	url = https://github.com/hasaneyldrm/exercises-dataset.git

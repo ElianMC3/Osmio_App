@@ -1,25 +1,88 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { profilesApi } from '@/services/api/profiles.api'
+import { supabase } from '@/services/supabase/client'
+import { useUserStore } from '@/store/userStore'
 
 const dayLabels = ['L', 'M', 'X', 'J', 'V', 'S', 'D'] as const
 
 export default function ProfileSettings() {
   const navigate = useNavigate()
+  const setProfile = useUserStore((s) => s.setProfile)
 
-  const [fullName, setFullName] = useState('Elite Warrior')
-  const [email] = useState('fighter@osmio.app')
-  const [weight, setWeight] = useState('84.5')
-  const [height, setHeight] = useState('188')
-  const [age, setAge] = useState('28')
+  const [fullName, setFullName] = useState('')
+  const [email, setEmail] = useState('')
+  const [weight, setWeight] = useState('')
+  const [height, setHeight] = useState('')
+  const [age, setAge] = useState('')
   const [preferredTime, setPreferredTime] = useState('Tarde')
   const [trainingDays, setTrainingDays] = useState<Record<string, boolean>>({
     L: true, M: true, X: false, J: true, V: true, S: false, D: false,
   })
   const [trainingReminders, setTrainingReminders] = useState(true)
   const [mealReminders, setMealReminders] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [saved, setSaved] = useState(false)
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const { data: userData } = await supabase.auth.getUser()
+        const user = userData.user
+        const [profile, days] = await Promise.all([
+          profilesApi.getProfile(),
+          profilesApi.getTrainingDays(),
+        ])
+        if (user) setEmail(user.email ?? '')
+        if (profile) {
+          setFullName(profile.name)
+          setWeight(String(profile.weight || ''))
+          setHeight(String(profile.height || ''))
+          if (profile.age) setAge(String(profile.age))
+          setProfile({ ...profile, id: user!.id, email: user!.email ?? '' })
+        }
+        setTrainingDays(days)
+      } catch {
+        setFullName('Atleta')
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
+  }, [setProfile])
+
+  const handleSave = async () => {
+    setSaving(true)
+    try {
+      await profilesApi.updateProfile({
+        name: fullName,
+        weight: parseFloat(weight) || 0,
+        height: parseFloat(height) || 0,
+        age: parseInt(age) || undefined,
+      })
+      await profilesApi.updateTrainingDays(trainingDays)
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2000)
+    } catch {
+      //
+    } finally {
+      setSaving(false)
+    }
+  }
 
   const toggleDay = (day: string) => {
     setTrainingDays((prev) => ({ ...prev, [day]: !prev[day] }))
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-6 max-w-4xl mx-auto pb-12">
+        <div className="flex items-center justify-center py-20">
+          <p className="font-label-caps text-sm text-on-surface-variant animate-pulse">Cargando perfil…</p>
+        </div>
+      </div>
+    )
   }
 
   const bmi = (parseFloat(weight) / Math.pow(parseFloat(height) / 100, 2)).toFixed(1)
@@ -279,6 +342,18 @@ export default function ProfileSettings() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Save */}
+      <div className="flex gap-4">
+        <button
+          onClick={handleSave}
+          disabled={saving || loading}
+          className="flex-1 bg-primary-fixed text-on-primary-fixed font-label-caps text-sm font-bold py-4 rounded-xl hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shadow-md"
+        >
+          <span className="material-symbols-outlined text-[20px]">save</span>
+          {saving ? 'GUARDANDO…' : saved ? '✓ GUARDADO' : 'GUARDAR CAMBIOS'}
+        </button>
       </div>
 
       {/* Sign Out */}

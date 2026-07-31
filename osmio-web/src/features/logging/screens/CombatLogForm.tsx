@@ -1,22 +1,53 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { GreenCard } from '../../../design-system/components/GreenCard'
 import { GreenButton } from '../../../design-system/components/GreenButton'
 import { GreenProgress } from '../../../design-system/components/GreenProgress'
+import { sessionsApi } from '@/services/api/sessions.api'
 
 type CombatType = 'competencia' | 'sparring' | 'clase'
 type Duration = '3:00' | '5:00' | 'personalizado'
 type Result = 'victoria' | 'derrota' | 'empate'
 
+interface SessionState {
+  discipline?: 'striking' | 'grappling'
+  trainingType?: string
+}
+
 export default function CombatLogForm() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const { discipline, trainingType } = (location.state ?? {}) as SessionState
   const [combatType, setCombatType] = useState<CombatType>('sparring')
   const [rounds, setRounds] = useState(3)
   const [duration, setDuration] = useState<Duration>('3:00')
   const [result, setResult] = useState<Result>('victoria')
   const [notes, setNotes] = useState('')
+  const [saving, setSaving] = useState(false)
 
   const maxRounds = 12
+
+  const handleSave = async () => {
+    setSaving(true)
+    try {
+      const durationMinutes = duration === '3:00' ? 3 : duration === '5:00' ? 5 : 5
+      const trainingTag = (trainingType ?? '').toUpperCase()
+      await sessionsApi.createCombatSession({
+        date: new Date().toISOString().split('T')[0],
+        type: discipline ?? (combatType === 'competencia' ? 'striking' : 'grappling'),
+        rounds,
+        durationMinutes,
+        rpe: result === 'victoria' ? 8 : result === 'derrota' ? 6 : 7,
+        positions: [],
+        notes: `${trainingTag ? `[${trainingTag}] ` : ''}${notes || `Resultado: ${result}`}`,
+      })
+      navigate(-1)
+    } catch (e) {
+      console.error('Error saving combat session:', e)
+    } finally {
+      setSaving(false)
+    }
+  }
 
   return (
     <div className="min-h-screen pb-32">
@@ -41,6 +72,12 @@ export default function CombatLogForm() {
           <p className="text-text-muted font-label-caps text-[12px] leading-none tracking-[0.1em]">
             Intel ID: #LOG-2024-8842
           </p>
+          {discipline && (
+            <p className="font-label-caps text-[11px] leading-none tracking-[0.1em] uppercase text-green">
+              {discipline}
+              {trainingType ? ` • ${trainingType}` : ''}
+            </p>
+          )}
         </div>
 
         {/* Detalles del Combate */}
@@ -191,12 +228,13 @@ export default function CombatLogForm() {
             Descartar
           </GreenButton>
           <GreenButton
-            onClick={() => navigate(-1)}
+            onClick={handleSave}
             variant="primary"
             size="lg"
             effects={true}
+            disabled={saving}
           >
-            Guardar Registro
+            {saving ? 'GUARDANDO…' : 'Guardar Registro'}
           </GreenButton>
         </div>
       </main>

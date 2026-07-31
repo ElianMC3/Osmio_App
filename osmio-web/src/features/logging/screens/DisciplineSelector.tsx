@@ -53,10 +53,11 @@ export default function DisciplineSelector() {
 
   const handleStart = () => {
     if (!trainingType) return
+    const state = { discipline: selectedDiscipline, trainingType }
     if (selectedDiscipline === 'fuerza') {
-      navigate('/logging/strength')
+      navigate('/logging/strength', { state })
     } else {
-      navigate('/logging/combat')
+      navigate('/logging/combat', { state })
     }
   }
 
