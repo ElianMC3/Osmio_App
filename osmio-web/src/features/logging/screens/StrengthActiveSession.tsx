@@ -11,6 +11,7 @@ interface SetData {
   reps: number
   restTime: number // in seconds
   done: boolean
+  drop?: boolean
 }
 
 interface ExerciseData {
@@ -89,17 +90,31 @@ export default function StrengthActiveSession() {
         if (active) {
           setCurrentRoutineId(routine.id)
           setExercises(
-            routine.exercises.map((rex) => ({
-              id: String(rex.exerciseId),
-              name: rex.exercise?.name ?? `#${rex.exerciseId}`,
-              category: (rex.exercise?.category ?? '').toUpperCase() || 'EJERCICIO',
-              sets: Array.from({ length: Math.max(1, rex.targetSets) }, () => ({
+            routine.exercises.map((rex) => {
+              const workSets = Array.from({ length: Math.max(1, rex.targetSets) }, () => ({
                 weight: rex.currentWeight,
                 reps: rex.targetRepsMax,
                 restTime: rex.restSeconds,
                 done: false,
-              })),
-            }))
+              }))
+              const dropSets = rex.dropset
+                ? [
+                    {
+                      weight: Math.round(((rex.currentWeight * rex.dropsetPercent) / 100) / 1.25) * 1.25,
+                      reps: rex.targetRepsMax,
+                      restTime: 90,
+                      done: false,
+                      drop: true,
+                    },
+                  ]
+                : []
+              return {
+                id: String(rex.exerciseId),
+                name: rex.exercise?.name ?? `#${rex.exerciseId}`,
+                category: (rex.exercise?.category ?? '').toUpperCase() || 'EJERCICIO',
+                sets: [...workSets, ...dropSets],
+              }
+            })
           )
         }
       } catch {
@@ -126,17 +141,15 @@ export default function StrengthActiveSession() {
       prev.map((ex) => {
         if (ex.id !== exerciseId) return ex
         const last = ex.sets[ex.sets.length - 1]
+        const newSet: SetData = {
+          weight: last?.weight ?? 0,
+          reps: last?.reps ?? 0,
+          restTime: last?.restTime ?? 180,
+          done: false,
+        }
         return {
           ...ex,
-          sets: [
-            ...ex.sets,
-            {
-              weight: last?.weight ?? 0,
-              reps: last?.reps ?? 0,
-              restTime: last?.restTime ?? 180,
-              done: false,
-            },
-          ],
+          sets: last?.drop ? [...ex.sets.slice(0, -1), newSet, last] : [...ex.sets, newSet],
         }
       }),
     )
@@ -290,6 +303,9 @@ export default function StrengthActiveSession() {
                   <GreenTag color="muted" variant="ghost" effects={true}>
                     {exercise.category}
                   </GreenTag>
+                  {exercise.sets.some((s) => s.drop) && (
+                    <GreenTag color="acid" variant="filled" effects={true}>DROPSET</GreenTag>
+                  )}
                 </div>
               </div>
               <div className="flex items-center gap-1">
@@ -322,10 +338,20 @@ export default function StrengthActiveSession() {
                   {exercise.sets.map((set, i) => (
                     <tr
                       key={i}
-                      className="bg-panel/30 hover:bg-panel/50 transition-colors"
+                      className={`transition-colors ${
+                        set.drop
+                          ? 'bg-acid/10 border border-acid/30 hover:bg-acid/15'
+                          : 'bg-panel/30 hover:bg-panel/50'
+                      }`}
                     >
-                      <td className="text-center font-data-display text-[24px] leading-none text-text-muted border-l-2 border-transparent">
-                        {i + 1}
+                      <td
+                        className={`text-center font-label-caps text-[13px] leading-none border-l-2 ${
+                          set.drop ? 'border-acid text-acid' : 'border-transparent text-text-muted'
+                        }`}
+                      >
+                        {set.drop ? 'DROP' : (
+                          <span className="font-data-display text-[24px]">{i + 1}</span>
+                        )}
                       </td>
                       <td>
                         <input

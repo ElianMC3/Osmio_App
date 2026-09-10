@@ -1,10 +1,10 @@
 import { supabase } from '../supabase/client'
 import type { UserProfile } from '../../store/userStore'
 
-async function requireUserId(): Promise<string> {
+async function requireUser(): Promise<{ id: string; email?: string }> {
   const { data, error } = await supabase.auth.getUser()
   if (error || !data.user) throw new Error('Not authenticated')
-  return data.user.id
+  return { id: data.user.id, email: data.user.email ?? undefined }
 }
 
 function mapProfileRow(row: any): UserProfile & { age?: number } {
@@ -22,7 +22,7 @@ function mapProfileRow(row: any): UserProfile & { age?: number } {
 
 export const profilesApi = {
   getProfile: async (): Promise<(UserProfile & { age?: number }) | null> => {
-    const userId = await requireUserId()
+    const { id: userId } = await requireUser()
 
     const { data, error } = await supabase
       .from('profiles')
@@ -34,7 +34,7 @@ export const profilesApi = {
   },
 
   updateProfile: async (profile: Partial<UserProfile & { age?: number }>): Promise<void> => {
-    const userId = await requireUserId()
+    const { id: userId, email } = await requireUser()
 
     const payload: Record<string, any> = {}
     if (profile.name !== undefined) payload.name = profile.name
@@ -46,7 +46,7 @@ export const profilesApi = {
 
     const { error } = await supabase
       .from('profiles')
-      .upsert({ id: userId, ...payload })
+      .upsert({ id: userId, email: email ?? '', ...payload })
 
     // La columna `age` puede no existir aún en la tabla; reintenta sin ella
     // para que el resto del perfil sí se guarde.
@@ -54,7 +54,7 @@ export const profilesApi = {
       delete payload.age
       const { error: retryError } = await supabase
         .from('profiles')
-        .upsert({ id: userId, ...payload })
+        .upsert({ id: userId, email: email ?? '', ...payload })
       if (retryError) throw new Error(retryError.message)
       return
     }
@@ -63,7 +63,7 @@ export const profilesApi = {
   },
 
   getTrainingDays: async (): Promise<Record<string, boolean>> => {
-    const userId = await requireUserId()
+    const { id: userId } = await requireUser()
 
     const { data, error } = await supabase
       .from('training_days')
@@ -86,7 +86,7 @@ export const profilesApi = {
   },
 
   updateTrainingDays: async (days: Record<string, boolean>): Promise<void> => {
-    const userId = await requireUserId()
+    const { id: userId } = await requireUser()
 
     const { error } = await supabase.from('training_days').upsert({
       user_id: userId,
@@ -102,7 +102,7 @@ export const profilesApi = {
   },
 
   getWeeklyGoals: async (): Promise<{ strength: number; combat: number; nutrition: number }> => {
-    const userId = await requireUserId()
+    const { id: userId } = await requireUser()
 
     const { data, error } = await supabase
       .from('weekly_goals')
@@ -117,7 +117,7 @@ export const profilesApi = {
   },
 
   updateWeeklyGoals: async (goals: { strength: number; combat: number; nutrition: number }): Promise<void> => {
-    const userId = await requireUserId()
+    const { id: userId } = await requireUser()
 
     const { error } = await supabase
       .from('weekly_goals')

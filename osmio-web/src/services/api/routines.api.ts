@@ -2,7 +2,7 @@ import { supabase } from '../supabase/client'
 import type { Routine, RoutineExercise, Exercise } from '../../shared/types/session.types'
 
 const EXERCISE_FIELDS =
-  'id, name, category, body_part, equipment, muscle_group, target, secondary_muscles, image, gif_url'
+  'id, name, category, body_part, equipment, muscle_group, target, secondary_muscles, instructions, image, gif_url, attribution'
 
 function mapExercise(row: any): Exercise {
   return {
@@ -14,8 +14,10 @@ function mapExercise(row: any): Exercise {
     muscleGroup: row.muscle_group ?? '',
     target: row.target ?? '',
     secondaryMuscles: row.secondary_muscles ?? [],
+    instructions: (row.instructions ?? {}) as Record<string, string>,
     image: row.image ?? '',
     gifUrl: row.gif_url ?? '',
+    attribution: row.attribution ?? '',
   }
 }
 
@@ -30,6 +32,8 @@ function mapRoutineExercise(row: any): RoutineExercise {
     targetRepsMax: row.target_reps_max ?? 12,
     currentWeight: Number(row.current_weight ?? 0),
     restSeconds: row.rest_seconds ?? 180,
+    dropset: row.dropset ?? false,
+    dropsetPercent: Number(row.dropset_percent ?? 50),
     notes: row.notes ?? '',
     exercise: row.exercises ? mapExercise(row.exercises) : undefined,
   }
@@ -88,7 +92,7 @@ export const routinesApi = {
   addExercise: async (
     routineId: string,
     exerciseId: number,
-    options: Partial<Pick<RoutineExercise, 'targetSets' | 'targetRepsMin' | 'targetRepsMax' | 'currentWeight' | 'restSeconds' | 'position'>> = {}
+    options: Partial<Pick<RoutineExercise, 'targetSets' | 'targetRepsMin' | 'targetRepsMax' | 'currentWeight' | 'restSeconds' | 'dropset' | 'dropsetPercent' | 'position'>> = {}
   ): Promise<RoutineExercise> => {
     const { data: maxRow } = await supabase
       .from('routine_exercises')
@@ -109,6 +113,8 @@ export const routinesApi = {
         target_reps_max: options.targetRepsMax ?? 12,
         current_weight: options.currentWeight ?? 0,
         rest_seconds: options.restSeconds ?? 180,
+        dropset: options.dropset ?? false,
+        dropset_percent: options.dropsetPercent ?? 50,
       })
       .select(`*, exercises(${EXERCISE_FIELDS})`)
       .single()
@@ -118,7 +124,7 @@ export const routinesApi = {
 
   updateRoutineExercise: async (
     id: string,
-    partial: Partial<Pick<RoutineExercise, 'targetSets' | 'targetRepsMin' | 'targetRepsMax' | 'currentWeight' | 'restSeconds' | 'notes' | 'position'>>
+    partial: Partial<Pick<RoutineExercise, 'targetSets' | 'targetRepsMin' | 'targetRepsMax' | 'currentWeight' | 'restSeconds' | 'dropset' | 'dropsetPercent' | 'notes' | 'position'>>
   ): Promise<void> => {
     const payload: Record<string, unknown> = {}
     if (partial.targetSets !== undefined) payload.target_sets = partial.targetSets
@@ -126,6 +132,8 @@ export const routinesApi = {
     if (partial.targetRepsMax !== undefined) payload.target_reps_max = partial.targetRepsMax
     if (partial.currentWeight !== undefined) payload.current_weight = partial.currentWeight
     if (partial.restSeconds !== undefined) payload.rest_seconds = partial.restSeconds
+    if (partial.dropset !== undefined) payload.dropset = partial.dropset
+    if (partial.dropsetPercent !== undefined) payload.dropset_percent = partial.dropsetPercent
     if (partial.notes !== undefined) payload.notes = partial.notes
     if (partial.position !== undefined) payload.position = partial.position
 

@@ -106,4 +106,26 @@ export const nutritionApi = {
       .upsert({ user_id: userId, date, weight }, { onConflict: 'user_id, date' })
     if (error) throw new Error(error.message)
   },
+
+  updateNutritionGoal: async (goal: MacroEntry): Promise<void> => {
+    const userId = await requireUserId()
+    const { data: existing } = await supabase
+      .from('nutrition_goals')
+      .select('id')
+      .eq('user_id', userId)
+      .maybeSingle()
+
+    if (existing) {
+      const { error } = await supabase
+        .from('nutrition_goals')
+        .update({ calories: goal.calories, protein: goal.protein, carbs: goal.carbs, fat: goal.fat })
+        .eq('id', existing.id)
+      if (error) throw new Error(error.message)
+    } else {
+      const { error } = await supabase
+        .from('nutrition_goals')
+        .insert({ user_id: userId, calories: goal.calories, protein: goal.protein, carbs: goal.carbs, fat: goal.fat })
+      if (error) throw new Error(error.message)
+    }
+  },
 }

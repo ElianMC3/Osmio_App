@@ -913,8 +913,8 @@ export default function DashboardHoy() {
         <aside className="dash-side">
           <div className="side-title">
             <small>DISTRICT.012 // DANGEROUS</small>
-            <strong>Veyra Noct</strong>
-            <span>lorem ipsum dolor</span>
+            <strong>Bienvenido</strong>
+            <span>Elian MC</span>
           </div>
 
           <div className="side-capsule">
@@ -926,7 +926,7 @@ export default function DashboardHoy() {
             <span className="side-flicker" />
             <div className="side-target">
               <img
-                src="https://media.tenor.com/RkTw7AIbIWkAAAAM/effy-stonem.gif"
+                src="https://media1.tenor.com/m/2EKSglynYpIAAAAd/higuruma-jjk.gif"
                 alt="Profile"
               />
             </div>

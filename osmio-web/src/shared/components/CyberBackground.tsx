@@ -3,8 +3,8 @@ import * as THREE from 'three'
 
 const MASK_SIZE = 1024
 const BRUSH_RADIUS = 120
-const BASE_IMAGE = '/backgrounds/cyber1.jpg'
-const REVEAL_IMAGE = '/backgrounds/cyber2.jpg'
+const BASE_IMAGE = '/backgrounds/b1.png'
+const REVEAL_IMAGE = '/backgrounds/b2.png'
 
 export default function CyberBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -18,7 +18,7 @@ export default function CyberBackground() {
       renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
     } catch {
       return
-    } 
+    }
 
     const scene = new THREE.Scene()
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10)

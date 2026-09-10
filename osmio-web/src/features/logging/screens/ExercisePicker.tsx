@@ -4,10 +4,8 @@ import { GreenCard } from '@/design-system/components/GreenCard'
 import { GreenTag } from '@/design-system/components/GreenTag'
 import { sessionsApi } from '@/services/api/sessions.api'
 import { routinesApi } from '@/services/api/routines.api'
+import ExerciseThumb from '@/features/strength/components/ExerciseThumb'
 import type { Exercise } from '@/shared/types/session.types'
-
-const imageUrl = (path?: string): string | undefined =>
-  path ? `/exercise-images/${path.split('/').pop()}` : undefined
 
 export default function ExercisePicker() {
   const [search, setSearch] = useState('')
@@ -155,18 +153,7 @@ export default function ExercisePicker() {
                 onClick={() => addToRoutine(ex)}
                 className="flex items-center gap-3 cursor-pointer"
               >
-                {ex.image ? (
-                  <img
-                    src={imageUrl(ex.image)}
-                    alt={ex.name}
-                    loading="lazy"
-                    className="w-12 h-12 rounded-lg object-cover border border-green/25 bg-black/40"
-                  />
-                ) : (
-                  <div className="w-12 h-12 rounded-lg border border-green/25 bg-black/40 flex items-center justify-center">
-                    <span className="material-symbols-outlined text-text-muted text-[20px]">fitness_center</span>
-                  </div>
-                )}
+                <ExerciseThumb exercise={ex} />
                 <div className="flex-1 min-w-0">
                   <p className="font-label-caps text-sm text-text-green font-semibold truncate">{ex.name}</p>
                   <div className="flex flex-wrap gap-1.5 mt-1">

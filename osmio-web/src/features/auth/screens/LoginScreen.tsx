@@ -42,7 +42,7 @@ export default function LoginScreen() {
           <div className="text-center mb-10">
             <h1 className="font-headline-md text-4xl text-green mb-3 tracking-tight">OSMIO</h1>
             <p className="font-label-caps text-xs text-text-muted uppercase tracking-[3px]">
-              {isRegister ? 'CREAR CUENTA' : 'INICIAR SESIÓN'}
+              {isRegister ? 'CREAR CUENTA' : 'The best way to grow up'}
             </p>
           </div>
 
@@ -53,7 +53,7 @@ export default function LoginScreen() {
               </label>
               <input
                 type="email"
-                placeholder="tu@email.com"
+                placeholder="Example@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -62,7 +62,7 @@ export default function LoginScreen() {
             </div>
             <div>
               <label className="font-label-caps text-xs text-text-muted block mb-2 tracking-[1px] uppercase">
-                Contraseña
+                Password
               </label>
               <input
                 type="password"
@@ -84,7 +84,7 @@ export default function LoginScreen() {
               disabled={submitting}
               className="w-full bg-primary text-on-primary font-label-caps uppercase tracking-[1.5px] text-sm py-3.5 rounded-lg hover:brightness-110 active:scale-[0.97] transition-all disabled:opacity-50 cursor-pointer mt-2"
             >
-              {submitting ? '…' : isRegister ? 'CREAR CUENTA' : 'ENTRAR'}
+              {submitting ? '…' : isRegister ? 'CREAR CUENTA' : 'LOG-IN'}
             </button>
           </form>
 

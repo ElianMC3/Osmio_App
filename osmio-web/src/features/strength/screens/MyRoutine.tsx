@@ -5,17 +5,17 @@ import { GreenButton } from '@/design-system/components/GreenButton'
 import { GreenTag } from '@/design-system/components/GreenTag'
 import { routinesApi } from '@/services/api/routines.api'
 import { useProgression } from '../hooks/useProgression'
+import ExerciseThumb from '../components/ExerciseThumb'
 import type { RoutineExercise } from '@/shared/types/session.types'
 import type { ProgressionRecommendation } from '../lib/progression'
-
-const imageUrl = (path?: string): string | undefined =>
-  path ? `/exercise-images/${path.split('/').pop()}` : undefined
 
 function ExerciseEditFields({ rex, onSave, onCancel }: { rex: RoutineExercise; onSave: (p: Partial<RoutineExercise>) => void; onCancel: () => void }) {
   const [sets, setSets] = useState(String(rex.targetSets))
   const [repsMin, setRepsMin] = useState(String(rex.targetRepsMin))
   const [repsMax, setRepsMax] = useState(String(rex.targetRepsMax))
   const [rest, setRest] = useState(String(rex.restSeconds))
+  const [dropset, setDropset] = useState(rex.dropset)
+  const [dropsetPercent, setDropsetPercent] = useState(String(rex.dropsetPercent))
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-green/20">
@@ -36,6 +36,35 @@ function ExerciseEditFields({ rex, onSave, onCancel }: { rex: RoutineExercise; o
           />
         </label>
       ))}
+      <div className="col-span-2 sm:col-span-4 flex items-center gap-3 flex-wrap">
+        <button
+          role="switch"
+          aria-checked={dropset}
+          aria-label="Activar dropset"
+          onClick={() => setDropset(!dropset)}
+          className={`relative w-12 h-6 rounded-full transition-colors duration-200 cursor-pointer ${dropset ? 'bg-acid' : 'bg-black/40 border border-green/25'}`}
+        >
+          <div
+            className={`absolute top-0.5 w-5 h-5 rounded-full transition-all ${dropset ? 'left-6 bg-paper' : 'left-0.5 bg-text-muted'}`}
+          />
+        </button>
+        <span className="font-label-caps text-[10px] text-text-muted uppercase tracking-wider">
+          Dropset
+        </span>
+        {dropset && (
+          <label className="flex flex-col gap-1">
+            <span className="font-label-caps text-[9px] text-text-muted uppercase tracking-wider">% del peso</span>
+            <input
+              type="number"
+              min="1"
+              max="100"
+              value={dropsetPercent}
+              onChange={(e) => setDropsetPercent(e.target.value)}
+              className="w-20 bg-black/40 border border-green/25 rounded-lg px-3 py-2 text-sm text-text-green focus:border-green focus:outline-none"
+            />
+          </label>
+        )}
+      </div>
       <div className="col-span-2 sm:col-span-4 flex justify-end gap-2">
         <GreenButton variant="ghost" size="sm" effects onClick={onCancel}>Cancelar</GreenButton>
         <GreenButton
@@ -48,6 +77,8 @@ function ExerciseEditFields({ rex, onSave, onCancel }: { rex: RoutineExercise; o
               targetRepsMin: Math.max(1, Number(repsMin) || 8),
               targetRepsMax: Math.max(1, Number(repsMax) || 12),
               restSeconds: Math.max(0, Number(rest) || 180),
+              dropset,
+              dropsetPercent: Math.min(100, Math.max(1, Number(dropsetPercent) || 50)),
             })
           }
         >
@@ -213,14 +244,10 @@ export default function MyRoutine() {
                       return (
                         <div key={rex.id} className="p-4 space-y-3">
                           <div className="flex items-center gap-3">
-                            {rex.exercise?.image && (
-                              <img
-                                src={imageUrl(rex.exercise.image)}
-                                alt={rex.exercise.name}
-                                loading="lazy"
-                                className="w-14 h-14 rounded-lg object-cover border border-green/25 bg-black/40"
-                              />
-                            )}
+                            <ExerciseThumb
+                              exercise={rex.exercise}
+                              onInfo={() => navigate(`/logging/strength/history?exerciseId=${rex.exerciseId}`)}
+                            />
                             <div className="flex-1 min-w-0">
                               <p className="font-label-caps text-sm text-text-green font-bold truncate">
                                 {rex.exercise?.name ?? `#${rex.exerciseId}`}
@@ -229,6 +256,11 @@ export default function MyRoutine() {
                                 <GreenTag color="green" variant="outlined" effects={false}>
                                   {rex.targetSets} × {rex.targetRepsMin}-{rex.targetRepsMax}
                                 </GreenTag>
+                                {rex.dropset && (
+                                  <GreenTag color="acid" variant="filled" effects={false}>
+                                    DROPSET {rex.dropsetPercent}%
+                                  </GreenTag>
+                                )}
                                 {rex.exercise?.equipment && (
                                   <GreenTag color="muted" variant="ghost" effects={false}>
                                     {rex.exercise.equipment}

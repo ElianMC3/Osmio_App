@@ -24,6 +24,7 @@ export default function ProfileSettings() {
   const [saving, setSaving] = useState(false)
   const [loading, setLoading] = useState(true)
   const [saved, setSaved] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     async function load() {
@@ -54,6 +55,7 @@ export default function ProfileSettings() {
 
   const handleSave = async () => {
     setSaving(true)
+    setError(null)
     try {
       await profilesApi.updateProfile({
         name: fullName,
@@ -64,8 +66,8 @@ export default function ProfileSettings() {
       await profilesApi.updateTrainingDays(trainingDays)
       setSaved(true)
       setTimeout(() => setSaved(false), 2000)
-    } catch {
-      //
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'No se pudieron guardar los cambios')
     } finally {
       setSaving(false)
     }
@@ -345,7 +347,10 @@ export default function ProfileSettings() {
       </div>
 
       {/* Save */}
-      <div className="flex gap-4">
+      <div className="space-y-3">
+        {error && (
+          <p className="font-label-sm text-sm text-error leading-relaxed">{error}</p>
+        )}
         <button
           onClick={handleSave}
           disabled={saving || loading}

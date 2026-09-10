@@ -8,9 +8,10 @@ export interface Exercise {
   muscleGroup?: string
   target?: string
   secondaryMuscles?: string[]
-  instructions?: { es?: string; en?: string }
+  instructions?: Record<string, string>
   image?: string
   gifUrl?: string
+  attribution?: string
 }
 
 export interface RoutineExercise {
@@ -23,6 +24,8 @@ export interface RoutineExercise {
   targetRepsMax: number
   currentWeight: number
   restSeconds: number
+  dropset: boolean
+  dropsetPercent: number
   notes: string
   exercise?: Exercise
 }

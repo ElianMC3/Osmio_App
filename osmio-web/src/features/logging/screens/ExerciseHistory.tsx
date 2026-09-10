@@ -4,6 +4,7 @@ import { GreenCard } from '@/design-system/components/GreenCard'
 import { GreenButton } from '@/design-system/components/GreenButton'
 import { GreenTag } from '@/design-system/components/GreenTag'
 import { sessionsApi } from '@/services/api/sessions.api'
+import ExerciseInfoCard from '@/features/strength/components/ExerciseInfoCard'
 import type { Exercise, StrengthSession } from '@/shared/types/session.types'
 
 export default function ExerciseHistory() {
@@ -37,9 +38,6 @@ export default function ExerciseHistory() {
     }
   }, [exerciseId])
 
-  const imageUrl = (path?: string): string | undefined =>
-    path ? `/exercise-images/${path.split('/').pop()}` : undefined
-
   return (
     <div className="min-h-screen pb-20">
       <header className="sticky top-0 z-30 flex items-center gap-md px-md h-14 bg-panel/80 backdrop-blur-xl border-b border-green/20">
@@ -70,29 +68,16 @@ export default function ExerciseHistory() {
           </GreenCard>
         ) : loading ? (
           <p className="font-label-caps text-sm text-text-muted animate-pulse text-center py-10">Cargando historial…</p>
-        ) : sessions.length === 0 ? (
-          <p className="font-label-caps text-sm text-text-muted opacity-50 text-center py-10">
-            Sin sesiones registradas para {exercise?.name ?? 'este ejercicio'}.
-          </p>
         ) : (
           <>
-            {exercise?.image && (
-              <div className="flex items-center gap-3">
-                <img
-                  src={imageUrl(exercise.image)}
-                  alt={exercise.name}
-                  loading="lazy"
-                  className="w-16 h-16 rounded-xl object-cover border border-green/25 bg-black/40"
-                />
-                <div className="flex flex-wrap gap-2">
-                  <GreenTag color="green" variant="outlined" effects={false}>{exercise.category}</GreenTag>
-                  <GreenTag color="muted" variant="ghost" effects={false}>{exercise.equipment}</GreenTag>
-                  <GreenTag color="muted" variant="ghost" effects={false}>{exercise.target}</GreenTag>
-                </div>
-              </div>
-            )}
+            {exercise && <ExerciseInfoCard exercise={exercise} />}
 
-            {sessions.map((session) => {
+            {sessions.length === 0 ? (
+              <p className="font-label-caps text-sm text-text-muted opacity-50 text-center py-10">
+                Sin sesiones registradas para {exercise?.name ?? 'este ejercicio'}.
+              </p>
+            ) : (
+              sessions.map((session) => {
               const sets = session.sets.filter((s) => s.weight > 0 || s.reps > 0)
               const topWeight = sets.length > 0 ? Math.max(...sets.map((s) => s.weight)) : 0
               const topReps = sets.length > 0 ? Math.max(...sets.map((s) => s.reps)) : 0
@@ -123,7 +108,8 @@ export default function ExerciseHistory() {
                   </div>
                 </GreenCard>
               )
-            })}
+            })
+            )}
           </>
         )}
       </main>

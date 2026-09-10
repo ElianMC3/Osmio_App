@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { nutritionApi } from '@/services/api/nutrition.api'
+import NutritionRecommendationCard from '../components/NutritionRecommendationCard'
 import type { DailyNutrition } from '@/shared/types/nutrition.types'
 
 const quickAddPresets = [
@@ -91,6 +92,9 @@ export default function NutritionDashboard() {
           ))}
         </div>
       </div>
+
+      {/* Recommendation Card */}
+      <NutritionRecommendationCard />
 
       {/* Main Grid Section */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">

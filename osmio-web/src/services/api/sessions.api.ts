@@ -37,49 +37,41 @@ async function requireUserId(): Promise<string> {
   return data.user.id
 }
 
+function mapExerciseRow(row: any): Exercise {
+  return {
+    id: row.id,
+    name: row.name,
+    category: row.category ?? '',
+    bodyPart: row.body_part ?? '',
+    equipment: row.equipment ?? '',
+    muscleGroup: row.muscle_group ?? '',
+    target: row.target ?? '',
+    secondaryMuscles: row.secondary_muscles ?? [],
+    instructions: (row.instructions ?? {}) as Record<string, string>,
+    image: row.image ?? '',
+    gifUrl: row.gif_url ?? '',
+    attribution: row.attribution ?? '',
+  }
+}
+
 export const sessionsApi = {
   getExercises: async (): Promise<Exercise[]> => {
     const { data, error } = await supabase
       .from('exercises')
-      .select('id, name, category, body_part, equipment, muscle_group, target, secondary_muscles, image, gif_url')
+      .select('id, name, category, body_part, equipment, muscle_group, target, secondary_muscles, instructions, image, gif_url, attribution')
       .order('name')
     if (error) throw new Error(error.message)
-    return (data ?? []).map((row: any) => ({
-      id: row.id,
-      name: row.name,
-      category: row.category ?? '',
-      bodyPart: row.body_part ?? '',
-      equipment: row.equipment ?? '',
-      muscleGroup: row.muscle_group ?? '',
-      target: row.target ?? '',
-      secondaryMuscles: row.secondary_muscles ?? [],
-      image: row.image ?? '',
-      gifUrl: row.gif_url ?? '',
-    }))
+    return (data ?? []).map(mapExerciseRow)
   },
 
   getExercise: async (id: number): Promise<Exercise | null> => {
     const { data, error } = await supabase
       .from('exercises')
-      .select('id, name, category, body_part, equipment, muscle_group, target, secondary_muscles, instructions, image, gif_url')
+      .select('id, name, category, body_part, equipment, muscle_group, target, secondary_muscles, instructions, image, gif_url, attribution')
       .eq('id', id)
       .maybeSingle()
     if (error) throw new Error(error.message)
-    if (!data) return null
-    const instructions = (data.instructions ?? {}) as Record<string, string>
-    return {
-      id: data.id,
-      name: data.name,
-      category: data.category ?? '',
-      bodyPart: data.body_part ?? '',
-      equipment: data.equipment ?? '',
-      muscleGroup: data.muscle_group ?? '',
-      target: data.target ?? '',
-      secondaryMuscles: data.secondary_muscles ?? [],
-      instructions: { es: instructions.es, en: instructions.en },
-      image: data.image ?? '',
-      gifUrl: data.gif_url ?? '',
-    }
+    return data ? mapExerciseRow(data) : null
   },
 
   getSessionsByExercise: async (exerciseId: number): Promise<StrengthSession[]> => {
