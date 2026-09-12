@@ -15,7 +15,7 @@ const variantStyles: Record<GreenButtonVariant, string> = {
   default:
     'bg-transparent border border-green/35 text-text-green',
   primary:
-    'bg-green text-black border border-green font-medium',
+    'bg-gradient-to-r from-primary via-green to-acid text-on-primary border border-on-green/10 font-semibold',
   ghost:
     'bg-transparent text-text-muted border border-transparent hover:text-text-green',
 }
@@ -48,7 +48,7 @@ export const GreenButton = forwardRef<HTMLButtonElement, GreenButtonProps>(
       ? variant === 'default'
         ? 'hover:bg-green/10 hover:border-green hover:text-green'
         : variant === 'primary'
-          ? 'hover:brightness-110 hover:shadow-[0_0_20px_rgba(199,217,136,0.35)]'
+          ? 'hover:brightness-110 hover:shadow-[0_0_24px_color-mix(in_srgb,var(--green)_35%,transparent)]'
           : 'hover:bg-green/5'
       : variant === 'default'
         ? 'hover:border-green/50'
@@ -65,7 +65,7 @@ export const GreenButton = forwardRef<HTMLButtonElement, GreenButtonProps>(
           cursor-pointer
           disabled:opacity-40 disabled:cursor-not-allowed
           focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green
-          rounded-[4px]
+          rounded-[10px]
           ${variantStyles[variant]}
           ${sizeStyles[size]}
           ${fullWidth ? 'w-full' : ''}

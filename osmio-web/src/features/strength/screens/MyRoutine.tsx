@@ -4,6 +4,8 @@ import { GreenCard } from '@/design-system/components/GreenCard'
 import { GreenButton } from '@/design-system/components/GreenButton'
 import { GreenTag } from '@/design-system/components/GreenTag'
 import { routinesApi } from '@/services/api/routines.api'
+import { PageBackdrop } from '@/design-system/components/PageBackdrop'
+import { PageHeader } from '@/design-system/components/PageHeader'
 import { useProgression } from '../hooks/useProgression'
 import ExerciseThumb from '../components/ExerciseThumb'
 import type { RoutineExercise } from '@/shared/types/session.types'
@@ -18,7 +20,7 @@ function ExerciseEditFields({ rex, onSave, onCancel }: { rex: RoutineExercise; o
   const [dropsetPercent, setDropsetPercent] = useState(String(rex.dropsetPercent))
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-green/20">
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-outline-variant/25">
       {[
         { label: 'Series', value: sets, set: setSets },
         { label: 'Reps min', value: repsMin, set: setRepsMin },
@@ -32,7 +34,7 @@ function ExerciseEditFields({ rex, onSave, onCancel }: { rex: RoutineExercise; o
             min="1"
             value={f.value}
             onChange={(e) => f.set(e.target.value)}
-            className="bg-black/40 border border-green/25 rounded-lg px-3 py-2 text-sm text-text-green focus:border-green focus:outline-none"
+            className="bg-surface-container-low/40 border border-outline-variant/40 rounded-lg px-3 py-2 text-sm text-text-green focus:border-green focus:shadow-[0_0_0_1px_color-mix(in_srgb,var(--green)_30%,transparent)] focus:outline-none transition-all"
           />
         </label>
       ))}
@@ -42,7 +44,7 @@ function ExerciseEditFields({ rex, onSave, onCancel }: { rex: RoutineExercise; o
           aria-checked={dropset}
           aria-label="Activar dropset"
           onClick={() => setDropset(!dropset)}
-          className={`relative w-12 h-6 rounded-full transition-colors duration-200 cursor-pointer ${dropset ? 'bg-acid' : 'bg-black/40 border border-green/25'}`}
+          className={`relative w-12 h-6 rounded-full transition-colors duration-200 cursor-pointer ${dropset ? 'bg-acid shadow-[0_0_12px_color-mix(in_srgb,var(--acid)_50%,transparent)]' : 'bg-panel/40 border border-outline-variant/40'}`}
         >
           <div
             className={`absolute top-0.5 w-5 h-5 rounded-full transition-all ${dropset ? 'left-6 bg-paper' : 'left-0.5 bg-text-muted'}`}
@@ -60,7 +62,7 @@ function ExerciseEditFields({ rex, onSave, onCancel }: { rex: RoutineExercise; o
               max="100"
               value={dropsetPercent}
               onChange={(e) => setDropsetPercent(e.target.value)}
-              className="w-20 bg-black/40 border border-green/25 rounded-lg px-3 py-2 text-sm text-text-green focus:border-green focus:outline-none"
+              className="w-20 bg-surface-container-low/40 border border-outline-variant/40 rounded-lg px-3 py-2 text-sm text-text-green focus:border-green focus:outline-none transition-all"
             />
           </label>
         )}
@@ -146,22 +148,26 @@ export default function MyRoutine() {
   }
 
   return (
-    <div className="min-h-screen pb-20">
-      <header className="sticky top-0 z-30 flex items-center gap-md px-md h-14 bg-panel/80 backdrop-blur-xl border-b border-green/20">
-        <button
-          onClick={() => navigate(-1)}
-          aria-label="Volver"
-          className="material-symbols-outlined text-text-muted hover:text-green transition-colors duration-200 active:scale-[0.98] cursor-pointer"
-        >
-          arrow_back
-        </button>
-        <div className="flex flex-col">
-          <h1 className="font-headline-md text-headline-md text-text-green leading-tight">Mi Rutina</h1>
-          <span className="font-label-caps text-[10px] text-text-muted">PESOS + PROGRESIÓN</span>
+    <div className="relative min-h-screen pb-24">
+      <PageBackdrop />
+      <div className="relative z-10 max-w-4xl mx-auto">
+        <div className="px-5 pt-6">
+          <PageHeader
+            kicker="SISTEMA DE PROGRESIÓN DE FUERZA"
+            title="Mi"
+            titleAccent="Rutina"
+            subtitle="Planificación de pesos, series y recomendaciones inteligentes de progresión."
+            onBack={() => navigate(-1)}
+            status={
+              <span className="status-pill">
+                <span className="status-dot bg-green" />
+                {routines.length} RUTINAS
+              </span>
+            }
+          />
         </div>
-      </header>
 
-      <main className="p-md space-y-lg">
+        <main className="p-md pt-lg space-y-lg">
         {loading ? (
           <p className="font-label-caps text-sm text-text-muted animate-pulse text-center py-10">Cargando rutinas…</p>
         ) : (
@@ -175,7 +181,7 @@ export default function MyRoutine() {
                   onChange={(e) => setNewName(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
                   placeholder="Nombre de la rutina (ej. Push / Pull / Piernas)"
-                  className="flex-1 bg-black/40 border border-green/25 rounded-xl px-4 py-3 text-sm text-text-green placeholder:text-text-muted placeholder:opacity-50 focus:border-green focus:outline-none"
+                  className="flex-1 bg-surface-container-low/40 border border-outline-variant/40 rounded-xl px-4 py-3 text-sm text-text-green placeholder:text-text-muted placeholder:opacity-50 focus:border-green focus:shadow-[0_0_0_1px_color-mix(in_srgb,var(--green)_30%,transparent)] focus:outline-none transition-all"
                 />
                 <GreenButton variant="primary" size="md" effects onClick={handleCreate} disabled={busy}>
                   <span className="material-symbols-outlined text-[16px]">add</span>
@@ -195,8 +201,9 @@ export default function MyRoutine() {
 
             {/* Routines */}
             {routines.map((routine) => (
-              <GreenCard key={routine.id} variant="default" padding="none" effects={false}>
-                <header className="p-4 border-b border-green/20 flex items-center justify-between gap-3 flex-wrap">
+              <GreenCard key={routine.id} variant="default" padding="none" effects={false} className="relative overflow-hidden">
+                <span className="gradient-hairline" />
+                <header className="p-4 border-b border-outline-variant/25 flex items-center justify-between gap-3 flex-wrap bg-gradient-to-r from-green/[0.04] to-transparent">
                   <div className="min-w-0">
                     <h2 className="font-headline-md text-[20px] text-text-green uppercase font-semibold truncate">
                       {routine.name}
@@ -238,7 +245,7 @@ export default function MyRoutine() {
                     Sin ejercicios. Toca "AGREGAR" para buscar en la base de datos.
                   </p>
                 ) : (
-                  <div className="divide-y divide-green/15">
+                  <div className="divide-y mt-lg divide-outline-variant/15">
                     {routine.exercises.map((rex) => {
                       const rec = recommendations.get(rex.id)
                       return (
@@ -246,13 +253,14 @@ export default function MyRoutine() {
                           <div className="flex items-center gap-3">
                             <ExerciseThumb
                               exercise={rex.exercise}
+                              size="md"
                               onInfo={() => navigate(`/logging/strength/history?exerciseId=${rex.exerciseId}`)}
                             />
-                            <div className="flex-1 min-w-0">
+                            <div className="flex-1 pt-lg min-w-0">
                               <p className="font-label-caps text-sm text-text-green font-bold truncate">
                                 {rex.exercise?.name ?? `#${rex.exerciseId}`}
                               </p>
-                              <div className="flex flex-wrap gap-1.5 mt-1">
+                              <div className="flex flex-wrap gap-1.5 mt-1 pt-lg">
                                 <GreenTag color="green" variant="outlined" effects={false}>
                                   {rex.targetSets} × {rex.targetRepsMin}-{rex.targetRepsMax}
                                 </GreenTag>
@@ -289,7 +297,7 @@ export default function MyRoutine() {
                                 step="1.25"
                                 defaultValue={rex.currentWeight || ''}
                                 onBlur={(e) => commitWeight(rex, e.target.value)}
-                                className="w-28 bg-black/40 border border-green/25 rounded-lg px-3 py-2 text-sm text-text-green focus:border-green focus:outline-none"
+                                className="w-28 bg-surface-container-low/40 border border-outline-variant/40 rounded-lg px-3 py-2 text-sm text-text-green focus:border-green focus:outline-none transition-all"
                                 placeholder="0"
                               />
                             </label>
@@ -347,9 +355,10 @@ export default function MyRoutine() {
                 )}
               </GreenCard>
             ))}
-          </>
-        )}
+</>
+      )}
       </main>
+      </div>
     </div>
   )
 }

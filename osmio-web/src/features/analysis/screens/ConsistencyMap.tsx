@@ -2,12 +2,17 @@ import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { GreenCard } from '@/design-system/components/GreenCard'
 import { GreenProgress } from '@/design-system/components/GreenProgress'
+import { PageBackdrop } from '@/design-system/components/PageBackdrop'
+import { PageHeader } from '@/design-system/components/PageHeader'
 import { analyticsApi } from '@/services/api/analytics.api'
+import AnalysisTabs from '../components/AnalysisTabs'
 
 const dayLabels = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
 function getHeatColor(active: boolean): string {
-  return active ? 'bg-green' : 'bg-panel'
+  return active
+    ? 'bg-gradient-to-br from-green to-acid shadow-[0_0_8px_color-mix(in_srgb,var(--green)_45%,transparent)]'
+    : 'bg-surface-container-low'
 }
 
 export default function ConsistencyMap() {
@@ -71,236 +76,220 @@ export default function ConsistencyMap() {
     { label: 'MEJOR RACHA', value: `${bestStreak} DÍAS` },
   ]
 
-  // Discipline distribution from sessions (approximated from consistency: just show active rate)
   const disciplines = [
     { label: 'ACTIVOS', pct: compliancePct },
     { label: 'INACTIVOS', pct: 100 - compliancePct },
   ]
 
   return (
-    <div className="min-h-screen pb-20">
-      {/* Header */}
-      <header className="sticky top-0 z-30 flex items-center gap-md px-md h-14 bg-panel/80 backdrop-blur-xl border-b border-green/20">
-        <button
-          onClick={() => navigate(-1)}
-          aria-label="Volver"
-          className="material-symbols-outlined text-text-muted hover:text-green transition-colors duration-200 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green cursor-pointer"
-        >
-          arrow_back
-        </button>
-        <div className="flex flex-col">
-          <h1 className="font-headline-md text-headline-md text-text-green leading-tight">
-            Análisis - Mapa de Consistencia
-          </h1>
-          <span className="font-label-caps text-[10px] text-text-muted">
-            Tu actividad reciente
-          </span>
+    <div className="relative min-h-screen pb-24">
+      <PageBackdrop />
+      <div className="relative z-10 max-w-4xl mx-auto">
+        <div className="px-5 pt-6">
+          <PageHeader
+            kicker="CENTRO DE ANÁLISIS · CONSISTENCIA"
+            title="Mapa de"
+            titleAccent="Consistencia"
+            subtitle="Tu patrón de entrenamiento a lo largo del tiempo."
+            onBack={() => navigate(-1)}
+            status={
+              <span className="status-pill">
+                <span className="status-dot bg-green" />
+                {consistency.length} DÍAS
+              </span>
+            }
+          />
         </div>
-      </header>
 
-      {/* Tab Navigation */}
-      <div className="flex items-center border-b border-green/20 px-md">
-        {([
-          { key: 'fuerza', label: 'Fuerza', path: '/analysis/strength' },
-          { key: 'carga', label: 'Carga de Combate', path: '/analysis/combat' },
-          { key: 'consistencia', label: 'Consistencia', path: '/analysis/consistency' },
-        ] as const).map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => navigate(tab.path)}
-            className={`pb-sm px-md font-label-caps text-label-caps transition-all duration-200 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green cursor-pointer ${
-              tab.key === 'consistencia'
-                ? 'text-green border-b-2 border-green'
-                : 'text-text-muted hover:text-text-green'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+        <main className="p-md pt-6 space-y-lg">
+          <AnalysisTabs active="consistencia" />
 
-      <div className="p-md space-y-lg">
-        <p className="font-label-caps text-[10px] text-text-muted uppercase tracking-widest">
-          {consistency.length} días registrados
-        </p>
+          <p className="font-label-caps text-[10px] text-text-muted uppercase tracking-widest flex items-center gap-2">
+            <span className="w-1.5 h-1.5 bg-acid inline-block rotate-45" />
+            {consistency.length} días registrados
+          </p>
 
-        {/* Heatmap */}
-        <GreenCard padding="md" effects>
-          <div className="flex items-center justify-between mb-md">
-            <div className="flex items-center gap-sm">
-              <span className="material-symbols-outlined text-green">calendar_view_month</span>
-              <h3 className="font-label-caps text-text-green">VOLUMEN DE ENTRENAMIENTO</h3>
+          <GreenCard padding="md" effects className="relative overflow-hidden">
+            <span className="gradient-hairline" />
+            <div className="flex items-center justify-between mb-md flex-wrap gap-sm">
+              <div className="flex items-center gap-sm">
+                <span className="material-symbols-outlined text-green" style={{ fontVariationSettings: '"FILL" 1' }}>calendar_view_month</span>
+                <h3 className="font-label-caps text-text-green">VOLUMEN DE ENTRENAMIENTO</h3>
+              </div>
+              <div className="flex items-center gap-xs">
+                <span className="font-label-caps text-[8px] text-text-muted mr-xs">MENOS</span>
+                {[
+                  'bg-surface-container-low',
+                  'bg-green/25',
+                  'bg-green-dim',
+                  'bg-green',
+                  'bg-gradient-to-br from-green to-acid',
+                ].map((color, i) => (
+                  <div key={i} className={`w-2.5 h-2.5 rounded-[2px] ${color}`} />
+                ))}
+                <span className="font-label-caps text-[8px] text-text-muted ml-xs">MÁS</span>
+              </div>
             </div>
-            <div className="flex items-center gap-xs">
-              <span className="font-label-caps text-[8px] text-text-muted mr-xs">MENOS</span>
-              {[
-                'bg-panel',
-                'bg-green/20',
-                'bg-green-dim',
-                'bg-green',
-                'bg-green',
-              ].map((color, i) => (
-                <div key={i} className={`w-2.5 h-2.5 ${color}`} />
-              ))}
-              <span className="font-label-caps text-[8px] text-text-muted ml-xs">MÁS</span>
-            </div>
-          </div>
 
-          <div className="overflow-x-auto scrollbar-thin pb-sm">
-            <div className="min-w-[600px]">
-              <div className="grid gap-[2px]" style={{ gridTemplateColumns: 'auto 1fr' }}>
-                {/* Day labels */}
-                <div className="grid gap-[2px]" style={{ gridTemplateRows: 'repeat(7, 1fr)' }}>
-                  {dayLabels.map((label, i) => (
+            <div className="overflow-x-auto scrollbar-thin pb-sm">
+              <div className="min-w-[600px]">
+                <div className="grid gap-[2px]" style={{ gridTemplateColumns: 'auto 1fr' }}>
+                  <div className="grid gap-[2px]" style={{ gridTemplateRows: 'repeat(7, 1fr)' }}>
+                    {dayLabels.map((label, i) => (
+                      <div key={label} className="h-3 flex items-center text-[8px] font-label-caps text-text-muted">
+                        {i % 2 === 0 ? label : ''}
+                      </div>
+                    ))}
+                  </div>
+
+                  {heatmapData.length > 0 ? (
                     <div
-                      key={label}
-                      className="h-3 flex items-center text-[8px] font-label-caps text-text-muted"
+                      className="grid gap-[2px]"
+                      style={{
+                        gridTemplateColumns: `repeat(${heatmapData.length}, 1fr)`,
+                        gridTemplateRows: 'repeat(7, 1fr)',
+                      }}
                     >
-                      {i % 2 === 0 ? label : ''}
+                      {Array.from({ length: 7 }, (_, dayIndex) =>
+                        heatmapData.map((week, weekIndex) => {
+                          const entry = week[dayIndex]
+                          return (
+                            <div
+                              key={`${weekIndex}-${dayIndex}`}
+                              className={`aspect-square rounded-[3px] ${getHeatColor(entry?.active ?? false)} transition-all hover:scale-125 cursor-pointer`}
+                              title={`Sem ${weekIndex + 1}, ${dayLabels[dayIndex]}: ${entry?.active ? 'Activo' : 'Inactivo'}`}
+                            />
+                          )
+                        })
+                      )}
                     </div>
-                  ))}
+                  ) : (
+                    <div className="py-6 text-center font-label-caps text-sm text-text-muted opacity-40">
+                      SIN DATOS DE CONSISTENCIA
+                    </div>
+                  )}
                 </div>
-
-                {/* Heatmap Grid */}
-                {heatmapData.length > 0 ? (
-                  <div
-                    className="grid gap-[2px]"
-                    style={{
-                      gridTemplateColumns: `repeat(${heatmapData.length}, 1fr)`,
-                      gridTemplateRows: 'repeat(7, 1fr)',
-                    }}
-                  >
-                    {Array.from({ length: 7 }, (_, dayIndex) =>
-                      heatmapData.map((week, weekIndex) => {
-                        const entry = week[dayIndex]
-                        return (
-                          <div
-                            key={`${weekIndex}-${dayIndex}`}
-                            className={`aspect-square ${getHeatColor(entry?.active ?? false)} transition-all hover:scale-125 cursor-pointer`}
-                            title={`Sem ${weekIndex + 1}, ${dayLabels[dayIndex]}: ${entry?.active ? 'Activo' : 'Inactivo'}`}
-                          />
-                        )
-                      })
-                    )}
-                  </div>
-                ) : (
-                  <div className="py-6 text-center font-label-caps text-sm text-text-muted opacity-40">
-                    SIN DATOS DE CONSISTENCIA
-                  </div>
-                )}
               </div>
             </div>
-          </div>
-        </GreenCard>
+          </GreenCard>
 
-        {/* Streak Cards */}
-        <div className="grid grid-cols-2 gap-sm">
-          <GreenCard variant="default" padding="md" effects>
-            <div className="flex flex-col justify-center relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-sm opacity-20">
-                <span className="material-symbols-outlined text-green text-[32px]">local_fire_department</span>
+          <div className="grid grid-cols-2 gap-sm">
+            <GreenCard variant="default" padding="md" effects className="relative overflow-hidden">
+              <span className="gradient-hairline" />
+              <div className="flex flex-col justify-center relative">
+                <div className="absolute top-0 right-0 p-sm opacity-20">
+                  <span className="material-symbols-outlined text-green text-[32px]" style={{ fontVariationSettings: '"FILL" 1' }}>local_fire_department</span>
+                </div>
+                <span className="font-label-caps text-text-muted mb-xs">RACHA ACTUAL</span>
+                <div className="flex items-baseline gap-xs">
+                  <span className="font-label-caps text-[36px] text-gradient-green leading-none">{currentStreak}</span>
+                  <span className="font-headline-md text-text-green">DÍAS</span>
+                </div>
+                <p className="text-[10px] text-text-muted mt-xs">
+                  Nivel: <span className="text-green">{currentStreak > 10 ? 'Alto' : currentStreak > 4 ? 'Medio' : 'Bajo'}</span>
+                </p>
               </div>
-              <span className="font-label-caps text-text-muted mb-xs">RACHA ACTUAL</span>
-              <div className="flex items-baseline gap-xs">
-                <span className="font-label-caps text-[36px] text-green leading-none">{currentStreak}</span>
-                <span className="font-headline-md text-text-green">DÍAS</span>
+            </GreenCard>
+
+            <GreenCard variant="default" padding="md" effects className="border-l-4 border-l-green relative overflow-hidden">
+              <span className="gradient-hairline" />
+              <div className="flex flex-col justify-center">
+                <span className="font-label-caps text-text-muted mb-xs">MEJOR MARCA</span>
+                <div className="flex items-baseline gap-xs">
+                  <span className="font-label-caps text-[36px] text-gradient-green leading-none">{bestStreak}</span>
+                  <span className="font-headline-md text-text-muted">DÍAS</span>
+                </div>
+                <p className="text-[10px] text-text-muted mt-xs">{consistency.length} días registrados</p>
               </div>
-              <p className="text-[10px] text-text-muted mt-xs">
-                Nivel: <span className="text-green">{currentStreak > 10 ? 'Alto' : currentStreak > 4 ? 'Medio' : 'Bajo'}</span>
+            </GreenCard>
+          </div>
+
+          <GreenCard padding="md" effects className="relative overflow-hidden">
+            <span className="gradient-hairline" />
+            <div className="flex justify-between items-center mb-md">
+              <span className="font-label-caps text-text-muted">CUMPLIMIENTO GENERAL</span>
+              <span className="material-symbols-outlined text-green" style={{ fontVariationSettings: '"FILL" 1' }}>track_changes</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="relative w-40 h-40 flex items-center justify-center" role="progressbar" aria-valuenow={compliancePct} aria-valuemin={0} aria-valuemax={100} aria-label={`Cumplimiento: ${compliancePct}%`}>
+                <svg className="w-full h-full transform -rotate-90">
+                  <circle className="text-surface-container-low" cx="80" cy="80" fill="transparent" r="68" stroke="currentColor" strokeWidth="10" />
+                  <circle
+                    className="text-green transition-all duration-1000 ease-out"
+                    cx="80"
+                    cy="80"
+                    fill="transparent"
+                    r="68"
+                    stroke="currentColor"
+                    strokeDasharray={2 * Math.PI * 68}
+                    strokeDashoffset={2 * Math.PI * 68 * (1 - compliancePct / 100)}
+                    strokeLinecap="square"
+                    strokeWidth="10"
+                    style={{ filter: 'drop-shadow(0 0 6px color-mix(in srgb, var(--green) 60%, transparent))' }}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="font-label-caps text-[36px] text-text-green leading-none">
+                    {compliancePct}<span className="text-headline-md">%</span>
+                  </span>
+                  <span className="font-label-caps text-[9px] text-text-muted mt-xs">
+                    {compliancePct > 70 ? 'META ALCANZADA' : 'EN PROGRESO'}
+                  </span>
+                </div>
+              </div>
+              <div className="w-full grid grid-cols-2 gap-sm mt-md">
+                <GreenCard variant="default" padding="sm" effects>
+                  <p className="font-label-caps text-[8px] text-text-muted">RACHA ACTUAL</p>
+                  <p className="font-label-caps text-sm text-text-green">{currentStreak} DÍAS</p>
+                </GreenCard>
+                <GreenCard variant="default" padding="sm" effects>
+                  <p className="font-label-caps text-[8px] text-text-muted">MEJOR RACHA</p>
+                  <p className="font-label-caps text-sm text-green">▲ {bestStreak} DÍAS</p>
+                </GreenCard>
+              </div>
+            </div>
+          </GreenCard>
+
+          <GreenCard variant="glass" padding="md" effects className="relative overflow-hidden">
+            <div className="absolute -right-4 -bottom-4 opacity-10 pointer-events-none">
+              <span className="material-symbols-outlined text-[100px]">psychology</span>
+            </div>
+            <div className="relative z-10">
+              <div className="flex items-center gap-sm mb-md">
+                <span className="material-symbols-outlined text-green" style={{ fontVariationSettings: '"FILL" 1' }}>lightbulb</span>
+                <h3 className="font-label-caps font-bold text-green">ANALYSIS_INSIGHT</h3>
+              </div>
+              <p className="font-headline-md mb-md italic leading-tight text-text-green">
+                {consistency.length > 0
+                  ? `Llevas un ${compliancePct}% de consistencia con una racha actual de ${currentStreak} días.`
+                  : 'Registra entrenamientos para ver tu análisis de consistencia.'}
+              </p>
+              <p className="text-sm font-medium opacity-80 border-t border-outline-variant/25 pt-md text-text-muted">
+                {totalActive} días activos de {totalDays} días registrados.
               </p>
             </div>
           </GreenCard>
 
-          <GreenCard variant="default" padding="md" effects className="border-l-4 border-l-green">
-            <div className="flex flex-col justify-center">
-              <span className="font-label-caps text-text-muted mb-xs">MEJOR MARCA</span>
-              <div className="flex items-baseline gap-xs">
-                <span className="font-label-caps text-[36px] text-text-green leading-none">{bestStreak}</span>
-                <span className="font-headline-md text-text-muted">DÍAS</span>
-              </div>
-              <p className="text-[10px] text-text-muted mt-xs">{consistency.length} días registrados</p>
+          <GreenCard padding="md" effects className="relative overflow-hidden">
+            <span className="gradient-hairline" />
+            <h4 className="font-label-caps text-text-green mb-md">DISTRIBUCIÓN DE ACTIVIDAD</h4>
+            <div className="space-y-sm">
+              {disciplines.map((item) => (
+                <GreenProgress key={item.label} value={item.pct} label={item.label} showValue size="sm" effects />
+              ))}
             </div>
           </GreenCard>
-        </div>
 
-        {/* Compliance Gauge */}
-        <GreenCard padding="md" effects>
-          <div className="flex justify-between items-center mb-md">
-            <span className="font-label-caps text-text-muted">CUMPLIMIENTO GENERAL</span>
-            <span className="material-symbols-outlined text-green">track_changes</span>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className="relative w-40 h-40 flex items-center justify-center" role="progressbar" aria-valuenow={compliancePct} aria-valuemin={0} aria-valuemax={100} aria-label={`Cumplimiento: ${compliancePct}%`}>
-              <svg className="w-full h-full transform -rotate-90">
-                <circle className="text-panel" cx="80" cy="80" fill="transparent" r="68" stroke="currentColor" strokeWidth="10" />
-                <circle className="text-green transition-all duration-1000 ease-out" cx="80" cy="80" fill="transparent" r="68" stroke="currentColor" strokeDasharray={2 * Math.PI * 68} strokeDashoffset={2 * Math.PI * 68 * (1 - compliancePct / 100)} strokeLinecap="square" strokeWidth="10" />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="font-label-caps text-[36px] text-text-green leading-none">
-                  {compliancePct}<span className="text-headline-md">%</span>
-                </span>
-                <span className="font-label-caps text-[9px] text-text-muted mt-xs">
-                  {compliancePct > 70 ? 'META ALCANZADA' : 'EN PROGRESO'}
-                </span>
+          <div className="grid grid-cols-2 gap-sm pt-md border-t border-outline-variant/25">
+            {stats.map((stat) => (
+              <div key={stat.label}>
+                <p className="font-label-caps text-[9px] text-text-muted">{stat.label}</p>
+                <p className={'font-label-caps text-headline-md text-text-green'}>{stat.value}</p>
               </div>
-            </div>
-            <div className="w-full grid grid-cols-2 gap-sm mt-md">
-              <GreenCard variant="default" padding="sm" effects>
-                <p className="font-label-caps text-[8px] text-text-muted">RACHA ACTUAL</p>
-                <p className="font-label-caps text-sm text-text-green">{currentStreak} DÍAS</p>
-              </GreenCard>
-              <GreenCard variant="default" padding="sm" effects>
-                <p className="font-label-caps text-[8px] text-text-muted">MEJOR RACHA</p>
-                <p className="font-label-caps text-sm text-green">▲ {bestStreak} DÍAS</p>
-              </GreenCard>
-            </div>
-          </div>
-        </GreenCard>
-
-        {/* Insights Card */}
-        <GreenCard variant="glass" padding="md" effects>
-          <div className="absolute -right-4 -bottom-4 opacity-10">
-            <span className="material-symbols-outlined text-[100px]">psychology</span>
-          </div>
-          <div className="relative z-10">
-            <div className="flex items-center gap-sm mb-md">
-              <span className="material-symbols-outlined text-green">lightbulb</span>
-              <h3 className="font-label-caps font-bold text-green">ANALYSIS_INSIGHT</h3>
-            </div>
-            <p className="font-headline-md mb-md italic leading-tight text-text-green">
-              {consistency.length > 0
-                ? `Llevas un ${compliancePct}% de consistencia con una racha actual de ${currentStreak} días.`
-                : 'Registra entrenamientos para ver tu análisis de consistencia.'}
-            </p>
-            <p className="text-sm font-medium opacity-80 border-t border-green/20 pt-md text-text-muted">
-              {totalActive} días activos de {totalDays} días registrados.
-            </p>
-          </div>
-        </GreenCard>
-
-        {/* Discipline Distribution */}
-        <GreenCard padding="md" effects>
-          <h4 className="font-label-caps text-text-green mb-md">DISTRIBUCIÓN DE ACTIVIDAD</h4>
-          <div className="space-y-sm">
-            {disciplines.map((item) => (
-              <GreenProgress key={item.label} value={item.pct} label={item.label} showValue size="sm" effects />
             ))}
           </div>
-        </GreenCard>
-
-        {/* Footer Stats */}
-        <div className="grid grid-cols-2 gap-sm pt-md border-t border-green/20">
-          {stats.map((stat) => (
-            <div key={stat.label}>
-              <p className="font-label-caps text-[9px] text-text-muted">{stat.label}</p>
-              <p className={'font-label-caps text-headline-md text-text-green'}>
-                {stat.value}
-              </p>
-            </div>
-          ))}
-        </div>
+        </main>
       </div>
-
     </div>
   )
 }

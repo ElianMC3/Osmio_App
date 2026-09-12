@@ -76,13 +76,13 @@ export default function LoginScreen() {
             </div>
 
             {error && (
-              <p className="font-label-caps text-xs text-error-container text-center leading-relaxed">{error}</p>
+              <p className="font-label-caps text-xs text-error text-center leading-relaxed">{error}</p>
             )}
 
             <button
               type="submit"
               disabled={submitting}
-              className="w-full bg-primary text-on-primary font-label-caps uppercase tracking-[1.5px] text-sm py-3.5 rounded-lg hover:brightness-110 active:scale-[0.97] transition-all disabled:opacity-50 cursor-pointer mt-2"
+              className="w-full bg-gradient-to-r from-primary via-green to-acid text-on-primary font-label-caps uppercase tracking-[1.5px] text-sm py-3.5 rounded-[10px] hover:brightness-110 hover:shadow-[0_0_24px_color-mix(in_srgb,var(--green)_35%,transparent)] active:scale-[0.97] transition-all disabled:opacity-50 cursor-pointer mt-2"
             >
               {submitting ? '…' : isRegister ? 'CREAR CUENTA' : 'LOG-IN'}
             </button>

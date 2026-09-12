@@ -43,11 +43,12 @@ export const GreenTag = forwardRef<HTMLSpanElement, GreenTagProps>(
         className={`
           font-label-caps text-[9px] uppercase tracking-[0.8px]
           px-2.5 py-1 inline-flex items-center gap-1
+          rounded-[6px]
           ${variantStyles[variant]}
           ${chosen.text}
           ${chosen.border}
           ${variant === 'filled' ? chosen.bg : ''}
-          ${effects ? 'transition-all duration-300 hover:scale-105 hover:shadow-[0_0_12px_rgba(199,217,136,0.2)]' : ''}
+          ${effects ? 'transition-all duration-300 hover:scale-105 hover:shadow-[0_0_12px_color-mix(in_srgb,var(--green)_20%,transparent)]' : ''}
           ${className}
         `}
         {...props}

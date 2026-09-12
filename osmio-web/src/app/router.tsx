@@ -20,6 +20,7 @@ import NutritionDashboard from '../features/nutrition/screens/NutritionDashboard
 import QuickAddMeal from '../features/nutrition/screens/QuickAddMeal'
 import DayNutritionDetail from '../features/nutrition/screens/DayNutritionDetail'
 import ProfileSettings from '../features/profile/screens/ProfileSettings'
+import SettingsScreen from '../features/settings/screens/SettingsScreen'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return (
@@ -33,7 +34,7 @@ function RootRedirect() {
   const { isAuthenticated, loading } = useAuth()
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#050705] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <p className="font-label-caps text-sm text-text-muted animate-pulse">Cargando…</p>
       </div>
     )
@@ -63,6 +64,7 @@ export function AppRouter() {
       <Route path="/nutrition/quick-add" element={<ProtectedRoute><QuickAddMeal /></ProtectedRoute>} />
       <Route path="/nutrition/:date" element={<ProtectedRoute><DayNutritionDetail /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><ProfileSettings /></ProtectedRoute>} />
+      <Route path="/settings" element={<ProtectedRoute><SettingsScreen /></ProtectedRoute>} />
     </Routes>
   )
 }

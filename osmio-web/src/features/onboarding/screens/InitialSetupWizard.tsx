@@ -70,15 +70,16 @@ export default function InitialSetupWizard() {
           width: 100%;
           background: var(--color-surface-variant);
           height: 4px;
-          border-radius: 2px;
+          border-radius: 9999px;
         }
         input[type="range"]::-webkit-slider-thumb {
           -webkit-appearance: none;
           height: 20px;
           width: 20px;
-          border-radius: 2px;
+          border-radius: 9999px;
           background: var(--color-primary-fixed);
           cursor: pointer;
+          box-shadow: 0 0 12px color-mix(in srgb, var(--color-primary-fixed) 45%, transparent);
         }
         .neo-checkbox:checked + label {
           border-color: var(--color-primary-fixed);
@@ -92,15 +93,15 @@ export default function InitialSetupWizard() {
       {/* Top AppBar */}
       <header className="fixed top-0 w-full z-50 backdrop-blur-xl bg-surface/80 border-b border-surface-variant h-16 flex items-center px-5">
         <div className="flex justify-between items-center w-full max-w-[1440px] mx-auto">
-          <h1 className="font-mono text-sm text-white tracking-tighter uppercase">OSMIO</h1>
+          <h1 className="font-mono text-sm text-on-surface tracking-tighter uppercase">OSMIO</h1>
           <div className="flex items-center gap-4">
             <button
               aria-label="Ayuda"
-              className="material-symbols-outlined text-on-surface-variant hover:text-white transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary text-[24px]"
+              className="material-symbols-outlined text-on-surface-variant hover:text-on-surface transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary text-[24px]"
             >
               help
             </button>
-            <div className="w-8 h-8 rounded-full border border-white/20 bg-surface-container-high overflow-hidden flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full border border-outline-variant bg-surface-container-high overflow-hidden flex items-center justify-center">
               <span className="material-symbols-outlined text-on-surface-variant text-[18px]">
                 person
               </span>
@@ -113,10 +114,10 @@ export default function InitialSetupWizard() {
         {/* Progress Indicator */}
         <div className="mb-10">
           <div className="flex justify-between items-end mb-2">
-            <span className="font-mono text-xs text-white uppercase tracking-widest">
+            <span className="font-mono text-xs text-on-surface uppercase tracking-widest">
               {STEP_LABELS[currentStep - 1]}
             </span>
-            <span className="font-mono text-sm text-white/50">
+            <span className="font-mono text-sm text-on-surface-variant">
               0{currentStep} / 0{TOTAL_STEPS}
             </span>
           </div>
@@ -144,7 +145,7 @@ export default function InitialSetupWizard() {
           {currentStep === 1 && (
             <section className="step-transition">
               <div className="mb-6">
-                <h2 className="text-[24px] leading-[1.2] font-bold text-white mb-1">
+                <h2 className="text-[24px] leading-[1.2] font-bold text-on-surface mb-1">
                   Bienvenido, Recluta
                 </h2>
                 <p className="text-on-surface-variant text-base leading-relaxed">
@@ -161,7 +162,7 @@ export default function InitialSetupWizard() {
                     placeholder="75.0"
                     value={peso}
                     onChange={(e) => setPeso(e.target.value)}
-                    className="w-full bg-surface-container border border-surface-variant p-4 focus:border-primary-fixed focus:ring-0 text-white font-mono text-sm outline-none"
+                    className="w-full bg-surface-container border border-outline-variant p-4 rounded-lg focus:border-primary-fixed focus:ring-0 text-on-surface font-mono text-sm outline-none"
                   />
                 </div>
                 <div className="col-span-1 space-y-1">
@@ -173,7 +174,7 @@ export default function InitialSetupWizard() {
                     placeholder="180"
                     value={altura}
                     onChange={(e) => setAltura(e.target.value)}
-                    className="w-full bg-surface-container border border-surface-variant p-4 focus:border-primary-fixed focus:ring-0 text-white font-mono text-sm outline-none"
+                    className="w-full bg-surface-container border border-outline-variant p-4 rounded-lg focus:border-primary-fixed focus:ring-0 text-on-surface font-mono text-sm outline-none"
                   />
                 </div>
                 <div className="col-span-1 space-y-1">
@@ -185,7 +186,7 @@ export default function InitialSetupWizard() {
                     placeholder="28"
                     value={edad}
                     onChange={(e) => setEdad(e.target.value)}
-                    className="w-full bg-surface-container border border-surface-variant p-4 focus:border-primary-fixed focus:ring-0 text-white font-mono text-sm outline-none"
+                    className="w-full bg-surface-container border border-outline-variant p-4 rounded-lg focus:border-primary-fixed focus:ring-0 text-on-surface font-mono text-sm outline-none"
                   />
                 </div>
                 <div className="col-span-1 space-y-1">
@@ -195,7 +196,7 @@ export default function InitialSetupWizard() {
                   <select
                     value={sexo}
                     onChange={(e) => setSexo(e.target.value)}
-                    className="w-full bg-surface-container border border-surface-variant p-4 focus:border-primary-fixed focus:ring-0 text-white appearance-none outline-none"
+                    className="w-full bg-surface-container border border-surface-variant p-4 focus:border-primary-fixed focus:ring-0 text-on-surface appearance-none outline-none"
                   >
                     <option>Masculino</option>
                     <option>Femenino</option>
@@ -210,7 +211,7 @@ export default function InitialSetupWizard() {
           {currentStep === 2 && (
             <section className="step-transition">
               <div className="mb-6">
-                <h2 className="text-[24px] leading-[1.2] font-bold text-white mb-1">
+                <h2 className="text-[24px] leading-[1.2] font-bold text-on-surface mb-1">
                   Objetivo Principal
                 </h2>
                 <p className="text-on-surface-variant text-base leading-relaxed">
@@ -234,7 +235,7 @@ export default function InitialSetupWizard() {
                       {g.icon}
                     </span>
                     <div>
-                      <span className="text-[20px] leading-[1.4] font-semibold block text-white">
+                      <span className="text-[20px] leading-[1.4] font-semibold block text-on-surface">
                         {g.title}
                       </span>
                       <span className="text-[11px] text-on-surface-variant uppercase tracking-widest">
@@ -251,7 +252,7 @@ export default function InitialSetupWizard() {
           {currentStep === 3 && (
             <section className="step-transition">
               <div className="mb-6">
-                <h2 className="text-[24px] leading-[1.2] font-bold text-white mb-1">
+                <h2 className="text-[24px] leading-[1.2] font-bold text-on-surface mb-1">
                   Tus Disciplinas
                 </h2>
                 <p className="text-on-surface-variant text-base leading-relaxed">
@@ -291,7 +292,7 @@ export default function InitialSetupWizard() {
           {currentStep === 4 && (
             <section className="step-transition">
               <div className="mb-6">
-                <h2 className="text-[24px] leading-[1.2] font-bold text-white mb-1">
+                <h2 className="text-[24px] leading-[1.2] font-bold text-on-surface mb-1">
                   Planificación
                 </h2>
                 <p className="text-on-surface-variant text-base leading-relaxed">
@@ -302,7 +303,7 @@ export default function InitialSetupWizard() {
                 {/* Sessions slider */}
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <label className="font-mono text-xs text-white uppercase tracking-widest">
+                    <label className="font-mono text-xs text-on-surface uppercase tracking-widest">
                       Sesiones por semana
                     </label>
                     <span className="font-mono text-xl text-primary-fixed">{sessions}</span>
@@ -323,7 +324,7 @@ export default function InitialSetupWizard() {
 
                 {/* Bloque Intensivo */}
                 <div className="space-y-4">
-                  <label className="font-mono text-xs text-white uppercase tracking-widest block">
+                  <label className="font-mono text-xs text-on-surface uppercase tracking-widest block">
                     Bloque Intensivo
                   </label>
                   <div className="grid grid-cols-2 gap-2">
@@ -331,14 +332,14 @@ export default function InitialSetupWizard() {
                       type="button"
                       onClick={() => setBloque('AM')}
                       aria-pressed={bloque === 'AM'}
-                      className={`p-4 border font-mono text-xs text-left transition-all duration-200 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
+                      className={`p-4 border rounded-xl font-mono text-xs text-left transition-all duration-200 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
                         bloque === 'AM'
-                          ? 'bg-primary-fixed/5 border-primary-fixed text-white'
-                          : 'bg-surface-container border-outline-variant text-white/40'
+                          ? 'bg-primary-fixed/5 border-primary-fixed text-on-surface'
+                          : 'bg-surface-container border-outline-variant text-on-surface-variant'
                       }`}
                     >
                       AM <br />
-                      <span className={bloque === 'AM' ? 'text-primary-fixed/60' : 'text-white/40'}>
+                      <span className={bloque === 'AM' ? 'text-primary-fixed/60' : 'text-on-surface-variant'}>
                         05:00 - 09:00
                       </span>
                     </button>
@@ -346,14 +347,14 @@ export default function InitialSetupWizard() {
                       type="button"
                       onClick={() => setBloque('PM')}
                       aria-pressed={bloque === 'PM'}
-                      className={`p-4 border font-mono text-xs text-left transition-all duration-200 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
+                      className={`p-4 border rounded-xl font-mono text-xs text-left transition-all duration-200 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
                         bloque === 'PM'
-                          ? 'bg-primary-fixed/5 border-primary-fixed text-white'
-                          : 'bg-surface-container border-outline-variant text-white/40'
+                          ? 'bg-primary-fixed/5 border-primary-fixed text-on-surface'
+                          : 'bg-surface-container border-outline-variant text-on-surface-variant'
                       }`}
                     >
                       PM <br />
-                      <span className={bloque === 'PM' ? 'text-primary-fixed/60' : 'text-white/40'}>
+                      <span className={bloque === 'PM' ? 'text-primary-fixed/60' : 'text-on-surface-variant'}>
                         17:00 - 21:00
                       </span>
                     </button>
@@ -368,7 +369,7 @@ export default function InitialSetupWizard() {
             {currentStep > 1 && (
               <button
                 onClick={handlePrev}
-                className="flex-1 border border-primary-fixed py-4 font-mono text-xs text-primary-fixed uppercase tracking-widest hover:bg-primary-fixed/10 transition-all duration-200 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="flex-1 border border-primary-fixed py-4 rounded-[10px] font-mono text-xs text-primary-fixed uppercase tracking-widest hover:bg-primary-fixed/10 transition-all duration-200 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >
                 ATRÁS
               </button>
@@ -376,7 +377,7 @@ export default function InitialSetupWizard() {
             <button
               onClick={handleNext}
               disabled={isFinalizing}
-              className={`flex-[2] py-4 font-mono text-xs uppercase tracking-widest transition-all duration-200 active:scale-[0.98] disabled:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
+              className={`flex-[2] py-4 rounded-[10px] font-mono text-xs uppercase tracking-widest transition-all duration-200 active:scale-[0.98] disabled:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
                 currentStep === TOTAL_STEPS
                   ? 'bg-primary-fixed text-on-primary hover:opacity-90'
                   : 'bg-primary-fixed text-on-primary hover:opacity-90'

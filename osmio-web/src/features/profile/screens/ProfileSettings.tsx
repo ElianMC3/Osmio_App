@@ -3,12 +3,15 @@ import { useNavigate } from 'react-router-dom'
 import { profilesApi } from '@/services/api/profiles.api'
 import { supabase } from '@/services/supabase/client'
 import { useUserStore } from '@/store/userStore'
+import { useAuth } from '@/shared/hooks/useAuth'
 
 const dayLabels = ['L', 'M', 'X', 'J', 'V', 'S', 'D'] as const
 
 export default function ProfileSettings() {
   const navigate = useNavigate()
+  const { logout } = useAuth()
   const setProfile = useUserStore((s) => s.setProfile)
+  const clearProfile = useUserStore((s) => s.clearProfile)
 
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
@@ -75,6 +78,17 @@ export default function ProfileSettings() {
 
   const toggleDay = (day: string) => {
     setTrainingDays((prev) => ({ ...prev, [day]: !prev[day] }))
+  }
+
+  const handleLogout = async () => {
+    setError(null)
+    try {
+      await logout()
+      clearProfile()
+      navigate('/login', { replace: true })
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'No se pudo cerrar sesión')
+    }
   }
 
   if (loading) {
@@ -363,7 +377,7 @@ export default function ProfileSettings() {
 
       {/* Sign Out */}
       <button
-        onClick={() => navigate('/')}
+        onClick={handleLogout}
         className="w-full bg-error-container text-on-error-container font-label-caps text-sm font-bold py-4 rounded-xl hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md"
       >
         <span className="material-symbols-outlined text-[20px]">logout</span>

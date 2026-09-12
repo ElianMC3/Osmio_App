@@ -4,6 +4,8 @@ import { GreenCard } from '@/design-system/components/GreenCard'
 import { GreenButton } from '@/design-system/components/GreenButton'
 import { GreenTag } from '@/design-system/components/GreenTag'
 import { GreenProgress } from '@/design-system/components/GreenProgress'
+import { PageBackdrop } from '@/design-system/components/PageBackdrop'
+import { PageHeader } from '@/design-system/components/PageHeader'
 import { sessionsApi } from '@/services/api/sessions.api'
 import type { StrengthSession, CombatSession } from '@/shared/types/session.types'
 const WEEKDAYS = ['LUN', 'MAR', 'MIE', 'JUE', 'VIE', 'SAB', 'DOM']
@@ -182,25 +184,24 @@ export default function MonthlyCalendar() {
   }
 
   return (
-    <div className="min-h-screen pb-20">
-      {/* Header */}
-      <header className="sticky top-0 z-30 flex items-center gap-md px-md h-14 bg-panel/80 backdrop-blur-xl border-b border-green/20">
-        <button
-          onClick={() => navigate(-1)}
-          aria-label="Volver"
-          className="material-symbols-outlined text-text-muted hover:text-green transition-colors duration-200 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green cursor-pointer"
-        >
-          arrow_back
-        </button>
-        <div className="flex flex-col">
-          <h1 className="font-headline-md text-headline-md text-text-green leading-tight">
-            Historial - Calendario
-          </h1>
-          <span className="font-label-caps text-[12px] text-text-muted">
-            Registro de entrenamientos
-          </span>
+    <div className="relative min-h-screen pb-24">
+      <PageBackdrop />
+      <div className="relative z-10 max-w-4xl mx-auto">
+        <div className="px-5 pt-6">
+          <PageHeader
+            kicker="REGISTRO DE OPERACIONES"
+            title="Historial"
+            titleAccent="Calendario"
+            subtitle="Registro de entrenamientos mes a mes."
+            onBack={() => navigate(-1)}
+            status={
+              <span className="status-pill">
+                <span className="status-dot bg-green" />
+                {allSessions.length} SESIONES
+              </span>
+            }
+          />
         </div>
-      </header>
 
       <div className="p-md space-y-lg">
         {/* Month Navigation */}
@@ -270,7 +271,7 @@ export default function MonthlyCalendar() {
                         ? 'hover:bg-panel'
                         : 'hover:bg-panel2/30'
                   }`}
-                  style={isSelected ? { border: '1px solid #c7d988', boxShadow: 'inset 0 0 10px rgba(199, 217, 136, 0.1)' } : undefined}
+                  style={isSelected ? { border: '1px solid var(--green)', boxShadow: 'inset 0 0 10px color-mix(in srgb, var(--green) 10%, transparent)' } : undefined}
                 >
                   <span className={`font-label-caps text-sm ${isSelected ? 'text-green' : ''}`}>
                     {day}
@@ -324,6 +325,7 @@ export default function MonthlyCalendar() {
               <GreenProgress value={days.length > 0 ? Math.round((days.length / daysInMonth) * 100) : 0} label="GOAL" showValue={true} size="sm" effects={true} />
             </div>
         </div>
+      </div>
       </div>
 
     </div>

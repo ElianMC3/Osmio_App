@@ -133,8 +133,8 @@ export default function DashboardHoy() {
     <div className="dash-root min-h-screen" onMouseMove={handleMouseMove}>
       <style>{`
         .dash-root {
-          background: #050705;
-          color: #e9eddc;
+          background: var(--panel2);
+          color: var(--text-green);
           font-family: 'Inter', sans-serif;
           position: relative;
           overflow: hidden;
@@ -159,7 +159,7 @@ export default function DashboardHoy() {
           z-index: 0;
           pointer-events: none;
           border-radius: 50%;
-          background: radial-gradient(circle, rgba(199,217,136,0.18), transparent 70%);
+          background: radial-gradient(circle, color-mix(in srgb, var(--green) 18%, transparent), transparent 70%);
           transform: translate(-50%,-50%);
           transition: 0.06s linear;
         }
@@ -180,7 +180,7 @@ export default function DashboardHoy() {
           padding: 20px;
           position: relative;
           overflow: hidden;
-          border-right: 1px solid rgba(199,217,136,0.2);
+          border-right: 1px solid color-mix(in srgb, var(--green) 20%, transparent);
         }
 
         .dash-main::before {
@@ -189,8 +189,8 @@ export default function DashboardHoy() {
           inset: 0;
           pointer-events: none;
           background:
-            linear-gradient(90deg, transparent 49%, rgba(233,237,220,0.06) 50%, transparent 51%),
-            linear-gradient(0deg, transparent 49%, rgba(233,237,220,0.06) 50%, transparent 51%);
+            linear-gradient(90deg, transparent 49%, color-mix(in srgb, var(--text-green) 6%, transparent) 50%, transparent 51%),
+            linear-gradient(0deg, transparent 49%, color-mix(in srgb, var(--text-green) 6%, transparent) 50%, transparent 51%);
           background-size: 36px 36px;
         }
 
@@ -201,18 +201,18 @@ export default function DashboardHoy() {
           overflow-y: auto;
           padding-right: 8px;
           scrollbar-width: thin;
-          scrollbar-color: #5f6f38 rgba(5,7,5,0.32);
+          scrollbar-color: var(--green-dark) color-mix(in srgb, var(--panel2) 32%, transparent);
         }
 
         .dash-scroll::-webkit-scrollbar { width: 8px; }
         .dash-scroll::-webkit-scrollbar-track {
           border-radius: 999px;
-          background: rgba(5,7,5,0.32);
+          background: color-mix(in srgb, var(--panel2) 32%, transparent);
         }
         .dash-scroll::-webkit-scrollbar-thumb {
-          border: 2px solid rgba(5,7,5,0.72);
+          border: 2px solid color-mix(in srgb, var(--panel2) 72%, transparent);
           border-radius: 999px;
-          background: linear-gradient(180deg, #c7d988, #5f6f38, #050705, #9faf62);
+          background: linear-gradient(180deg, var(--green), var(--green-dark), var(--panel2), var(--green-dim));
         }
 
         .dash-side {
@@ -223,9 +223,9 @@ export default function DashboardHoy() {
           border-top-right-radius: 16px;
           border-top-left-radius: 16px;
           background:
-            radial-gradient(circle at 50% 12%, rgba(215,220,197,0.48), transparent 26%),
-            radial-gradient(circle at 50% 56%, rgba(199,217,136,0.18), transparent 34%),
-            linear-gradient(180deg, #aeb899, #050705 39%);
+            radial-gradient(circle at 50% 12%, color-mix(in srgb, var(--paper) 48%, transparent), transparent 26%),
+            radial-gradient(circle at 50% 56%, color-mix(in srgb, var(--green) 18%, transparent), transparent 34%),
+            linear-gradient(180deg, var(--green-dim), var(--panel2) 39%);
         }
 
         .dash-side::before {
@@ -234,14 +234,14 @@ export default function DashboardHoy() {
           inset: 0;
           pointer-events: none;
           background:
-            linear-gradient(90deg, transparent 49%, rgba(233,237,220,0.06) 50%, transparent 51%),
-            linear-gradient(0deg, transparent 49%, rgba(233,237,220,0.06) 50%, transparent 51%);
+            linear-gradient(90deg, transparent 49%, color-mix(in srgb, var(--text-green) 6%, transparent) 50%, transparent 51%),
+            linear-gradient(0deg, transparent 49%, color-mix(in srgb, var(--text-green) 6%, transparent) 50%, transparent 51%);
           background-size: 36px 36px;
         }
 
         .dash-card {
-          background: rgba(16,21,14,0.7);
-          border: 1px solid rgba(199,217,136,0.25);
+          background: color-mix(in srgb, var(--panel) 70%, transparent);
+          border: 1px solid color-mix(in srgb, var(--green) 25%, transparent);
           border-radius: 22px;
           padding: 20px;
           backdrop-filter: blur(8px);
@@ -249,8 +249,8 @@ export default function DashboardHoy() {
         }
 
         .dash-card:hover {
-          border-color: rgba(199,217,136,0.5);
-          background: rgba(199,217,136,0.06);
+          border-color: color-mix(in srgb, var(--green) 50%, transparent);
+          background: color-mix(in srgb, var(--green) 6%, transparent);
         }
 
         .dash-label {
@@ -258,33 +258,33 @@ export default function DashboardHoy() {
           font-size: 11px;
           letter-spacing: 1px;
           text-transform: uppercase;
-          color: #aab497;
+          color: var(--text-muted);
         }
 
         .dash-green {
-          color: #c7d988;
+          color: var(--green);
         }
 
         .dash-title {
           font-family: 'Inter', sans-serif;
           font-size: 20px;
           line-height: 1.2;
-          color: #c7d988;
+          color: var(--green);
         }
 
         .dash-value {
           font-family: 'JetBrains Mono', monospace;
           font-size: 24px;
-          color: #e9eddc;
+          color: var(--text-green);
         }
 
         .dash-muted {
-          color: #aab497;
+          color: var(--text-muted);
           font-size: 11px;
         }
 
         .dash-faint {
-          color: rgba(233,237,220,0.58);
+          color: color-mix(in srgb, var(--text-green) 57%, transparent);
         }
 
         .dash-bar {
@@ -293,15 +293,15 @@ export default function DashboardHoy() {
         }
 
         .dash-bg-panel {
-          background: #10150e;
+          background: var(--panel);
         }
 
         .dash-bg-panel2 {
-          background: #182012;
+          background: var(--panel2);
         }
 
         .dash-border {
-          border-color: rgba(199,217,136,0.35);
+          border-color: color-mix(in srgb, var(--green) 35%, transparent);
         }
 
         .dash-scan {
@@ -312,7 +312,7 @@ export default function DashboardHoy() {
           height: 50px;
           z-index: 4;
           pointer-events: none;
-          background: linear-gradient(180deg, transparent, rgba(199,217,136,0.28), transparent);
+          background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--green) 28%, transparent), transparent);
           animation: dashScanMove 4s infinite linear;
         }
 
@@ -333,7 +333,7 @@ export default function DashboardHoy() {
           font: 9px 'JetBrains Mono', monospace;
           letter-spacing: 1.6px;
           text-transform: uppercase;
-          color: rgba(17,20,15,0.62);
+          color: color-mix(in srgb, var(--panel2) 62%, transparent);
         }
 
         .side-title strong {
@@ -342,7 +342,7 @@ export default function DashboardHoy() {
           font-family: 'Inter', sans-serif;
           font-size: 28px;
           line-height: 0.95;
-          color: #11140f;
+          color: var(--panel2);
           letter-spacing: -1px;
           text-transform: uppercase;
         }
@@ -352,7 +352,7 @@ export default function DashboardHoy() {
           font: 9px 'JetBrains Mono', monospace;
           letter-spacing: 1.6px;
           text-transform: uppercase;
-          color: rgba(17,20,15,0.62);
+          color: color-mix(in srgb, var(--panel2) 62%, transparent);
         }
 
         .side-capsule {
@@ -362,12 +362,12 @@ export default function DashboardHoy() {
           bottom: 16px;
           height: 62%;
           overflow: hidden;
-          border: 6px solid #050705;
+          border: 6px solid var(--panel2);
           border-radius: 120px 120px 28px 28px;
-          background: #050705;
+          background: var(--panel2);
           box-shadow:
-            inset 0 0 0 1px rgba(199,217,136,0.18),
-            inset 0 0 42px rgba(199,217,136,0.08);
+            inset 0 0 0 1px color-mix(in srgb, var(--green) 18%, transparent),
+            inset 0 0 42px color-mix(in srgb, var(--green) 8%, transparent);
         }
 
         .side-capsule > img {
@@ -392,10 +392,10 @@ export default function DashboardHoy() {
           z-index: 1;
           pointer-events: none;
           background:
-            radial-gradient(circle at 50% 50%, transparent 0 24%, rgba(5,7,5,0.08) 30%, rgba(5,7,5,0.76) 72%),
-            linear-gradient(180deg, rgba(5,7,5,0.08), rgba(199,217,136,0.18) 48%, rgba(5,7,5,0.72)),
+            radial-gradient(circle at 50% 50%, transparent 0 24%, color-mix(in srgb, var(--panel2) 8%, transparent) 30%, color-mix(in srgb, var(--panel2) 76%, transparent) 72%),
+            linear-gradient(180deg, color-mix(in srgb, var(--panel2) 8%, transparent), color-mix(in srgb, var(--green) 18%, transparent) 48%, color-mix(in srgb, var(--panel2) 72%, transparent)),
             repeating-linear-gradient(0deg, rgba(255,255,255,0.055) 0 1px, transparent 1px 7px),
-            repeating-linear-gradient(90deg, rgba(199,217,136,0.04) 0 1px, transparent 1px 19px);
+            repeating-linear-gradient(90deg, color-mix(in srgb, var(--green) 4%, transparent) 0 1px, transparent 1px 19px);
           mix-blend-mode: multiply;
         }
 
@@ -406,9 +406,9 @@ export default function DashboardHoy() {
           z-index: 2;
           pointer-events: none;
           background:
-            radial-gradient(circle at 50% 52%, rgba(199,217,136,0.24), transparent 29%),
-            linear-gradient(90deg, transparent 0 48%, rgba(215,255,160,0.16) 50%, transparent 52%),
-            linear-gradient(180deg, transparent 0 35%, rgba(217,255,133,0.08) 48%, transparent 60%);
+            radial-gradient(circle at 50% 52%, color-mix(in srgb, var(--green) 24%, transparent), transparent 29%),
+            linear-gradient(90deg, transparent 0 48%, color-mix(in srgb, var(--acid) 16%, transparent) 50%, transparent 52%),
+            linear-gradient(180deg, transparent 0 35%, color-mix(in srgb, var(--acid) 8%, transparent) 48%, transparent 60%);
         }
 
         .side-capsule .side-scan {
@@ -420,7 +420,7 @@ export default function DashboardHoy() {
           z-index: 3;
           pointer-events: none;
           background:
-            linear-gradient(180deg, transparent, rgba(217,255,133,0.28), rgba(199,217,136,0.06), transparent);
+            linear-gradient(180deg, transparent, color-mix(in srgb, var(--acid) 28%, transparent), color-mix(in srgb, var(--green) 6%, transparent), transparent);
           mix-blend-mode: screen;
           animation: sideScanMove 4.6s infinite linear;
         }
@@ -436,7 +436,7 @@ export default function DashboardHoy() {
           z-index: 3;
           pointer-events: none;
           background:
-            linear-gradient(110deg, transparent 0 36%, rgba(233,237,220,0.12) 39%, transparent 43% 100%);
+            linear-gradient(110deg, transparent 0 36%, color-mix(in srgb, var(--text-green) 12%, transparent) 39%, transparent 43% 100%);
           mix-blend-mode: screen;
           opacity: 0;
           animation: sideFlicker 3.4s infinite steps(1,end);
@@ -458,7 +458,7 @@ export default function DashboardHoy() {
           height: 110px;
           overflow: visible;
           border-radius: 50%;
-          background: #050705;
+          background: var(--panel2);
           transform: translate(-50%, -50%);
         }
 
@@ -472,11 +472,11 @@ export default function DashboardHoy() {
           background:
             conic-gradient(from 20deg,
               transparent 0 12%,
-              #c7d988 13% 22%,
+              var(--green) 13% 22%,
               transparent 23% 38%,
-              #5f6f38 39% 47%,
+              var(--green-dark) 39% 47%,
               transparent 48% 70%,
-              #d9ff85 71% 77%,
+              var(--acid) 71% 77%,
               transparent 78% 100%);
           animation: spin 7s linear infinite;
         }
@@ -485,13 +485,13 @@ export default function DashboardHoy() {
           content: "";
           position: absolute;
           inset: -16px;
-          border: 1px solid rgba(199,217,136,0.46);
+          border: 1px solid color-mix(in srgb, var(--green) 46%, transparent);
           border-radius: 50%;
           pointer-events: none;
           box-shadow:
-            0 0 18px rgba(199,217,136,0.42),
-            0 0 42px rgba(157,190,91,0.28),
-            inset 0 0 18px rgba(199,217,136,0.22);
+            0 0 18px color-mix(in srgb, var(--green) 42%, transparent),
+            0 0 42px color-mix(in srgb, var(--green-dim) 28%, transparent),
+            inset 0 0 18px color-mix(in srgb, var(--green) 22%, transparent);
         }
 
         .side-target img {
@@ -500,7 +500,7 @@ export default function DashboardHoy() {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          border: 2px solid rgba(233,237,220,0.48);
+          border: 2px solid color-mix(in srgb, var(--text-green) 48%, transparent);
           border-radius: 50%;
           opacity: 0.96;
           filter: grayscale(0.18) contrast(1.32) saturate(0.88);
@@ -515,18 +515,18 @@ export default function DashboardHoy() {
           font-size: 10px;
           letter-spacing: 1px;
           text-transform: uppercase;
-          border: 1px solid rgba(199,217,136,0.35);
+          border: 1px solid color-mix(in srgb, var(--green) 35%, transparent);
           background: transparent;
-          color: #e9eddc;
+          color: var(--text-green);
           padding: 10px 16px;
           cursor: pointer;
           transition: 0.35s ease;
         }
 
         .dash-btn:hover {
-          background: rgba(199,217,136,0.1);
-          color: #c7d988;
-          border-color: #c7d988;
+          background: color-mix(in srgb, var(--green) 10%, transparent);
+          color: var(--green);
+          border-color: var(--green);
         }
 
         .dash-btn:active {
@@ -541,20 +541,20 @@ export default function DashboardHoy() {
           width: 52px;
           height: 52px;
           border-radius: 50%;
-          background: #c7d988;
-          color: #050705;
+          background: var(--green);
+          color: var(--panel2);
           display: flex;
           align-items: center;
           justify-content: center;
           border: none;
           cursor: pointer;
-          box-shadow: 0 0 30px rgba(199,217,136,0.3);
+          box-shadow: 0 0 30px color-mix(in srgb, var(--green) 30%, transparent);
           transition: 0.25s ease;
         }
 
         .dash-fab:hover {
           transform: scale(1.05);
-          box-shadow: 0 0 40px rgba(199,217,136,0.5);
+          box-shadow: 0 0 40px color-mix(in srgb, var(--green) 50%, transparent);
         }
 
         .dash-fab:active {
@@ -566,8 +566,8 @@ export default function DashboardHoy() {
           align-items: center;
           gap: 12px;
           padding: 12px 16px;
-          border-left: 4px solid #d9ff85;
-          background: rgba(199,217,136,0.06);
+          border-left: 4px solid var(--acid);
+          background: color-mix(in srgb, var(--green) 6%, transparent);
         }
 
         .dash-meter {
@@ -579,28 +579,28 @@ export default function DashboardHoy() {
           justify-content: space-between;
           margin-bottom: 4px;
           font: 10px 'JetBrains Mono', monospace;
-          color: #aab497;
+          color: var(--text-muted);
         }
 
         .dash-track {
           height: 6px;
-          background: rgba(5,7,5,0.4);
+          background: color-mix(in srgb, var(--panel2) 40%, transparent);
           position: relative;
         }
 
         .dash-track-fill {
           height: 100%;
-          background: #c7d988;
+          background: var(--green);
           transition: width 0.5s ease;
         }
 
         .dash-heat-cell {
           opacity: var(--cell-opacity);
-          background: #c7d988;
+          background: var(--green);
         }
 
         .dash-heat-cell.empty {
-          border: 1px solid rgba(199,217,136,0.2);
+          border: 1px solid color-mix(in srgb, var(--green) 20%, transparent);
           background: transparent;
         }
 
@@ -609,8 +609,8 @@ export default function DashboardHoy() {
           inset: 0;
           pointer-events: none;
           background:
-            linear-gradient(90deg, transparent 49%, rgba(233,237,220,0.06) 50%, transparent 51%),
-            linear-gradient(0deg, transparent 49%, rgba(233,237,220,0.06) 50%, transparent 51%);
+            linear-gradient(90deg, transparent 49%, color-mix(in srgb, var(--text-green) 6%, transparent) 50%, transparent 51%),
+            linear-gradient(0deg, transparent 49%, color-mix(in srgb, var(--text-green) 6%, transparent) 50%, transparent 51%);
           background-size: 36px 36px;
         }
       `}</style>
@@ -627,7 +627,7 @@ export default function DashboardHoy() {
               <section>
                 <div className="dash-card relative overflow-hidden">
                   <div className="absolute -right-8 -top-8 opacity-8 rotate-12">
-                    <span className="material-symbols-outlined text-[160px]" style={{color: '#c7d988'}}>
+                    <span className="material-symbols-outlined text-[160px]" style={{color: 'var(--green)'}}>
                       sports_kabaddi
                     </span>
                   </div>
@@ -635,7 +635,7 @@ export default function DashboardHoy() {
 
                   <header className="mb-5 flex justify-between items-start relative z-10">
                     <div>
-                      <span className="dash-label" style={{color: '#c7d988'}}>
+                      <span className="dash-label" style={{color: 'var(--green)'}}>
                         Hoy • {currentDay} {formatDate(now)}
                       </span>
                       <h2 className="dash-title mt-1 uppercase" style={{fontSize: '20px'}}>
@@ -643,11 +643,11 @@ export default function DashboardHoy() {
                       </h2>
                     </div>
                     <div style={{
-                      background: 'rgba(199,217,136,0.1)',
-                      border: '1px solid rgba(199,217,136,0.25)',
+                      background: 'color-mix(in srgb, var(--green) 10%, transparent)',
+                      border: '1px solid color-mix(in srgb, var(--green) 25%, transparent)',
                       padding: '4px 10px'
                     }}>
-                      <span className="dash-label" style={{color: '#c7d988', fontSize: '10px'}}>SESIONES: {todaySessions.length}</span>
+                      <span className="dash-label" style={{color: 'var(--green)', fontSize: '10px'}}>SESIONES: {todaySessions.length}</span>
                     </div>
                   </header>
 
@@ -657,16 +657,16 @@ export default function DashboardHoy() {
                         <div key={i} className="flex gap-4 items-center group cursor-pointer">
                           <div style={{
                             width: 44, height: 44,
-                            background: '#182012',
+                            background: 'var(--panel2)',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            border: '1px solid rgba(199,217,136,0.2)'
+                            border: '1px solid color-mix(in srgb, var(--green) 20%, transparent)'
                           }}>
-                            <span className="material-symbols-outlined" style={{color: '#c7d988'}}>
+                            <span className="material-symbols-outlined" style={{color: 'var(--green)'}}>
                               {'exerciseId' in s ? 'fitness_center' : 'sports_kabaddi'}
                             </span>
                           </div>
                           <div>
-                            <h3 style={{fontSize: '16px', fontWeight: 600, color: '#e9eddc', fontFamily: "'Inter',sans-serif"}}>
+                            <h3 style={{fontSize: '16px', fontWeight: 600, color: 'var(--text-green)', fontFamily: "'Inter',sans-serif"}}>
                               {'exerciseName' in s ? s.exerciseName : s.type}
                             </h3>
                             <p className="dash-muted" style={{marginTop: 2}}>
@@ -678,14 +678,14 @@ export default function DashboardHoy() {
                         <div className="flex gap-4 items-center">
                           <div style={{
                             width: 44, height: 44,
-                            background: '#182012',
+                            background: 'var(--panel2)',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            border: '1px solid rgba(199,217,136,0.2)'
+                            border: '1px solid color-mix(in srgb, var(--green) 20%, transparent)'
                           }}>
-                            <span className="material-symbols-outlined" style={{color: '#aab497'}}>rest</span>
+                            <span className="material-symbols-outlined" style={{color: 'var(--text-muted)'}}>rest</span>
                           </div>
                           <div>
-                            <h3 style={{fontSize: '16px', fontWeight: 600, color: '#aab497', fontFamily: "'Inter',sans-serif"}}>
+                            <h3 style={{fontSize: '16px', fontWeight: 600, color: 'var(--text-muted)', fontFamily: "'Inter',sans-serif"}}>
                               Sin sesiones registradas
                             </h3>
                             <p className="dash-muted" style={{marginTop: 2}}>
@@ -699,7 +699,7 @@ export default function DashboardHoy() {
                     <div className="flex flex-col gap-2">
                       <div className="flex justify-between">
                         <span className="dash-muted">Fatiga Acumulada</span>
-                        <span style={{color: '#c7d988', fontSize: 11, fontFamily: "'JetBrains Mono',monospace"}}>{Math.min(100, todaySessions.length * 25 + 20)}%</span>
+                        <span style={{color: 'var(--green)', fontSize: 11, fontFamily: "'JetBrains Mono',monospace"}}>{Math.min(100, todaySessions.length * 25 + 20)}%</span>
                       </div>
                       <div className="dash-track">
                         <div className="dash-track-fill" style={{width: `${Math.min(100, todaySessions.length * 25 + 20)}%`}} />
@@ -715,7 +715,7 @@ export default function DashboardHoy() {
               {/* Alert */}
               {todaySessions.length === 0 && (
                 <section className="dash-alert">
-                  <span className="material-symbols-outlined" style={{color: '#d9ff85'}}>info</span>
+                  <span className="material-symbols-outlined" style={{color: 'var(--acid)'}}>info</span>
                   <p className="dash-muted" style={{fontSize: '12px', lineHeight: 1.42, margin: 0}}>
                     No hay sesiones registradas hoy. ¡Empieza tu entrenamiento!
                   </p>
@@ -727,7 +727,7 @@ export default function DashboardHoy() {
                 <div className="md:col-span-7 dash-card">
                   <div className="flex justify-between items-center mb-5">
                     <h3 className="dash-label">RESUMEN SEMANAL</h3>
-                    <span className="material-symbols-outlined" style={{color: '#aab497', fontSize: 18}}>more_horiz</span>
+                    <span className="material-symbols-outlined" style={{color: 'var(--text-muted)', fontSize: 18}}>more_horiz</span>
                   </div>
                   <div className="space-y-5">
                     <div className="space-y-2">
@@ -738,7 +738,7 @@ export default function DashboardHoy() {
                       <div className="flex gap-1" style={{height: 20}}>
                         {strikingBars.map((v, i) => (
                           <div key={i} className="flex-1" style={{
-                            background: v >= 0.8 ? '#c7d988' : v > 0 ? 'rgba(199,217,136,0.4)' : '#182012'
+                            background: v >= 0.8 ? 'var(--green)' : v > 0 ? 'color-mix(in srgb, var(--green) 40%, transparent)' : 'var(--panel2)'
                           }} />
                         ))}
                       </div>
@@ -751,7 +751,7 @@ export default function DashboardHoy() {
                       <div className="flex gap-1" style={{height: 20}}>
                         {grapplingBars.map((v, i) => (
                           <div key={i} className="flex-1" style={{
-                            background: v >= 0.8 ? '#9faf62' : v > 0 ? 'rgba(159,175,98,0.4)' : '#182012'
+                            background: v >= 0.8 ? 'var(--green-dim)' : v > 0 ? 'color-mix(in srgb, var(--green-dim) 40%, transparent)' : 'var(--panel2)'
                           }} />
                         ))}
                       </div>
@@ -790,10 +790,10 @@ export default function DashboardHoy() {
 
                   <div className="dash-card">
                     <div className="flex items-center gap-3">
-                      <span className="material-symbols-outlined" style={{color: '#c7d988'}}>water_drop</span>
+                      <span className="material-symbols-outlined" style={{color: 'var(--green)'}}>water_drop</span>
                       <div>
                         <span className="dash-label" style={{display: 'block'}}>HIDRATACIÓN</span>
-                        <span style={{fontSize: '14px', color: '#e9eddc', fontFamily: "'JetBrains Mono',monospace"}}>{nutrition.totals.calories > 0 ? `${Math.round(nutrition.totals.calories / 1000)}L` : '—'} / 4.0L</span>
+                        <span style={{fontSize: '14px', color: 'var(--text-green)', fontFamily: "'JetBrains Mono',monospace"}}>{nutrition.totals.calories > 0 ? `${Math.round(nutrition.totals.calories / 1000)}L` : '—'} / 4.0L</span>
                       </div>
                     </div>
                   </div>
@@ -806,9 +806,9 @@ export default function DashboardHoy() {
                   <h3 className="dash-label">TENDENCIA RECUPERACIÓN (VFC)</h3>
                   <span style={{
                     padding: '3px 10px',
-                    border: '1px solid rgba(199,217,136,0.25)',
+                    border: '1px solid color-mix(in srgb, var(--green) 25%, transparent)',
                     fontSize: '10px',
-                    color: '#c7d988',
+                    color: 'var(--green)',
                     textTransform: 'uppercase',
                     fontFamily: "'JetBrains Mono',monospace",
                     letterSpacing: '0.5px'
@@ -816,21 +816,21 @@ export default function DashboardHoy() {
                     {consistencyPct > 70 ? 'OPTIMAL ZONE' : consistencyPct > 40 ? 'MODERATE' : 'NEED REST'}
                   </span>
                 </div>
-                <div style={{position: 'relative', height: 180, width: '100%', borderBottom: '1px solid #182012', borderLeft: '1px solid #182012', display: 'flex', alignItems: 'flex-end'}}>
+                <div style={{position: 'relative', height: 180, width: '100%', borderBottom: '1px solid var(--panel2)', borderLeft: '1px solid var(--panel2)', display: 'flex', alignItems: 'flex-end'}}>
                   <svg className="w-full h-full absolute inset-0" preserveAspectRatio="none" viewBox="0 0 400 100">
                     <defs>
                       <linearGradient id="graphG" x1="0" x2="0" y1="0" y2="1">
-                        <stop offset="0%" stopColor="#c7d988" />
+                        <stop offset="0%" stopColor="var(--green)" />
                         <stop offset="100%" stopColor="transparent" />
                       </linearGradient>
                     </defs>
-                    <path d={GRAPH_PATH} fill="none" stroke="#c7d988" strokeWidth="1.5" />
+                    <path d={GRAPH_PATH} fill="none" stroke="var(--green)" strokeWidth="1.5" />
                     <path d={GRAPH_FILL} fill="url(#graphG)" opacity="0.2" />
-                    <rect fill="#c7d988" height="4" width="4" x="-2" y="78" />
-                    <rect fill="#c7d988" height="4" width="4" x="148" y="58" />
-                    <rect fill="#d9ff85" height="4" width="4" x="398" y="28" />
+                    <rect fill="var(--green)" height="4" width="4" x="-2" y="78" />
+                    <rect fill="var(--green)" height="4" width="4" x="148" y="58" />
+                    <rect fill="var(--acid)" height="4" width="4" x="398" y="28" />
                   </svg>
-                  <div className="flex w-full justify-between px-2 pb-2" style={{fontSize: '10px', color: '#aab497', fontFamily: "'JetBrains Mono',monospace", position: 'relative', zIndex: 1}}>
+                  <div className="flex w-full justify-between px-2 pb-2" style={{fontSize: '10px', color: 'var(--text-muted)', fontFamily: "'JetBrains Mono',monospace", position: 'relative', zIndex: 1}}>
                     {WEEKDAY_LABELS.map((d) => (
                       <span key={d}>{d}</span>
                     ))}
@@ -865,12 +865,12 @@ export default function DashboardHoy() {
                           fontSize: '13px',
                           fontFamily: "'JetBrains Mono',monospace",
                           cursor: day > 0 ? 'pointer' : 'default',
-                          background: isSelected ? 'rgba(199,217,136,0.15)' : isLogged ? 'rgba(199,217,136,0.1)' : 'transparent',
-                          color: isLogged ? '#c7d988' : day === 0 ? 'transparent' : '#aab497',
-                          border: isLogged ? '1px solid rgba(199,217,136,0.25)' : isSelected ? '1px solid rgba(199,217,136,0.5)' : '1px solid transparent',
+                          background: isSelected ? 'color-mix(in srgb, var(--green) 15%, transparent)' : isLogged ? 'color-mix(in srgb, var(--green) 10%, transparent)' : 'transparent',
+                          color: isLogged ? 'var(--green)' : day === 0 ? 'transparent' : 'var(--text-muted)',
+                          border: isLogged ? '1px solid color-mix(in srgb, var(--green) 25%, transparent)' : isSelected ? '1px solid color-mix(in srgb, var(--green) 50%, transparent)' : '1px solid transparent',
                           transition: '0.2s'
                         }}
-                        onMouseEnter={(e) => { if (day > 0 && !isLogged) e.currentTarget.style.background = 'rgba(199,217,136,0.06)' }}
+                        onMouseEnter={(e) => { if (day > 0 && !isLogged) e.currentTarget.style.background = 'color-mix(in srgb, var(--green) 6%, transparent)' }}
                         onMouseLeave={(e) => { if (day > 0 && !isLogged && !isSelected) e.currentTarget.style.background = 'transparent' }}
                       >
                         {day > 0 ? day : ''}
@@ -883,7 +883,7 @@ export default function DashboardHoy() {
               {/* Streak */}
               <section className="dash-card">
                 <div className="flex items-center gap-4">
-                  <span className="material-symbols-outlined" style={{color: '#c7d988', fontSize: 36}}>
+                  <span className="material-symbols-outlined" style={{color: 'var(--green)', fontSize: 36}}>
                     local_fire_department
                   </span>
                   <div className="flex-1">
@@ -894,7 +894,7 @@ export default function DashboardHoy() {
                         <span className="dash-muted" style={{display: 'block'}}>días actual</span>
                       </div>
                       <div>
-                        <span className="dash-value" style={{color: '#c7d988'}}>{bestStreak}</span>
+                        <span className="dash-value" style={{color: 'var(--green)'}}>{bestStreak}</span>
                         <span className="dash-muted" style={{display: 'block'}}>mejor racha</span>
                       </div>
                       <div>
@@ -946,7 +946,7 @@ function MacroRow({ label, current, target, pct }: { label: string; current: str
     <div className="space-y-1">
       <div className="flex justify-between" style={{fontSize: '11px'}}>
         <span className="dash-muted" style={{textTransform: 'uppercase'}}>{label}</span>
-        <span style={{color: '#e9eddc', fontFamily: "'JetBrains Mono',monospace"}}>
+        <span style={{color: 'var(--text-green)', fontFamily: "'JetBrains Mono',monospace"}}>
           {current} / {target}
         </span>
       </div>

@@ -54,6 +54,21 @@ async function requireUserId(): Promise<string> {
   return data.user.id
 }
 
+let dropsetSupportCache: Promise<boolean> | null = null
+
+function hasDropsetColumns(): Promise<boolean> {
+  if (!dropsetSupportCache) {
+    dropsetSupportCache = (async () => {
+      const { error } = await supabase
+        .from('routine_exercises')
+        .select('dropset, dropset_percent')
+        .limit(1)
+      return !(error && error.message.includes('does not exist'))
+    })()
+  }
+  return dropsetSupportCache
+}
+
 export const routinesApi = {
   getRoutines: async (): Promise<Routine[]> => {
     const userId = await requireUserId()
@@ -102,20 +117,23 @@ export const routinesApi = {
       .limit(1)
       .maybeSingle()
 
+    const row: Record<string, unknown> = {
+      routine_id: routineId,
+      exercise_id: exerciseId,
+      position: options.position ?? ((maxRow?.position ?? -1) + 1),
+      target_sets: options.targetSets ?? 3,
+      target_reps_min: options.targetRepsMin ?? 8,
+      target_reps_max: options.targetRepsMax ?? 12,
+      current_weight: options.currentWeight ?? 0,
+      rest_seconds: options.restSeconds ?? 180,
+    }
+    if (await hasDropsetColumns()) {
+      row.dropset = options.dropset ?? false
+      row.dropset_percent = options.dropsetPercent ?? 50
+    }
     const { data, error } = await supabase
       .from('routine_exercises')
-      .insert({
-        routine_id: routineId,
-        exercise_id: exerciseId,
-        position: options.position ?? ((maxRow?.position ?? -1) + 1),
-        target_sets: options.targetSets ?? 3,
-        target_reps_min: options.targetRepsMin ?? 8,
-        target_reps_max: options.targetRepsMax ?? 12,
-        current_weight: options.currentWeight ?? 0,
-        rest_seconds: options.restSeconds ?? 180,
-        dropset: options.dropset ?? false,
-        dropset_percent: options.dropsetPercent ?? 50,
-      })
+      .insert(row)
       .select(`*, exercises(${EXERCISE_FIELDS})`)
       .single()
     if (error) throw new Error(error.message)
@@ -132,10 +150,12 @@ export const routinesApi = {
     if (partial.targetRepsMax !== undefined) payload.target_reps_max = partial.targetRepsMax
     if (partial.currentWeight !== undefined) payload.current_weight = partial.currentWeight
     if (partial.restSeconds !== undefined) payload.rest_seconds = partial.restSeconds
-    if (partial.dropset !== undefined) payload.dropset = partial.dropset
-    if (partial.dropsetPercent !== undefined) payload.dropset_percent = partial.dropsetPercent
     if (partial.notes !== undefined) payload.notes = partial.notes
     if (partial.position !== undefined) payload.position = partial.position
+    if ((partial.dropset !== undefined || partial.dropsetPercent !== undefined) && (await hasDropsetColumns())) {
+      if (partial.dropset !== undefined) payload.dropset = partial.dropset
+      if (partial.dropsetPercent !== undefined) payload.dropset_percent = partial.dropsetPercent
+    }
 
     const { error } = await supabase.from('routine_exercises').update(payload).eq('id', id)
     if (error) throw new Error(error.message)

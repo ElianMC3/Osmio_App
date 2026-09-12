@@ -16,11 +16,11 @@ export default function ExerciseThumb({ exercise, className = '', onInfo = null,
   const src = hover && gif ? gif : image
 
   const sizeClass =
-    size === 'md' ? 'w-20 h-20' : 'w-14 h-14'
+    size === 'md' ? 'w-25 h-20' : 'w-14 h-14'
 
   return (
     <div
-      className={`relative shrink-0 ${sizeClass} rounded-lg overflow-hidden border border-green/25 bg-black/40 ${className}`}
+      className={`relative shrink-0 ${sizeClass} rounded-lg overflow-hidden border border-green/25 bg-panel/40 ring-1 ring-outline-variant/20 ${className}`}
       onMouseEnter={() => setHover(!!gif)}
       onMouseLeave={() => setHover(false)}
     >

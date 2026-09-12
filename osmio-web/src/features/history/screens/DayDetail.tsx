@@ -47,7 +47,7 @@ export default function DayDetail() {
   return (
     <div className="min-h-screen pb-20">
       {/* Header */}
-      <header className="sticky top-0 z-30 flex items-center justify-between px-md h-14 bg-panel/80 backdrop-blur-xl border-b border-green/20">
+      <header className="mx-md px-md h-14 flex items-center justify-between rounded-2xl bg-panel/80 backdrop-blur-xl border border-green/20 shadow-lg shadow-black/20">
         <div className="flex items-center gap-md">
           <button
             onClick={() => navigate(-1)}
@@ -250,7 +250,7 @@ export default function DayDetail() {
               return (
                 <div
                   key={i}
-                  className={`w-7 h-7 shrink-0 ${color} border border-[#050705]`}
+                  className={`w-7 h-7 shrink-0 ${color} border border-outline-variant`}
                   title={`Day -${30 - i}`}
                 />
               )

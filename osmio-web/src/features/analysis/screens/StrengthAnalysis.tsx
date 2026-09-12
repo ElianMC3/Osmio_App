@@ -2,10 +2,14 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { GreenCard } from '@/design-system/components/GreenCard'
 import { GreenButton } from '@/design-system/components/GreenButton'
+import { PageBackdrop } from '@/design-system/components/PageBackdrop'
+import { PageHeader } from '@/design-system/components/PageHeader'
+import { SectionHeader } from '@/design-system/components/SectionHeader'
 import { analyticsApi } from '@/services/api/analytics.api'
 import { useProgression } from '../../strength/hooks/useProgression'
 import type { ProgressionRecommendation } from '../../strength/lib/progression'
 import type { StrengthAnalytics } from '@/services/api/analytics.api'
+import AnalysisTabs from '../components/AnalysisTabs'
 
 export default function StrengthAnalysis() {
   const navigate = useNavigate()
@@ -65,249 +69,179 @@ export default function StrengthAnalysis() {
   }
 
   return (
-    <div className="min-h-screen pb-20">
-      {/* Header */}
-      <header className="sticky top-0 z-30 flex items-center gap-md px-md h-14 bg-panel/80 backdrop-blur-xl border-b border-green/20">
-        <button
-          onClick={() => navigate(-1)}
-          aria-label="Volver"
-          className="material-symbols-outlined text-text-muted hover:text-green transition-colors duration-200 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green cursor-pointer"
-        >
-          arrow_back
-        </button>
-        <div className="flex flex-col">
-          <h1 className="font-headline-md text-headline-md text-text-green leading-tight">
-            Análisis - Fuerza
-          </h1>
-          <span className="font-label-caps text-[10px] text-text-muted">
-            {weekLabel}
-          </span>
-        </div>
-      </header>
-
-      {/* Tab Navigation */}
-      <div className="flex items-center border-b border-green/20 px-md">
-        {([
-          { key: 'fuerza', label: 'Fuerza', path: '/analysis/strength' },
-          { key: 'carga', label: 'Carga de Combate', path: '/analysis/combat' },
-          { key: 'consistencia', label: 'Consistencia', path: '/analysis/consistency' },
-        ] as const).map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => navigate(tab.path)}
-            className={`pb-sm px-md font-label-caps text-label-caps transition-all duration-200 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green cursor-pointer ${
-              tab.key === 'fuerza'
-                ? 'text-green border-b-2 border-green'
-                : 'text-text-muted hover:text-text-green'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      <div className="p-md space-y-lg">
-        {/* Segmented Chips */}
-        <div className="flex gap-xs">
-          {([
-            { key: 'technical', label: 'Technical' },
-            { key: 'physical', label: 'Physical' },
-            { key: 'sparring', label: 'Sparring' },
-          ] as const).map((chip) => (
-            <GreenButton
-              key={chip.key}
-              variant={activeChip === chip.key ? 'primary' : 'default'}
-              size="sm"
-              effects
-              onClick={() => setActiveChip(chip.key)}
-            >
-              {chip.label}
-            </GreenButton>
-          ))}
+    <div className="relative min-h-screen pb-24">
+      <PageBackdrop />
+      <div className="relative z-10 max-w-4xl mx-auto">
+        <div className="px-5 pt-6">
+          <PageHeader
+            kicker="CENTRO DE ANÁLISIS · FUERZA"
+            title="Análisis"
+            titleAccent="de Fuerza"
+            subtitle="Volumen, rendimiento y recomendaciones de progresión."
+            onBack={() => navigate(-1)}
+            status={
+              <span className="status-pill">
+                <span className="status-dot bg-green" />
+                {weekLabel.toUpperCase()}
+              </span>
+            }
+          />
         </div>
 
-        {/* Summary Cards Row */}
-        {data && (
-          <div className="grid grid-cols-3 gap-sm">
-            <GreenCard variant="default" padding="sm" effects>
-              <span className="font-label-caps text-[9px] text-text-muted block uppercase">
-                % vs Semana Ant.
-              </span>
-              <span className="font-label-caps text-[18px] text-green">
-                {changeLabel}
-              </span>
-            </GreenCard>
-            <GreenCard variant="default" padding="sm" effects>
-              <span className="font-label-caps text-[9px] text-text-muted block uppercase">
-                Vol. Promedio Día
-              </span>
-              <span className="font-label-caps text-[18px] text-green-dim">
-                {avgDaily.toLocaleString()}
-              </span>
-            </GreenCard>
-            <GreenCard variant="default" padding="sm" effects>
-              <span className="font-label-caps text-[9px] text-text-muted block uppercase">
-                Diferencia
-              </span>
-              <span className="font-label-caps text-[18px] text-acid">
-                {changePct >= 0 ? '+' : ''}{changePct}
-              </span>
-            </GreenCard>
-          </div>
-        )}
+        <main className="p-md pt-6 space-y-lg">
+          <AnalysisTabs active="fuerza" />
 
-        {/* PR Cards */}
-        <div>
-          <p className="font-label-caps text-label-caps text-green/60 mb-xs">
-            STRENGTH MATRIX
-          </p>
-          <h2 className="font-headline-md text-headline-md text-text-green uppercase italic mb-md">
-            Personal Records
-          </h2>
-          <div className="grid grid-cols-3 gap-sm">
-            {prCards.length > 0 ? prCards.map((pr) => (
-              <GreenCard
-                key={pr.exercise}
-                variant="default"
-                padding="sm"
+          <div className="flex gap-xs">
+            {([
+              { key: 'technical', label: 'Technical' },
+              { key: 'physical', label: 'Physical' },
+              { key: 'sparring', label: 'Sparring' },
+            ] as const).map((chip) => (
+              <GreenButton
+                key={chip.key}
+                variant={activeChip === chip.key ? 'primary' : 'default'}
+                size="sm"
                 effects
+                onClick={() => setActiveChip(chip.key)}
               >
-                <span className="font-label-caps text-[9px] text-text-muted block mb-xs">
-                  {pr.exercise}
-                </span>
-                <div className="flex items-baseline gap-xs mb-xs">
-                  <span className="font-label-caps text-[28px] text-green font-bold leading-none">
-                    {pr.value}
-                  </span>
-                  <span className="font-label-caps text-[9px] text-green">
-                    {pr.unit}
-                  </span>
-                </div>
-                <div className="flex items-center gap-xs text-text-muted">
-                  <span className="material-symbols-outlined text-[12px]">calendar_month</span>
-                  <span className="font-label-caps text-[8px]">{pr.date}</span>
-                </div>
-              </GreenCard>
-            )) : (
-              <div className="col-span-3 font-label-caps text-sm text-text-muted opacity-40 text-center py-6">
-                SIN PRs REGISTRADOS
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Progression Recommendations */}
-        <div>
-          <p className="font-label-caps text-label-caps text-green/60 mb-xs">
-            PROGRESSION ENGINE
-          </p>
-          <h2 className="font-headline-md text-headline-md text-text-green uppercase italic mb-md">
-            Recomendaciones de Peso
-          </h2>
-          <div className="space-y-sm">
-            {progressionLoading ? (
-              <div className="font-label-caps text-sm text-text-muted opacity-40 text-center py-6">CARGANDO…</div>
-            ) : recList.length > 0 ? (
-              recList.map((item) => {
-                const badge = recBadge(item.rec.action, item.rec.suggestedWeight)
-                return (
-                  <GreenCard key={item.name} variant="default" padding="sm" effects>
-                    <div className="flex items-center justify-between gap-3 flex-wrap">
-                      <div className="min-w-0">
-                        <p className="font-label-caps text-xs text-text-green font-bold truncate">{item.name}</p>
-                        <p className="font-label-caps text-[9px] text-text-muted">
-                          {item.rec.targetSets} × {item.rec.targetRepsMin}-{item.rec.targetRepsMax} · actual {item.rec.currentWeight} kg
-                        </p>
-                      </div>
-                      <span className={`font-label-caps text-xs ${badge.className}`}>{badge.label}</span>
-                    </div>
-                    <p className="font-label-sm text-[11px] text-text-muted leading-relaxed mt-xs">{item.rec.reason}</p>
-                  </GreenCard>
-                )
-              })
-            ) : (
-              <div className="font-label-caps text-sm text-text-muted opacity-40 text-center py-6">
-                SIN RUTINA CONFIGURADA
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Bar Chart */}
-        <GreenCard padding="md" effects>
-          <p className="font-label-caps text-label-caps text-text-muted mb-xs">
-            LOAD INTENSITY
-          </p>
-          <h3 className="font-headline-md text-headline-md text-text-green uppercase mb-lg">
-            Volumen Semanal
-          </h3>
-          <div className="flex items-end justify-between gap-xs h-40">
-            {weeklyBars.map((bar, i) => (
-              <div key={bar.label} className="flex flex-col items-center flex-1 group">
-                <div className="w-full bg-green/10 h-full relative">
-                  <div
-                    className={`absolute bottom-0 w-full transition-all ${
-                      i === weeklyBars.length - 1
-                        ? 'bg-green shadow-[0_0_8px_rgba(199,217,136,0.5)]'
-                        : 'bg-green/40 group-hover:opacity-100 opacity-60'
-                    }`}
-                    style={{ height: `${bar.height}%` }}
-                  />
-                </div>
-                <span
-                  className={`font-label-caps text-[8px] mt-xs ${
-                    i === weeklyBars.length - 1
-                      ? 'text-green'
-                      : 'text-text-muted'
-                  }`}
-                >
-                  {bar.label}
-                </span>
-              </div>
+                {chip.label}
+              </GreenButton>
             ))}
           </div>
-          <div className="pt-md border-t border-green/20 flex justify-between items-baseline mt-md">
-            <span className="font-label-caps text-label-caps text-text-muted">
-              TOTAL TONNAGE
-            </span>
-            <div className="flex items-baseline gap-xs">
-              <span className="font-label-caps text-headline-md text-green font-bold">
-                {totalVolume.toLocaleString()}
-              </span>
-              <span className="font-label-caps text-[10px] text-green">KG</span>
+
+          {data && (
+            <div className="grid grid-cols-3 gap-sm">
+              <GreenCard variant="default" padding="sm" effects className="relative overflow-hidden">
+                <span className="gradient-hairline" />
+                <span className="font-label-caps text-[9px] text-text-muted block uppercase">% vs Semana Ant.</span>
+                <span className="font-label-caps text-[18px] text-text-green font-bold">{changeLabel}</span>
+              </GreenCard>
+              <GreenCard variant="default" padding="sm" effects>
+                <span className="font-label-caps text-[9px] text-text-muted block uppercase">Vol. Promedio Día</span>
+                <span className="font-label-caps text-[18px] text-green-dim font-bold">{avgDaily.toLocaleString()}</span>
+              </GreenCard>
+              <GreenCard variant="default" padding="sm" effects>
+                <span className="font-label-caps text-[9px] text-text-muted block uppercase">Diferencia</span>
+                <span className="font-label-caps text-[18px] text-acid font-bold">
+                  {changePct >= 0 ? '+' : ''}{changePct}
+                </span>
+              </GreenCard>
+            </div>
+          )}
+
+          <div>
+            <div className="mb-3">
+              <SectionHeader kicker="STRENGTH MATRIX" title="Personal Records" />
+            </div>
+            <div className="grid grid-cols-3 gap-sm">
+              {prCards.length > 0 ? prCards.map((pr) => (
+                <GreenCard key={pr.exercise} variant="default" padding="sm" effects className="relative overflow-hidden">
+                  <span className="gradient-hairline" />
+                  <span className="font-label-caps text-[9px] text-text-muted block mb-xs">{pr.exercise}</span>
+                  <div className="flex items-baseline gap-xs mb-xs">
+                    <span className="font-label-caps text-[28px] text-gradient-green font-bold leading-none">{pr.value}</span>
+                    <span className="font-label-caps text-[9px] text-green">{pr.unit}</span>
+                  </div>
+                  <div className="flex items-center gap-xs text-text-muted">
+                    <span className="material-symbols-outlined text-[12px]">calendar_month</span>
+                    <span className="font-label-caps text-[8px]">{pr.date}</span>
+                  </div>
+                </GreenCard>
+              )) : (
+                <div className="col-span-3 font-label-caps text-sm text-text-muted opacity-40 text-center py-6">
+                  SIN PRs REGISTRADOS
+                </div>
+              )}
             </div>
           </div>
-        </GreenCard>
 
-        {/* Stats Row */}
-        <div className="grid grid-cols-3 gap-sm">
-          <GreenCard variant="default" padding="sm" effects>
-            <span className="font-label-caps text-[9px] text-text-muted block uppercase">
-              Total Volume
-            </span>
-            <span className="font-label-caps text-[18px] text-green">
-              {totalVolume.toLocaleString()} KG
-            </span>
+          <div>
+            <div className="mb-3">
+              <SectionHeader kicker="PROGRESSION ENGINE" title="Recomendaciones de Peso" />
+            </div>
+            <div className="space-y-sm">
+              {progressionLoading ? (
+                <div className="font-label-caps text-sm text-text-muted opacity-40 text-center py-6">CARGANDO…</div>
+              ) : recList.length > 0 ? (
+                recList.map((item) => {
+                  const badge = recBadge(item.rec.action, item.rec.suggestedWeight)
+                  return (
+                    <GreenCard key={item.name} variant="default" padding="sm" effects className="relative overflow-hidden">
+                      <span className="gradient-hairline" />
+                      <div className="flex items-center justify-between gap-3 flex-wrap">
+                        <div className="min-w-0">
+                          <p className="font-label-caps text-xs text-text-green font-bold truncate">{item.name}</p>
+                          <p className="font-label-caps text-[9px] text-text-muted">
+                            {item.rec.targetSets} × {item.rec.targetRepsMin}-{item.rec.targetRepsMax} · actual {item.rec.currentWeight} kg
+                          </p>
+                        </div>
+                        <span className={`font-label-caps text-xs ${badge.className} font-bold`}>{badge.label}</span>
+                      </div>
+                      <p className="font-label-sm text-[11px] text-text-muted leading-relaxed mt-xs">{item.rec.reason}</p>
+                    </GreenCard>
+                  )
+                })
+              ) : (
+                <div className="font-label-caps text-sm text-text-muted opacity-40 text-center py-6">
+                  SIN RUTINA CONFIGURADA
+                </div>
+              )}
+            </div>
+          </div>
+
+          <GreenCard padding="md" effects className="relative overflow-hidden">
+            <span className="gradient-hairline" />
+            <div className="mb-4">
+              <SectionHeader kicker="LOAD INTENSITY" title="Volumen Semanal" />
+            </div>
+            <div className="flex items-end justify-between gap-xs h-40">
+              {weeklyBars.map((bar, i) => (
+                <div key={bar.label} className="flex flex-col items-center flex-1 group">
+                  <div className="w-full bg-surface-container-low h-full relative rounded-t-sm">
+                    <div
+                      className={`absolute bottom-0 w-full transition-all rounded-t-sm ${
+                        i === weeklyBars.length - 1
+                          ? 'bg-gradient-to-t from-primary via-green to-acid shadow-[0_0_16px_color-mix(in_srgb,var(--green)_45%,transparent)]'
+                          : 'bg-green/40 group-hover:bg-green/60'
+                      }`}
+                      style={{ height: `${bar.height}%` }}
+                    />
+                  </div>
+                  <span
+                    className={`font-label-caps text-[8px] mt-xs ${
+                      i === weeklyBars.length - 1 ? 'text-green' : 'text-text-muted'
+                    }`}
+                  >
+                    {bar.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div className="pt-md border-t border-outline-variant/25 flex justify-between items-baseline mt-md">
+              <span className="font-label-caps text-label-caps text-text-muted">TOTAL TONNAGE</span>
+              <div className="flex items-baseline gap-xs">
+                <span className="font-label-caps text-headline-md text-gradient-green font-bold">{totalVolume.toLocaleString()}</span>
+                <span className="font-label-caps text-[10px] text-green">KG</span>
+              </div>
+            </div>
           </GreenCard>
-          <GreenCard variant="default" padding="sm" effects>
-            <span className="font-label-caps text-[9px] text-text-muted block uppercase">
-              Weeks
-            </span>
-            <span className="font-label-caps text-[18px] text-green">
-              {data?.volumeByWeek.length ?? 0}
-            </span>
-          </GreenCard>
-          <GreenCard variant="default" padding="sm" effects>
-            <span className="font-label-caps text-[9px] text-text-muted block uppercase">
-              PRs
-            </span>
-            <span className="font-label-caps text-[18px] text-green">
-              {prCount}
-            </span>
-          </GreenCard>
-        </div>
+
+          <div className="grid grid-cols-3 gap-sm">
+            <GreenCard variant="default" padding="sm" effects>
+              <span className="font-label-caps text-[9px] text-text-muted block uppercase">Total Volume</span>
+              <span className="font-label-caps text-[18px] text-text-green font-bold">{totalVolume.toLocaleString()} KG</span>
+            </GreenCard>
+            <GreenCard variant="default" padding="sm" effects>
+              <span className="font-label-caps text-[9px] text-text-muted block uppercase">Weeks</span>
+              <span className="font-label-caps text-[18px] text-text-green font-bold">{data?.volumeByWeek.length ?? 0}</span>
+            </GreenCard>
+            <GreenCard variant="default" padding="sm" effects>
+              <span className="font-label-caps text-[9px] text-text-muted block uppercase">PRs</span>
+              <span className="font-label-caps text-[18px] text-text-green font-bold">{prCount}</span>
+            </GreenCard>
+          </div>
+        </main>
       </div>
-
     </div>
   )
 }

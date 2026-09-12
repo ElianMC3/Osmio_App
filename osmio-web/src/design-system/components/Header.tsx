@@ -5,7 +5,7 @@ export function Header() {
   const todayStr = new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }).toUpperCase()
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-30 h-16 bg-surface/85 backdrop-blur-xl border-b border-outline-variant/20 lg:pl-64 transition-all duration-200">
+    <header className="fixed top-0 left-0 right-0 z-30 h-16 bg-surface/85 backdrop-blur-xl border-b border-outline-variant/20 lg:pl-72 transition-all duration-200">
       <div className="h-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
         {/* Brand / Title & Status */}
         <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/dashboard')}>
@@ -35,8 +35,8 @@ export function Header() {
           </button>
 
           <button
-            onClick={() => navigate('/profile')}
-            aria-label="Configuración de Perfil"
+            onClick={() => navigate('/settings')}
+            aria-label="Configuración"
             title="Configuración"
             className="p-2 text-on-surface-variant hover:text-primary-fixed hover:bg-surface-container-high rounded-lg transition-all active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer"
           >

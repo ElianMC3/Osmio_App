@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { GreenCard } from '@/design-system/components/GreenCard'
 import { GreenTag } from '@/design-system/components/GreenTag'
+import { PageBackdrop } from '@/design-system/components/PageBackdrop'
+import { PageHeader } from '@/design-system/components/PageHeader'
 import { sessionsApi } from '@/services/api/sessions.api'
 import { routinesApi } from '@/services/api/routines.api'
 import ExerciseThumb from '@/features/strength/components/ExerciseThumb'
@@ -85,88 +87,104 @@ export default function ExercisePicker() {
   }
 
   return (
-    <div className="min-h-screen pb-20">
-      <header className="sticky top-0 z-30 flex items-center gap-md px-md h-14 bg-panel/80 backdrop-blur-xl border-b border-green/20">
-        <button
-          onClick={() => navigate(-1)}
-          aria-label="Volver"
-          className="material-symbols-outlined text-text-muted hover:text-green transition-colors duration-200 active:scale-[0.98] cursor-pointer"
-        >
-          arrow_back
-        </button>
-        <div className="flex flex-col">
-          <h1 className="font-headline-md text-headline-md text-text-green leading-tight">Seleccionar ejercicio</h1>
-          <span className="font-label-caps text-[10px] text-text-muted">{exercises.length.toLocaleString()} EJERCICIOS</span>
-        </div>
-      </header>
-
-      <main className="p-md space-y-3">
-        {/* Search */}
-        <div className="relative">
-          <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted text-[18px]">
-            search
-          </span>
-          <input
-            type="text"
-            placeholder="Buscar por nombre, músculo, equipo…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-panel border border-green/25 rounded-xl py-3 pl-11 pr-4 text-sm text-text-green placeholder:text-text-muted placeholder:opacity-50 focus:outline-none focus:border-green"
+    <div className="relative min-h-screen pb-24">
+      <PageBackdrop />
+      <div className="relative z-10 max-w-3xl mx-auto">
+        <div className="px-5 pt-6">
+          <PageHeader
+            kicker="BIBLIOTECA DE MOVIMIENTOS"
+            title="Seleccionar"
+            titleAccent="Ejercicio"
+            subtitle="Busca en la base de datos de movimientos y añádelo a tu rutina."
+            onBack={() => navigate(-1)}
+            status={
+              <span className="status-pill">
+                <span className="status-dot bg-green" />
+                {exercises.length.toLocaleString()} EJERCICIOS
+              </span>
+            }
           />
         </div>
 
-        {/* Filters */}
-        <div className="flex gap-2 overflow-x-auto pb-1">
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="bg-panel border border-green/25 rounded-lg px-3 py-2 text-xs text-text-green focus:outline-none focus:border-green"
-          >
-            {categories.map((c) => (
-              <option key={c} value={c}>{c === 'todas' ? 'Todas las categorías' : c}</option>
-            ))}
-          </select>
-          <select
-            value={equipment}
-            onChange={(e) => setEquipment(e.target.value)}
-            className="bg-panel border border-green/25 rounded-lg px-3 py-2 text-xs text-text-green focus:outline-none focus:border-green"
-          >
-            {equipments.map((c) => (
-              <option key={c} value={c}>{c === 'todos' ? 'Todo equipo' : c}</option>
-            ))}
-          </select>
-        </div>
-
-        {loading ? (
-          <p className="font-label-caps text-sm text-text-muted animate-pulse text-center py-10">Cargando ejercicios…</p>
-        ) : (
-          <div className="space-y-2">
-            {filtered.length === 0 && (
-              <p className="font-label-caps text-sm text-text-muted opacity-50 text-center py-10">Sin resultados</p>
-            )}
-            {filtered.map((ex) => (
-              <GreenCard
-                key={ex.id}
-                variant="interactive"
-                padding="sm"
-                effects={true}
-                onClick={() => addToRoutine(ex)}
-                className="flex items-center gap-3 cursor-pointer"
-              >
-                <ExerciseThumb exercise={ex} />
-                <div className="flex-1 min-w-0">
-                  <p className="font-label-caps text-sm text-text-green font-semibold truncate">{ex.name}</p>
-                  <div className="flex flex-wrap gap-1.5 mt-1">
-                    <GreenTag color="green" variant="outlined" effects={false}>{ex.category}</GreenTag>
-                    {ex.equipment && <GreenTag color="muted" variant="ghost" effects={false}>{ex.equipment}</GreenTag>}
-                  </div>
-                </div>
-                <span className="material-symbols-outlined text-text-muted text-[18px]">add_circle</span>
-              </GreenCard>
-            ))}
+        <main className="p-md space-y-3">
+          <div className="relative">
+            <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted text-[18px]">
+              search
+            </span>
+            <input
+              type="text"
+              placeholder="Buscar por nombre, músculo, equipo…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full bg-surface-container/60 backdrop-blur-xl border border-outline-variant/40 rounded-xl py-3 pl-11 pr-4 text-sm text-text-green placeholder:text-text-muted placeholder:opacity-50 focus:outline-none focus:border-green focus:shadow-[0_0_0_1px_color-mix(in_srgb,var(--green)_35%,transparent),0_0_22px_color-mix(in_srgb,var(--green)_18%,transparent)] transition-all"
+            />
           </div>
-        )}
-      </main>
+
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="bg-surface-container/60 backdrop-blur-xl border border-outline-variant/40 rounded-lg px-3 py-2 text-xs text-text-green focus:outline-none focus:border-green transition-all cursor-pointer"
+            >
+              {categories.map((c) => (
+                <option key={c} value={c}>{c === 'todas' ? 'Todas las categorías' : c}</option>
+              ))}
+            </select>
+            <select
+              value={equipment}
+              onChange={(e) => setEquipment(e.target.value)}
+              className="bg-surface-container/60 backdrop-blur-xl border border-outline-variant/40 rounded-lg px-3 py-2 text-xs text-text-green focus:outline-none focus:border-green transition-all cursor-pointer"
+            >
+              {equipments.map((c) => (
+                <option key={c} value={c}>{c === 'todos' ? 'Todo equipo' : c}</option>
+              ))}
+            </select>
+          </div>
+
+          {loading ? (
+            <p className="font-label-caps text-sm text-text-muted animate-pulse text-center py-10">Cargando ejercicios…</p>
+          ) : (
+            <div className="space-y-2">
+              {filtered.length === 0 && (
+                <p className="font-label-caps text-sm text-text-muted opacity-50 text-center py-10">Sin resultados</p>
+              )}
+              {filtered.map((ex) => (
+                <GreenCard
+                  key={ex.id}
+                  variant="interactive"
+                  padding="sm"
+                  effects
+                  onClick={() => addToRoutine(ex)}
+                  className="flex items-center gap-3 cursor-pointer relative overflow-hidden"
+                >
+                  <span className="gradient-hairline" />
+                  <ExerciseThumb
+                    exercise={ex}
+                    onInfo={() => navigate(`/logging/strength/history?exerciseId=${ex.id}`)}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-label-caps text-sm font-semibold truncate text-text-green">
+                      {ex.name}
+                    </p>
+                    <div className="flex flex-wrap gap-1.5 mt-1.5">
+                      <GreenTag color="green" variant="outlined" effects={false}>{ex.category}</GreenTag>
+                      {ex.equipment && <GreenTag color="muted" variant="ghost" effects={false}>{ex.equipment}</GreenTag>}
+                    </div>
+                  </div>
+                  <span
+                    className={`material-symbols-outlined text-[20px] transition-colors ${
+                      addingId === ex.id ? 'text-green animate-pulse' : 'text-text-muted group-hover:text-green'
+                    }`}
+                    style={addingId === ex.id ? { fontVariationSettings: '"FILL" 1' } : undefined}
+                  >
+                    {addingId === ex.id ? 'sync' : 'add_circle'}
+                  </span>
+                </GreenCard>
+              ))}
+            </div>
+          )}
+        </main>
+      </div>
     </div>
   )
 }

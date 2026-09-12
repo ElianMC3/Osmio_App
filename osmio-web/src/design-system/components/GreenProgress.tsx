@@ -44,9 +44,9 @@ export const GreenProgress = forwardRef<HTMLDivElement, GreenProgressProps>(
             )}
           </div>
         )}
-        <div className="bg-black/40 relative" style={{ height: sizeStyles[size] }}>
+        <div className="bg-outline/15 rounded-full relative" style={{ height: sizeStyles[size] }}>
           <div
-            className={`h-full bg-green ${effects ? 'transition-all duration-500' : ''}`}
+            className={`h-full bg-gradient-to-r from-green to-acid rounded-full ${effects ? 'transition-all duration-500' : ''}`}
             style={{ width: `${clampedValue}%` }}
           />
           {effects && clampedValue > 0 && (
@@ -54,7 +54,7 @@ export const GreenProgress = forwardRef<HTMLDivElement, GreenProgressProps>(
               className="absolute inset-0 pointer-events-none"
               style={{
                 width: `${clampedValue}%`,
-                boxShadow: '0 0 6px rgba(199,217,136,0.3)',
+                boxShadow: '0 0 6px color-mix(in srgb, var(--green) 30%, transparent)',
               }}
             />
           )}

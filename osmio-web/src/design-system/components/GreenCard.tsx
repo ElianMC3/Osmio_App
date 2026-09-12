@@ -8,9 +8,9 @@ interface GreenCardProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 const variantStyles: Record<string, string> = {
-  default: 'bg-panel border border-green/25',
-  glass: 'bg-panel/50 backdrop-blur-xl border border-green/15',
-  interactive: 'bg-panel border border-green/25',
+  default: 'bg-panel/70 backdrop-blur-xl border border-outline-variant/30 shadow-xl shadow-black/25',
+  glass: 'bg-panel/45 backdrop-blur-2xl border border-outline-variant/20 shadow-lg shadow-black/20',
+  interactive: 'bg-panel/70 backdrop-blur-xl border border-outline-variant/30 shadow-xl shadow-black/25',
 }
 
 const paddingStyles: Record<string, string> = {
@@ -34,7 +34,7 @@ export const GreenCard = forwardRef<HTMLDivElement, GreenCardProps>(
   ) => {
     const interactiveClasses = variant === 'interactive'
       ? effects
-        ? 'hover:border-green/50 hover:bg-green/5 cursor-pointer transition-all duration-300 active:scale-[0.97]'
+        ? 'hover:-translate-y-0.5 hover:border-green/50 hover:bg-green/[0.04] hover:shadow-green/10 cursor-pointer transition-all duration-300 active:scale-[0.98]'
         : 'hover:border-green/40 cursor-pointer transition-colors duration-300'
       : ''
 
@@ -66,6 +66,9 @@ export const GreenCard = forwardRef<HTMLDivElement, GreenCardProps>(
               animation: 'greenScanMove 4s infinite linear',
             }}
           />
+        )}
+        {effects && (
+          <span className="pointer-events-none absolute left-5 right-5 top-0 h-px bg-gradient-to-r from-transparent via-green/40 to-transparent z-10" />
         )}
         {children}
         {effects && (

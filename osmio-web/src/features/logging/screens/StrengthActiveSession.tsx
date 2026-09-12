@@ -3,6 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { GreenCard } from '../../../design-system/components/GreenCard'
 import { GreenButton } from '../../../design-system/components/GreenButton'
 import { GreenTag } from '../../../design-system/components/GreenTag'
+import { PageBackdrop } from '../../../design-system/components/PageBackdrop'
+import { PageHeader } from '../../../design-system/components/PageHeader'
 import { sessionsApi } from '@/services/api/sessions.api'
 import { routinesApi } from '@/services/api/routines.api'
 
@@ -192,123 +194,114 @@ export default function StrengthActiveSession() {
   }
 
   return (
-    <div className="min-h-screen pb-32">
-      <main className="px-5 pt-6 space-y-5">
-        {/* Header */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <GreenButton
-              onClick={() => navigate(-1)}
-              variant="ghost"
-              size="md"
-              effects={true}
-              aria-label="Volver"
-              className="flex items-center justify-center w-10 h-10"
-            >
-              <span className="material-symbols-outlined text-text-muted">arrow_back</span>
-            </GreenButton>
-            <div className="flex-1">
-              <h1 className="font-headline-lg-mobile text-headline-lg-mobile text-text-green uppercase tracking-tight">
-                Fuerza - Sesión Activa
-              </h1>
-            </div>
-          </div>
+    <div className="relative min-h-screen pb-32">
+      <PageBackdrop />
+      <main className="relative z-10 px-5 pt-6 space-y-5 max-w-4xl mx-auto">
+        <PageHeader
+          kicker={`SISTEMA DE PREPARACIÓN DE COMBATE · FUERZA${trainingType ? ` · ${String(trainingType).toUpperCase()}` : ''}`}
+          title="Sesión"
+          titleAccent="Activa"
+          subtitle="Registro en tiempo real de series, peso y volumen acumulado."
+          onBack={() => navigate(-1)}
+          status={
+            <span className="status-pill">
+              <span className="status-dot bg-acid" />
+              <span className="font-data-display tabular-nums">{formatTime(elapsed)}</span>
+            </span>
+          }
+        />
 
-          {/* Status bar with timer and volume */}
-          <div className="flex items-center gap-3">
-            <GreenCard variant="default" padding="sm" effects={true} className="flex-1">
-              <span className="font-label-caps text-[10px] leading-none tracking-[0.1em] text-text-muted block">
-                STATUS
-              </span>
-              <span className="font-data-display text-[24px] leading-none text-green tabular-nums">
-                {formatTime(elapsed)}
-              </span>
-            </GreenCard>
-            <GreenCard variant="default" padding="sm" effects={true} className="text-right">
-              <span className="font-label-caps text-[10px] leading-none tracking-[0.1em] text-text-muted block">
-                VOLUMEN
-              </span>
-              <span className="font-data-display text-[18px] leading-none text-text-green">
-                {totalVolume.toLocaleString()}{' '}
-                <span className="text-[11px] text-text-muted">KG</span>
-              </span>
-            </GreenCard>
-          </div>
-
-          {/* Quick actions */}
-          <div className="flex gap-2">
-            <GreenButton
-              onClick={() => setShowTimer(!showTimer)}
-              aria-label={showTimer ? 'Ocultar timer' : 'Mostrar timer'}
-              aria-pressed={showTimer}
-              variant={showTimer ? 'primary' : 'default'}
-              size="sm"
-              effects={true}
-            >
-              <span className="material-symbols-outlined text-[16px]">timer</span>
-              TIMER
-            </GreenButton>
-            <GreenButton
-              onClick={() => navigate('/strength/routine')}
-              aria-label="Ver pesos"
-              variant="default"
-              size="sm"
-              effects={true}
-            >
-              <span className="material-symbols-outlined text-[16px]">fitness_center</span>
-              PESOS
-            </GreenButton>
-            <GreenButton
-              onClick={() => setShowNotes(!showNotes)}
-              aria-label={showNotes ? 'Ocultar notas' : 'Mostrar notas'}
-              aria-pressed={showNotes}
-              variant={showNotes ? 'primary' : 'default'}
-              size="sm"
-              effects={true}
-            >
-              <span className="material-symbols-outlined text-[16px]">edit_note</span>
-              NOTAS
-            </GreenButton>
-          </div>
+        <div className="flex items-center gap-3">
+          <GreenCard variant="default" padding="sm" effects className="flex-1 relative overflow-hidden">
+            <span className="gradient-hairline" />
+            <span className="font-label-caps text-[10px] leading-none tracking-[0.1em] text-text-muted block">
+              STATUS
+            </span>
+            <span className="font-data-display text-[26px] leading-none text-gradient-green tabular-nums">
+              {formatTime(elapsed)}
+            </span>
+          </GreenCard>
+          <GreenCard variant="default" padding="sm" effects className="text-right relative overflow-hidden">
+            <span className="gradient-hairline" />
+            <span className="font-label-caps text-[10px] leading-none tracking-[0.1em] text-text-muted block">
+              VOLUMEN
+            </span>
+            <span className="font-data-display text-[20px] leading-none text-gradient-green">
+              {totalVolume.toLocaleString()}{' '}
+              <span className="text-[11px] text-text-muted">KG</span>
+            </span>
+          </GreenCard>
         </div>
 
-        {/* Notes panel */}
+        <div className="flex gap-2 flex-wrap">
+          <GreenButton
+            onClick={() => setShowTimer(!showTimer)}
+            aria-label={showTimer ? 'Ocultar timer' : 'Mostrar timer'}
+            aria-pressed={showTimer}
+            variant={showTimer ? 'primary' : 'default'}
+            size="sm"
+            effects
+          >
+            <span className="material-symbols-outlined text-[16px]">timer</span>
+            TIMER
+          </GreenButton>
+          <GreenButton
+            onClick={() => navigate('/strength/routine')}
+            aria-label="Ver pesos"
+            variant="default"
+            size="sm"
+            effects
+          >
+            <span className="material-symbols-outlined text-[16px]">fitness_center</span>
+            PESOS
+          </GreenButton>
+          <GreenButton
+            onClick={() => setShowNotes(!showNotes)}
+            aria-label={showNotes ? 'Ocultar notas' : 'Mostrar notas'}
+            aria-pressed={showNotes}
+            variant={showNotes ? 'primary' : 'default'}
+            size="sm"
+            effects
+          >
+            <span className="material-symbols-outlined text-[16px]">edit_note</span>
+            NOTAS
+          </GreenButton>
+        </div>
+
         {showNotes && (
-          <GreenCard variant="glass" padding="md" effects={true}>
+          <GreenCard variant="glass" padding="md" effects>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Notas de la sesión..."
-              className="w-full bg-black/40 border border-green/25 p-3 font-body-lg text-[16px] text-text-green focus:border-green focus:ring-0 outline-none resize-none h-24 transition-all placeholder:text-text-muted placeholder:opacity-30"
+              className="w-full bg-panel/40 border border-outline-variant/40 p-3 rounded-xl font-body-lg text-[16px] text-text-green focus:border-green focus:ring-0 outline-none resize-none h-24 transition-all placeholder:text-text-muted placeholder:opacity-30"
             />
           </GreenCard>
         )}
 
-        {/* Exercise Cards */}
-        {exercises.map((exercise) => (
-          <GreenCard
-            key={exercise.id}
-            variant="default"
-            padding="none"
-            effects={true}
-          >
-            {/* Exercise Header */}
-            <header className="p-4 flex items-center justify-between border-b border-green/25">
-              <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-green">fitness_center</span>
-                <div>
-                  <h2 className="font-headline-md text-[20px] leading-[1.4] font-semibold text-green uppercase">
+        {exercises.map((exercise, exIndex) => (
+          <GreenCard key={exercise.id} variant="default" padding="none" effects className="relative overflow-hidden">
+            <span className="gradient-hairline" />
+            <header className="p-4 flex items-center justify-between gap-3 border-b border-outline-variant/25 bg-gradient-to-r from-green/[0.05] to-transparent">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="flex items-center justify-center w-10 h-10 rounded-xl border border-green/25 bg-green/5 text-green flex-shrink-0">
+                  <span className="material-symbols-outlined" style={{ fontVariationSettings: '"FILL" 1' }}>
+                    fitness_center
+                  </span>
+                </div>
+                <div className="min-w-0">
+                  <h2 className="font-headline-md text-[20px] leading-[1.4] font-bold text-gradient-green uppercase truncate">
                     {exercise.name}
                   </h2>
-                  <GreenTag color="muted" variant="ghost" effects={true}>
-                    {exercise.category}
-                  </GreenTag>
-                  {exercise.sets.some((s) => s.drop) && (
-                    <GreenTag color="acid" variant="filled" effects={true}>DROPSET</GreenTag>
-                  )}
+                  <div className="flex flex-wrap gap-2 items-center mt-1">
+                    <GreenTag color="muted" variant="ghost" effects={false}>{exercise.category}</GreenTag>
+                    {exercise.sets.some((s) => s.drop) && (
+                      <GreenTag color="acid" variant="filled" effects={false}>DROPSET</GreenTag>
+                    )}
+                  </div>
                 </div>
               </div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 flex-shrink-0">
                 <button
                   onClick={() => navigate(`/logging/strength/history?exerciseId=${exercise.id}`)}
                   aria-label={`Historial de ${exercise.name}`}
@@ -320,8 +313,16 @@ export default function StrengthActiveSession() {
               </div>
             </header>
 
-            {/* Set Table */}
             <div className="p-4">
+              <div className="flex items-center justify-between mb-2 px-3">
+                <span className="font-label-caps text-[10px] tracking-[0.1em] text-text-muted uppercase">
+                  EJERCICIO {String(exIndex + 1).padStart(2, '0')}
+                </span>
+                <span className="font-label-caps text-[10px] tracking-[0.1em] text-text-muted uppercase">
+                  {exercise.sets.filter((s) => s.done).length}/{exercise.sets.length} SETS
+                </span>
+              </div>
+
               <table className="w-full text-left border-separate border-spacing-y-1">
                 <thead>
                   <tr className="font-label-caps text-[12px] leading-none tracking-[0.1em] text-text-muted">
@@ -341,7 +342,7 @@ export default function StrengthActiveSession() {
                       className={`transition-colors ${
                         set.drop
                           ? 'bg-acid/10 border border-acid/30 hover:bg-acid/15'
-                          : 'bg-panel/30 hover:bg-panel/50'
+                          : 'bg-surface-container-low/40 hover:bg-surface-container-low'
                       }`}
                     >
                       <td
@@ -385,7 +386,7 @@ export default function StrengthActiveSession() {
                           aria-label={`Descanso: ${formatRest(set.restTime)}`}
                           variant={set.restTime === 300 ? 'primary' : 'default'}
                           size="sm"
-                          effects={true}
+                          effects
                           className="w-full text-center font-data-display text-[14px]"
                         >
                           {formatRest(set.restTime)}
@@ -398,7 +399,7 @@ export default function StrengthActiveSession() {
                           onChange={(e) =>
                             updateSet(exercise.id, i, { done: e.target.checked })
                           }
-                          className="w-5 h-5 rounded-sm bg-black/40 border-green/25 text-green focus:ring-green/20 checked:bg-green cursor-pointer"
+                          className="w-5 h-5 rounded-sm bg-panel/40 border-green/25 text-green focus:ring-green/20 checked:bg-green cursor-pointer"
                         />
                       </td>
                     </tr>
@@ -406,14 +407,13 @@ export default function StrengthActiveSession() {
                 </tbody>
               </table>
 
-              {/* Add Set Button */}
               <GreenButton
                 onClick={() => addSet(exercise.id)}
                 variant="default"
                 size="md"
                 fullWidth
-                effects={true}
-                className="mt-3 border-dashed"
+                effects
+                className="mt-3 border-dashed rounded-xl"
               >
                 + Agregar Set
               </GreenButton>
@@ -421,21 +421,19 @@ export default function StrengthActiveSession() {
           </GreenCard>
         ))}
 
-        {/* Add Exercise */}
         <GreenButton
           aria-label="Agregar ejercicio"
           onClick={() => navigate('/logging/strength/picker', { state: { routineId: currentRoutineId } })}
           variant="default"
           fullWidth
           size="lg"
-          effects={true}
-          className="py-6 border-dashed flex flex-col items-center justify-center gap-2"
+          effects
+          className="py-6 rounded-xl border-dashed flex flex-col items-center justify-center gap-2"
         >
           <span className="material-symbols-outlined text-[32px]">add_box</span>
           <span>+ Agregar Ejercicio</span>
         </GreenButton>
 
-        {/* Finish Session Button */}
         <GreenButton
           onClick={finishSession}
           disabled={saving}
@@ -443,8 +441,8 @@ export default function StrengthActiveSession() {
           variant="primary"
           fullWidth
           size="lg"
-          effects={true}
-          className="h-14"
+          effects
+          className="h-14 rounded-xl text-sm tracking-[0.18em]"
         >
           {saving ? 'GUARDANDO…' : 'FINALIZAR SESIÓN'}
           <span className="material-symbols-outlined text-[20px]">stop_circle</span>

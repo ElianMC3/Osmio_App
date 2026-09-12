@@ -64,7 +64,7 @@ export default function SplashWelcome() {
 
         {/* Brand title + tagline only */}
         <div className="flex flex-col items-center gap-3">
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight uppercase leading-none">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-on-surface tracking-tight uppercase leading-none">
             OSMIO
           </h1>
           <p className="font-mono text-sm sm:text-base text-primary-fixed tracking-[0.3em] uppercase font-semibold whitespace-nowrap">

@@ -18,13 +18,13 @@ export default function ExerciseInfoCard({ exercise }: { exercise: Exercise }) {
               src={gif ?? image}
               alt={exercise.name}
               loading="lazy"
-              className="w-full aspect-square rounded-xl object-cover border border-green/25 bg-black/40"
+              className="w-full aspect-square rounded-xl object-cover border border-outline-variant/35 bg-panel/40"
             />
           </div>
         )}
 
         <div className="flex-1 min-w-0">
-          <h3 className="font-headline-md text-lg text-text-green uppercase font-semibold mb-2">
+          <h3 className="font-headline-md text-lg text-gradient-green uppercase font-semibold mb-2">
             {exercise.name}
           </h3>
 
