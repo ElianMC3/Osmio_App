@@ -2,7 +2,7 @@
 
 Aplicación web de seguimiento de entrenamiento de fuerza y deportes de combate, con análisis de carga, historial, consistencia y nutrición.
 
-Construida con React 19, TypeScript, Vite, Tailwind CSS v4 y Supabase (PostgreSQL + Auth). Interfaz dark militar con acento "acid green".
+Construida con React 19, TypeScript, Vite, Tailwind CSS v4 y Supabase (PostgreSQL + Auth).
 
 ---
 
