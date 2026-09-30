@@ -111,16 +111,16 @@ export default function StrengthAnalysis() {
 
           {data && (
             <div className="grid grid-cols-3 gap-sm">
-              <GreenCard variant="default" padding="sm" effects className="relative overflow-hidden">
+              <GreenCard variant="default" padding="sm"  className="relative overflow-hidden">
                 <span className="gradient-hairline" />
                 <span className="font-label-caps text-[9px] text-text-muted block uppercase">% vs Semana Ant.</span>
                 <span className="font-label-caps text-[18px] text-text-green font-bold">{changeLabel}</span>
               </GreenCard>
-              <GreenCard variant="default" padding="sm" effects>
+              <GreenCard variant="default" padding="sm" >
                 <span className="font-label-caps text-[9px] text-text-muted block uppercase">Vol. Promedio Día</span>
                 <span className="font-label-caps text-[18px] text-green-dim font-bold">{avgDaily.toLocaleString()}</span>
               </GreenCard>
-              <GreenCard variant="default" padding="sm" effects>
+              <GreenCard variant="default" padding="sm" >
                 <span className="font-label-caps text-[9px] text-text-muted block uppercase">Diferencia</span>
                 <span className="font-label-caps text-[18px] text-acid font-bold">
                   {changePct >= 0 ? '+' : ''}{changePct}
@@ -135,7 +135,7 @@ export default function StrengthAnalysis() {
             </div>
             <div className="grid grid-cols-3 gap-sm">
               {prCards.length > 0 ? prCards.map((pr) => (
-                <GreenCard key={pr.exercise} variant="default" padding="sm" effects className="relative overflow-hidden">
+                <GreenCard key={pr.exercise} variant="default" padding="sm"  className="relative overflow-hidden">
                   <span className="gradient-hairline" />
                   <span className="font-label-caps text-[9px] text-text-muted block mb-xs">{pr.exercise}</span>
                   <div className="flex items-baseline gap-xs mb-xs">
@@ -166,7 +166,7 @@ export default function StrengthAnalysis() {
                 recList.map((item) => {
                   const badge = recBadge(item.rec.action, item.rec.suggestedWeight)
                   return (
-                    <GreenCard key={item.name} variant="default" padding="sm" effects className="relative overflow-hidden">
+                    <GreenCard key={item.name} variant="default" padding="sm"  className="relative overflow-hidden">
                       <span className="gradient-hairline" />
                       <div className="flex items-center justify-between gap-3 flex-wrap">
                         <div className="min-w-0">

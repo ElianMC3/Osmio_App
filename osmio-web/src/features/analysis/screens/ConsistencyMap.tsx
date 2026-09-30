@@ -109,7 +109,7 @@ export default function ConsistencyMap() {
             {consistency.length} días registrados
           </p>
 
-          <GreenCard padding="md" effects className="relative overflow-hidden">
+          <GreenCard padding="md"  className="relative overflow-hidden">
             <span className="gradient-hairline" />
             <div className="flex items-center justify-between mb-md flex-wrap gap-sm">
               <div className="flex items-center gap-sm">
@@ -174,7 +174,7 @@ export default function ConsistencyMap() {
           </GreenCard>
 
           <div className="grid grid-cols-2 gap-sm">
-            <GreenCard variant="default" padding="md" effects className="relative overflow-hidden">
+            <GreenCard variant="default" padding="md"  className="relative overflow-hidden">
               <span className="gradient-hairline" />
               <div className="flex flex-col justify-center relative">
                 <div className="absolute top-0 right-0 p-sm opacity-20">
@@ -191,7 +191,7 @@ export default function ConsistencyMap() {
               </div>
             </GreenCard>
 
-            <GreenCard variant="default" padding="md" effects className="border-l-4 border-l-green relative overflow-hidden">
+            <GreenCard variant="default" padding="md"  className="border-l-4 border-l-green relative overflow-hidden">
               <span className="gradient-hairline" />
               <div className="flex flex-col justify-center">
                 <span className="font-label-caps text-text-muted mb-xs">MEJOR MARCA</span>
@@ -204,7 +204,7 @@ export default function ConsistencyMap() {
             </GreenCard>
           </div>
 
-          <GreenCard padding="md" effects className="relative overflow-hidden">
+          <GreenCard padding="md"  className="relative overflow-hidden">
             <span className="gradient-hairline" />
             <div className="flex justify-between items-center mb-md">
               <span className="font-label-caps text-text-muted">CUMPLIMIENTO GENERAL</span>
@@ -238,11 +238,11 @@ export default function ConsistencyMap() {
                 </div>
               </div>
               <div className="w-full grid grid-cols-2 gap-sm mt-md">
-                <GreenCard variant="default" padding="sm" effects>
+                <GreenCard variant="default" padding="sm" >
                   <p className="font-label-caps text-[8px] text-text-muted">RACHA ACTUAL</p>
                   <p className="font-label-caps text-sm text-text-green">{currentStreak} DÍAS</p>
                 </GreenCard>
-                <GreenCard variant="default" padding="sm" effects>
+                <GreenCard variant="default" padding="sm" >
                   <p className="font-label-caps text-[8px] text-text-muted">MEJOR RACHA</p>
                   <p className="font-label-caps text-sm text-green">▲ {bestStreak} DÍAS</p>
                 </GreenCard>
@@ -250,7 +250,7 @@ export default function ConsistencyMap() {
             </div>
           </GreenCard>
 
-          <GreenCard variant="glass" padding="md" effects className="relative overflow-hidden">
+          <GreenCard variant="glass" padding="md"  className="relative overflow-hidden">
             <div className="absolute -right-4 -bottom-4 opacity-10 pointer-events-none">
               <span className="material-symbols-outlined text-[100px]">psychology</span>
             </div>
@@ -270,12 +270,12 @@ export default function ConsistencyMap() {
             </div>
           </GreenCard>
 
-          <GreenCard padding="md" effects className="relative overflow-hidden">
+          <GreenCard padding="md"  className="relative overflow-hidden">
             <span className="gradient-hairline" />
             <h4 className="font-label-caps text-text-green mb-md">DISTRIBUCIÓN DE ACTIVIDAD</h4>
             <div className="space-y-sm">
               {disciplines.map((item) => (
-                <GreenProgress key={item.label} value={item.pct} label={item.label} showValue size="sm" effects />
+                <GreenProgress key={item.label} value={item.pct} label={item.label} showValue size="sm" />
               ))}
             </div>
           </GreenCard>
