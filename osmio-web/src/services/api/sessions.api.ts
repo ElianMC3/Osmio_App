@@ -1,34 +1,41 @@
 import { supabase } from '../supabase/client'
 import type { StrengthSession, CombatSession, Exercise } from '../../shared/types/session.types'
+import type {
+  CombatSessionRow,
+  ExerciseRow,
+  SetEntryRow,
+  StrengthSessionRow,
+  StrengthSessionWithSetsRow,
+} from './rows'
 
-function mapStrengthRow(row: any, sets?: StrengthSession['sets']): StrengthSession {
+function mapStrengthRow(row: StrengthSessionRow, sets?: StrengthSession['sets']): StrengthSession {
   return {
     id: row.id,
     date: row.date,
-    exerciseId: row.exercise_id,
+    exerciseId: row.exercise_id ?? 0,
     exerciseName: row.exercise_name,
     sets: sets ?? [],
     notes: row.notes ?? '',
   }
 }
 
-function mapCombatRow(row: any): CombatSession {
+function mapCombatRow(row: CombatSessionRow): CombatSession {
   return {
     id: row.id,
     date: row.date,
     type: row.type,
     rounds: row.rounds,
     durationMinutes: row.duration_minutes,
-    rpe: row.rpe,
+    rpe: row.rpe ?? 0,
     positions: row.positions ?? [],
     notes: row.notes ?? '',
   }
 }
 
-function mapSets(entries: any[]): StrengthSession['sets'] {
+function mapSets(entries: SetEntryRow[] | null | undefined): StrengthSession['sets'] {
   return (entries ?? [])
     .sort((a, b) => a.set_order - b.set_order)
-    .map((s) => ({ reps: s.reps, weight: s.weight, rpe: s.rpe }))
+    .map((s) => ({ reps: s.reps, weight: s.weight, rpe: s.rpe ?? 0 }))
 }
 
 async function requireUserId(): Promise<string> {
@@ -37,7 +44,7 @@ async function requireUserId(): Promise<string> {
   return data.user.id
 }
 
-function mapExerciseRow(row: any): Exercise {
+function mapExerciseRow(row: ExerciseRow): Exercise {
   return {
     id: row.id,
     name: row.name,
@@ -61,7 +68,7 @@ export const sessionsApi = {
       .select('id, name, category, body_part, equipment, muscle_group, target, secondary_muscles, instructions, image, gif_url, attribution')
       .order('name')
     if (error) throw new Error(error.message)
-    return (data ?? []).map(mapExerciseRow)
+    return ((data ?? []) as ExerciseRow[]).map(mapExerciseRow)
   },
 
   getExercise: async (id: number): Promise<Exercise | null> => {
@@ -71,7 +78,7 @@ export const sessionsApi = {
       .eq('id', id)
       .maybeSingle()
     if (error) throw new Error(error.message)
-    return data ? mapExerciseRow(data) : null
+    return data ? mapExerciseRow(data as ExerciseRow) : null
   },
 
   getSessionsByExercise: async (exerciseId: number): Promise<StrengthSession[]> => {
@@ -82,7 +89,7 @@ export const sessionsApi = {
       .order('date', { ascending: false })
       .limit(50)
     if (error) throw new Error(error.message)
-    return data.map((row: any) => mapStrengthRow(row, mapSets(row.set_entries)))
+    return ((data ?? []) as StrengthSessionWithSetsRow[]).map((row) => mapStrengthRow(row, mapSets(row.set_entries)))
   },
 
   getStrengthSessions: async (): Promise<StrengthSession[]> => {
@@ -91,7 +98,7 @@ export const sessionsApi = {
       .select('*, set_entries(reps, weight, rpe, set_order)')
       .order('date', { ascending: false })
     if (error) throw new Error(error.message)
-    return data.map((row: any) => mapStrengthRow(row, mapSets(row.set_entries)))
+    return ((data ?? []) as StrengthSessionWithSetsRow[]).map((row) => mapStrengthRow(row, mapSets(row.set_entries)))
   },
 
   getCombatSessions: async (): Promise<CombatSession[]> => {
@@ -100,7 +107,7 @@ export const sessionsApi = {
       .select('*')
       .order('date', { ascending: false })
     if (error) throw new Error(error.message)
-    return data.map(mapCombatRow)
+    return ((data ?? []) as CombatSessionRow[]).map(mapCombatRow)
   },
 
   createStrengthSession: async (session: Omit<StrengthSession, 'id'>): Promise<StrengthSession> => {
@@ -129,7 +136,7 @@ export const sessionsApi = {
       const { error: setsError } = await supabase.from('set_entries').insert(setRows)
       if (setsError) throw new Error(setsError.message)
     }
-    return mapStrengthRow(data, session.sets)
+    return mapStrengthRow(data as StrengthSessionRow, session.sets)
   },
 
   createCombatSession: async (session: Omit<CombatSession, 'id'>): Promise<CombatSession> => {
@@ -149,7 +156,7 @@ export const sessionsApi = {
       .select()
       .single()
     if (error) throw new Error(error.message)
-    return mapCombatRow(data)
+    return mapCombatRow(data as CombatSessionRow)
   },
 
   getSessionsByDate: async (date: string): Promise<(StrengthSession | CombatSession)[]> => {
@@ -165,8 +172,8 @@ export const sessionsApi = {
       .eq('date', date)
     if (combatError) throw new Error(combatError.message)
 
-    const strength = strengthData.map((row: any) => mapStrengthRow(row, mapSets(row.set_entries)))
-    const combat = combatData.map(mapCombatRow)
+    const strength = ((strengthData ?? []) as StrengthSessionWithSetsRow[]).map((row) => mapStrengthRow(row, mapSets(row.set_entries)))
+    const combat = ((combatData ?? []) as CombatSessionRow[]).map(mapCombatRow)
     return [...strength, ...combat]
   },
 }

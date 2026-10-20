@@ -27,8 +27,8 @@ export default function LoginScreen() {
       }
       await login(email, password)
       navigate(from, { replace: true })
-    } catch (err: any) {
-      setError(err.message || 'Error de autenticación')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error de autenticación')
     } finally {
       setSubmitting(false)
     }

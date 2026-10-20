@@ -1,7 +1,8 @@
 import { supabase } from '../supabase/client'
 import type { DailyNutrition, MealEntry, MacroEntry } from '../../shared/types/nutrition.types'
+import type { BodyWeightRow, MealRow, NutritionGoalRow } from './rows'
 
-function mapMealRow(row: any): MealEntry {
+function mapMealRow(row: MealRow): MealEntry {
   return {
     id: row.id,
     name: row.name,
@@ -13,7 +14,7 @@ function mapMealRow(row: any): MealEntry {
   }
 }
 
-function sumMacros(meals: any[]): MacroEntry {
+function sumMacros(meals: MealRow[]): MacroEntry {
   const totals = { calories: 0, protein: 0, carbs: 0, fat: 0 }
   for (const m of meals) {
     totals.calories += Number(m.calories)
@@ -52,14 +53,16 @@ export const nutritionApi = {
       .single()
     if (goalError && goalError.code !== 'PGRST116') throw new Error(goalError.message)
 
+    const mealRows = (meals ?? []) as MealRow[]
+    const goal = goalRow as NutritionGoalRow | null
     const defaultGoal: MacroEntry = { calories: 2400, protein: 180, carbs: 280, fat: 75 }
 
     return {
       date,
-      meals: meals.map(mapMealRow),
-      totals: sumMacros(meals),
-      goal: goalRow
-        ? { calories: goalRow.calories, protein: goalRow.protein, carbs: goalRow.carbs, fat: goalRow.fat }
+      meals: mealRows.map(mapMealRow),
+      totals: sumMacros(mealRows),
+      goal: goal
+        ? { calories: goal.calories, protein: goal.protein, carbs: goal.carbs, fat: goal.fat }
         : defaultGoal,
     }
   },
@@ -80,7 +83,7 @@ export const nutritionApi = {
       .select()
       .single()
     if (error) throw new Error(error.message)
-    return mapMealRow(data)
+    return mapMealRow(data as MealRow)
   },
 
   deleteMeal: async (_date: string, mealId: string): Promise<void> => {
@@ -96,7 +99,7 @@ export const nutritionApi = {
       .eq('user_id', userId)
       .order('date', { ascending: false })
     if (error) throw new Error(error.message)
-    return data
+    return (data ?? []) as BodyWeightRow[]
   },
 
   updateWeight: async (date: string, weight: number): Promise<void> => {
@@ -109,23 +112,20 @@ export const nutritionApi = {
 
   updateNutritionGoal: async (goal: MacroEntry): Promise<void> => {
     const userId = await requireUserId()
-    const { data: existing } = await supabase
+    // user_id es la PK de nutrition_goals: un upsert evita duplicados y
+    // sustituye al select('id') previo, que apuntaba a una columna inexistente.
+    const { error } = await supabase
       .from('nutrition_goals')
-      .select('id')
-      .eq('user_id', userId)
-      .maybeSingle()
-
-    if (existing) {
-      const { error } = await supabase
-        .from('nutrition_goals')
-        .update({ calories: goal.calories, protein: goal.protein, carbs: goal.carbs, fat: goal.fat })
-        .eq('id', existing.id)
-      if (error) throw new Error(error.message)
-    } else {
-      const { error } = await supabase
-        .from('nutrition_goals')
-        .insert({ user_id: userId, calories: goal.calories, protein: goal.protein, carbs: goal.carbs, fat: goal.fat })
-      if (error) throw new Error(error.message)
-    }
+      .upsert(
+        {
+          user_id: userId,
+          calories: goal.calories,
+          protein: goal.protein,
+          carbs: goal.carbs,
+          fat: goal.fat,
+        },
+        { onConflict: 'user_id' }
+      )
+    if (error) throw new Error(error.message)
   },
 }

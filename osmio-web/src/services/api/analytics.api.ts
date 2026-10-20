@@ -1,4 +1,11 @@
 import { supabase } from '../supabase/client'
+import type {
+  CombatRoundsByWeekRow,
+  CombatTotalRoundsRow,
+  PrRow,
+  TrainingConsistencyRow,
+  VolumeByWeekRow,
+} from './rows'
 
 export interface StrengthAnalytics {
   volumeByWeek: { week: string; load: number }[]
@@ -33,8 +40,8 @@ export const analyticsApi = {
     if (prsError) throw new Error(prsError.message)
 
     return {
-      volumeByWeek: volumeData ?? [],
-      prs: prsData ?? [],
+      volumeByWeek: (volumeData ?? []) as VolumeByWeekRow[],
+      prs: (prsData ?? []) as PrRow[],
     }
   },
 
@@ -55,8 +62,12 @@ export const analyticsApi = {
     if (totalsError) throw new Error(totalsError.message)
 
     return {
-      roundsByWeek: roundsData ?? [],
-      totalRounds: totalsData ?? { striking: 0, grappling: 0 },
+      roundsByWeek: ((roundsData ?? []) as CombatRoundsByWeekRow[]).map((row) => ({
+        week: row.week,
+        striking: row.striking ?? 0,
+        grappling: row.grappling ?? 0,
+      })),
+      totalRounds: (totalsData ?? { striking: 0, grappling: 0 }) as CombatTotalRoundsRow,
     }
   },
 
@@ -68,6 +79,6 @@ export const analyticsApi = {
       .select('date, active')
       .eq('user_id', userId)
     if (error) throw new Error(error.message)
-    return data ?? []
+    return (data ?? []) as TrainingConsistencyRow[]
   },
 }

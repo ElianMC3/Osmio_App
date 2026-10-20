@@ -3,6 +3,7 @@ import { sessionsApi } from '@/services/api/sessions.api'
 import { nutritionApi } from '@/services/api/nutrition.api'
 import { analyticsApi } from '@/services/api/analytics.api'
 import type { StrengthSession, CombatSession } from '@/shared/types/session.types'
+import type { MealEntry } from '@/shared/types/nutrition.types'
 
 const WEEKDAYS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 const WEEKDAY_LABELS = ['LUN', 'MAR', 'MIE', 'JUE', 'VIE', 'SAB', 'DOM']
@@ -54,7 +55,7 @@ export default function DashboardHoy() {
   const [sessions, setSessions] = useState<(StrengthSession | CombatSession)[]>([])
   const [combatAnalytics, setCombatAnalytics] = useState<{ roundsByWeek: { week: string; striking: number; grappling: number }[]; totalRounds: { striking: number; grappling: number } }>({ roundsByWeek: [], totalRounds: { striking: 0, grappling: 0 } })
   const [consistencyData, setConsistencyData] = useState<{ date: string; active: boolean }[]>([])
-  const [nutrition, setNutrition] = useState<{ meals: any[]; totals: { calories: number; protein: number; carbs: number; fat: number }; goal: { calories: number; protein: number; carbs: number; fat: number } }>({ meals: [], totals: { calories: 0, protein: 0, carbs: 0, fat: 0 }, goal: { calories: 2400, protein: 180, carbs: 280, fat: 75 } })
+  const [nutrition, setNutrition] = useState<{ meals: MealEntry[]; totals: { calories: number; protein: number; carbs: number; fat: number }; goal: { calories: number; protein: number; carbs: number; fat: number } }>({ meals: [], totals: { calories: 0, protein: 0, carbs: 0, fat: 0 }, goal: { calories: 2400, protein: 180, carbs: 280, fat: 75 } })
 
   useEffect(() => {
     async function fetchData() {

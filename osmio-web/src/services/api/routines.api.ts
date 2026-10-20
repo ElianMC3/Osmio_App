@@ -1,10 +1,18 @@
 import { supabase } from '../supabase/client'
-import type { Routine, RoutineExercise, Exercise } from '../../shared/types/session.types'
+import type { Routine, RoutineExercise, Exercise, StrengthSession } from '../../shared/types/session.types'
+import type {
+  ExerciseRow,
+  RoutineExerciseRow,
+  RoutineRow,
+  RoutineWithExercisesRow,
+  SetEntryRow,
+  StrengthSessionWithSetsRow,
+} from './rows'
 
 const EXERCISE_FIELDS =
   'id, name, category, body_part, equipment, muscle_group, target, secondary_muscles, instructions, image, gif_url, attribution'
 
-function mapExercise(row: any): Exercise {
+function mapExercise(row: ExerciseRow): Exercise {
   return {
     id: row.id,
     name: row.name,
@@ -21,7 +29,7 @@ function mapExercise(row: any): Exercise {
   }
 }
 
-function mapRoutineExercise(row: any): RoutineExercise {
+function mapRoutineExercise(row: RoutineExerciseRow): RoutineExercise {
   return {
     id: row.id,
     routineId: row.routine_id,
@@ -39,7 +47,7 @@ function mapRoutineExercise(row: any): RoutineExercise {
   }
 }
 
-function mapRoutine(row: any, exercises: any[] = []): Routine {
+function mapRoutine(row: RoutineRow, exercises: RoutineExerciseRow[] = []): Routine {
   return {
     id: row.id,
     name: row.name,
@@ -54,21 +62,6 @@ async function requireUserId(): Promise<string> {
   return data.user.id
 }
 
-let dropsetSupportCache: Promise<boolean> | null = null
-
-function hasDropsetColumns(): Promise<boolean> {
-  if (!dropsetSupportCache) {
-    dropsetSupportCache = (async () => {
-      const { error } = await supabase
-        .from('routine_exercises')
-        .select('dropset, dropset_percent')
-        .limit(1)
-      return !(error && error.message.includes('does not exist'))
-    })()
-  }
-  return dropsetSupportCache
-}
-
 export const routinesApi = {
   getRoutines: async (): Promise<Routine[]> => {
     const userId = await requireUserId()
@@ -78,7 +71,7 @@ export const routinesApi = {
       .eq('user_id', userId)
       .order('created_at')
     if (error) throw new Error(error.message)
-    return (data ?? []).map((row: any) =>
+    return ((data ?? []) as RoutineWithExercisesRow[]).map((row) =>
       mapRoutine(row, [...(row.routine_exercises ?? [])].sort((a, b) => (a.position ?? 0) - (b.position ?? 0)))
     )
   },
@@ -91,7 +84,7 @@ export const routinesApi = {
       .select()
       .single()
     if (error) throw new Error(error.message)
-    return mapRoutine(data)
+    return mapRoutine(data as RoutineRow)
   },
 
   updateRoutine: async (id: string, partial: { name?: string; description?: string }): Promise<void> => {
@@ -127,17 +120,15 @@ export const routinesApi = {
       current_weight: options.currentWeight ?? 0,
       rest_seconds: options.restSeconds ?? 180,
     }
-    if (await hasDropsetColumns()) {
-      row.dropset = options.dropset ?? false
-      row.dropset_percent = options.dropsetPercent ?? 50
-    }
+    row.dropset = options.dropset ?? false
+    row.dropset_percent = options.dropsetPercent ?? 50
     const { data, error } = await supabase
       .from('routine_exercises')
       .insert(row)
       .select(`*, exercises(${EXERCISE_FIELDS})`)
       .single()
     if (error) throw new Error(error.message)
-    return mapRoutineExercise(data)
+    return mapRoutineExercise(data as RoutineExerciseRow)
   },
 
   updateRoutineExercise: async (
@@ -152,10 +143,8 @@ export const routinesApi = {
     if (partial.restSeconds !== undefined) payload.rest_seconds = partial.restSeconds
     if (partial.notes !== undefined) payload.notes = partial.notes
     if (partial.position !== undefined) payload.position = partial.position
-    if ((partial.dropset !== undefined || partial.dropsetPercent !== undefined) && (await hasDropsetColumns())) {
-      if (partial.dropset !== undefined) payload.dropset = partial.dropset
-      if (partial.dropsetPercent !== undefined) payload.dropset_percent = partial.dropsetPercent
-    }
+    if (partial.dropset !== undefined) payload.dropset = partial.dropset
+    if (partial.dropsetPercent !== undefined) payload.dropset_percent = partial.dropsetPercent
 
     const { error } = await supabase.from('routine_exercises').update(payload).eq('id', id)
     if (error) throw new Error(error.message)
@@ -166,7 +155,7 @@ export const routinesApi = {
     if (error) throw new Error(error.message)
   },
 
-  getSessionsForExercises: async (exerciseIds: number[]): Promise<Record<number, import('../../shared/types/session.types').StrengthSession[]>> => {
+  getSessionsForExercises: async (exerciseIds: number[]): Promise<Record<number, StrengthSession[]>> => {
     if (exerciseIds.length === 0) return {}
     const { data, error } = await supabase
       .from('strength_sessions')
@@ -176,12 +165,18 @@ export const routinesApi = {
       .limit(300)
     if (error) throw new Error(error.message)
 
-    const grouped: Record<number, any[]> = {}
-    for (const row of data ?? []) {
+    type PartialSetRow = Pick<SetEntryRow, 'reps' | 'weight' | 'rpe' | 'set_order'>
+    type PartialSessionRow = Omit<StrengthSessionWithSetsRow, 'set_entries'> & {
+      set_entries: PartialSetRow[] | null
+    }
+
+    const grouped: Record<number, StrengthSession[]> = {}
+    for (const row of (data ?? []) as PartialSessionRow[]) {
+      if (row.exercise_id === null) continue
       const sets = (row.set_entries ?? [])
-        .sort((a: any, b: any) => a.set_order - b.set_order)
-        .map((s: any) => ({ reps: s.reps, weight: s.weight, rpe: s.rpe }))
-      const session = {
+        .sort((a, b) => a.set_order - b.set_order)
+        .map((s) => ({ reps: s.reps, weight: s.weight, rpe: s.rpe ?? 0 }))
+      const session: StrengthSession = {
         id: row.id,
         date: row.date,
         exerciseId: row.exercise_id,

@@ -1,5 +1,6 @@
 import { supabase } from '../supabase/client'
 import type { UserProfile } from '../../store/userStore'
+import type { ProfileRow, TrainingDaysRow, WeeklyGoalsRow } from './rows'
 
 async function requireUser(): Promise<{ id: string; email?: string }> {
   const { data, error } = await supabase.auth.getUser()
@@ -7,7 +8,7 @@ async function requireUser(): Promise<{ id: string; email?: string }> {
   return { id: data.user.id, email: data.user.email ?? undefined }
 }
 
-function mapProfileRow(row: any): UserProfile & { age?: number } {
+function mapProfileRow(row: ProfileRow): UserProfile & { age?: number } {
   return {
     id: row.id,
     name: row.name,
@@ -30,13 +31,13 @@ export const profilesApi = {
       .eq('id', userId)
       .maybeSingle()
     if (error) throw new Error(error.message)
-    return data ? mapProfileRow(data) : null
+    return data ? mapProfileRow(data as ProfileRow) : null
   },
 
   updateProfile: async (profile: Partial<UserProfile & { age?: number }>): Promise<void> => {
     const { id: userId, email } = await requireUser()
 
-    const payload: Record<string, any> = {}
+    const payload: Record<string, string | number> = {}
     if (profile.name !== undefined) payload.name = profile.name
     if (profile.weight !== undefined) payload.weight = profile.weight
     if (profile.height !== undefined) payload.height = profile.height
@@ -47,17 +48,6 @@ export const profilesApi = {
     const { error } = await supabase
       .from('profiles')
       .upsert({ id: userId, email: email ?? '', ...payload })
-
-    // La columna `age` puede no existir aún en la tabla; reintenta sin ella
-    // para que el resto del perfil sí se guarde.
-    if (error && error.code === '42703' && payload.age !== undefined) {
-      delete payload.age
-      const { error: retryError } = await supabase
-        .from('profiles')
-        .upsert({ id: userId, email: email ?? '', ...payload })
-      if (retryError) throw new Error(retryError.message)
-      return
-    }
 
     if (error) throw new Error(error.message)
   },
@@ -72,17 +62,17 @@ export const profilesApi = {
       .maybeSingle()
     if (error) throw new Error(error.message)
 
-    return data
-      ? {
-          L: data.monday,
-          M: data.tuesday,
-          X: data.wednesday,
-          J: data.thursday,
-          V: data.friday,
-          S: data.saturday,
-          D: data.sunday,
-        }
-      : { L: true, M: true, X: false, J: true, V: true, S: false, D: false }
+    if (!data) return { L: true, M: true, X: false, J: true, V: true, S: false, D: false }
+    const row = data as TrainingDaysRow
+    return {
+      L: row.monday,
+      M: row.tuesday,
+      X: row.wednesday,
+      J: row.thursday,
+      V: row.friday,
+      S: row.saturday,
+      D: row.sunday,
+    }
   },
 
   updateTrainingDays: async (days: Record<string, boolean>): Promise<void> => {
@@ -111,9 +101,9 @@ export const profilesApi = {
       .maybeSingle()
     if (error) throw new Error(error.message)
 
-    return data
-      ? { strength: data.strength, combat: data.combat, nutrition: data.nutrition }
-      : { strength: 4, combat: 3, nutrition: 7 }
+    if (!data) return { strength: 4, combat: 3, nutrition: 7 }
+    const row = data as WeeklyGoalsRow
+    return { strength: row.strength, combat: row.combat, nutrition: row.nutrition }
   },
 
   updateWeeklyGoals: async (goals: { strength: number; combat: number; nutrition: number }): Promise<void> => {
