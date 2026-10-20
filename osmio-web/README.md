@@ -58,14 +58,19 @@ Las migraciones están en `migrations/` y se aplican **en orden** desde Supabase
 
 | Archivo | Contenido |
 |---------|-----------|
+| `000_core_schema.sql` | **Ejecutar primero.** Tablas base (perfiles, sesiones, series, combate, nutrición, metas, recuperación), índices y RLS owner-only |
 | `001_exercises_extend.sql` | Extiende `exercises` (categoría, equipo, grupo muscular, patrón de movimiento) |
 | `002_routines.sql` | `routines` + `routine_exercises` con RLS owner-only |
-| `003_seed_exercises_part_01..20.sql` | Seed del catálogo de ejercicios (~2.000 registros) |
+| `003_seed_exercises_part_01..20.sql` | Seed del catálogo de ejercicios (~5.200 registros) |
 | `004_routine_dropset.sql` | Columnas `dropset` / `dropset_percent` en `routine_exercises` |
+| `005_profile_age.sql` | Columna `profiles.age` (que `profiles.api.ts` ya intentaba guardar) |
+| `006_views.sql` | Vistas de análisis con `security_invoker = true` |
 
 Todas las tablas de usuario aplican **Row Level Security**: cada cliente solo lee y escribe sus propios registros (`auth.uid() = user_id`).
 
-Vistas usadas por el módulo de análisis: `strength_volume_by_week`, `strength_prs`.
+`006_views.sql` es obligatorio: sin `security_invoker`, las vistas se ejecutan con los privilegios de `postgres`, saltan RLS y la anon key podía leer datos de **todos** los usuarios.
+
+Vistas usadas por el módulo de análisis: `strength_volume_by_week`, `strength_prs`, `combat_rounds_by_week`, `combat_total_rounds`, `training_consistency` y `daily_nutrition_totals`.
 
 ---
 
@@ -191,7 +196,8 @@ Componentes base reutilizables: `Button`, `Card`, `GreenCard`, `GreenButton`, `G
 
 ## Estado actual
 
-- Migración `004_routine_dropset.sql` pendiente de aplicar en Supabase
+- La cadena de migraciones se puede reconstruir desde cero: `000` → `001` → `002` → `003` → `004` → `005` → `006`
+- Migraciones `004`, `005` y `006` aplicadas y verificadas en el proyecto de Supabase
 - `FINAL FOOD DATASET` en revisión para sustituir la base local de alimentos
 - Sin suite de tests configurada (solo `lint` + `tsc` + `build` en CI)
 
