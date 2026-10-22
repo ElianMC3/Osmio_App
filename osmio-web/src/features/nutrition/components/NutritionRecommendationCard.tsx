@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { profilesApi } from '@/services/api/profiles.api'
 import { nutritionApi } from '@/services/api/nutrition.api'
-import { ACTIVITY_MULTIPLIERS } from '@/shared/utils/calorieCalculator'
+import { ACTIVITY_MULTIPLIERS, DEFAULT_AGE } from '@/shared/utils/calorieCalculator'
 import { useCalorieGoal } from '../hooks/useCalorieGoal'
 
 export default function NutritionRecommendationCard() {
   const navigate = useNavigate()
   const [weight, setWeight] = useState<number | null>(null)
   const [height, setHeight] = useState<number | null>(null)
+  const [age, setAge] = useState<number | null>(null)
   const [experience, setExperience] = useState<'beginner' | 'intermediate' | 'advanced'>('intermediate')
   const [loading, setLoading] = useState(true)
   const [applying, setApplying] = useState(false)
@@ -24,6 +25,7 @@ export default function NutritionRecommendationCard() {
         if (profile) {
           setWeight(profile.weight > 0 ? profile.weight : null)
           setHeight(profile.height > 0 ? profile.height : null)
+          setAge(profile.age ?? null)
           setExperience(profile.experience)
         }
       })
@@ -39,6 +41,7 @@ export default function NutritionRecommendationCard() {
   const goal = useCalorieGoal({
     weightKg: weight ?? 0,
     heightCm: height ?? 0,
+    age: age ?? undefined,
     activityMultiplier: ACTIVITY_MULTIPLIERS[experience],
     goal: 'bulk',
   })
@@ -103,7 +106,7 @@ export default function NutritionRecommendationCard() {
               RECOMENDACIÓN NUTRICIONAL
             </h3>
             <p className="font-label-sm text-xs text-on-surface-variant mt-0.5">
-              Para ganar masa muscular · {weight} kg · {height} cm · {experience}
+              Para ganar masa muscular · {weight} kg · {height} cm · {age ?? DEFAULT_AGE} años · {experience}
             </p>
           </div>
         </div>
