@@ -34,12 +34,15 @@ La app queda disponible en `http://localhost:5173`.
 
 ### Variables de entorno
 
+`.env` no se versiona (está en `.gitignore`). El repo incluye `.env.example` con la plantilla:
+
 ```env
 VITE_SUPABASE_URL=https://<project-ref>.supabase.co
 VITE_SUPABASE_ANON_KEY=<anon-key>
+VITE_API_URL=http://localhost:3001/api   # opcional
 ```
 
-Ambas son obligatorias: `src/services/supabase/client.ts` lanza error al cargar si faltan.
+Las dos primeras son obligatorias: `src/services/supabase/client.ts` lanza error al cargar si faltan. `VITE_API_URL` es opcional y por defecto apunta a `http://localhost:3001/api`.
 
 ### Scripts
 

@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { profilesApi } from '@/services/api/profiles.api'
 import { nutritionApi } from '@/services/api/nutrition.api'
-import { ACTIVITY_MULTIPLIERS, useCalorieGoal } from '../hooks/useCalorieGoal'
+import { ACTIVITY_MULTIPLIERS } from '@/shared/utils/calorieCalculator'
+import { useCalorieGoal } from '../hooks/useCalorieGoal'
 
 export default function NutritionRecommendationCard() {
   const navigate = useNavigate()
@@ -38,7 +39,7 @@ export default function NutritionRecommendationCard() {
   const goal = useCalorieGoal({
     weightKg: weight ?? 0,
     heightCm: height ?? 0,
-    activityMultiplier: ACTIVITY_MULTIPLIERS[experience] ?? 1.55,
+    activityMultiplier: ACTIVITY_MULTIPLIERS[experience],
     goal: 'bulk',
   })
 
