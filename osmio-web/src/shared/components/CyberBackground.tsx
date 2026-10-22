@@ -36,6 +36,10 @@ export default function CyberBackground() {
     }
     updateCamera()
 
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    let reducedMotion = motionQuery.matches
+    const renderOnce = () => renderer.render(scene, camera)
+
     const fitCover = (plane: THREE.Mesh, texture: THREE.Texture) => {
       const img = texture.image as HTMLImageElement
       const imgAspect = img.width / img.height
@@ -127,11 +131,20 @@ export default function CyberBackground() {
       prevMouse = null
     }
 
-    window.addEventListener('mousemove', onMouseMove)
-    window.addEventListener('mouseleave', onMouseLeave)
-    window.addEventListener('touchstart', onTouchStart, { passive: true })
-    window.addEventListener('touchmove', onTouchMove, { passive: true })
-    window.addEventListener('touchend', onTouchEnd)
+    const attachPointer = () => {
+      window.addEventListener('mousemove', onMouseMove)
+      window.addEventListener('mouseleave', onMouseLeave)
+      window.addEventListener('touchstart', onTouchStart, { passive: true })
+      window.addEventListener('touchmove', onTouchMove, { passive: true })
+      window.addEventListener('touchend', onTouchEnd)
+    }
+    const detachPointer = () => {
+      window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('mouseleave', onMouseLeave)
+      window.removeEventListener('touchstart', onTouchStart)
+      window.removeEventListener('touchmove', onTouchMove)
+      window.removeEventListener('touchend', onTouchEnd)
+    }
 
     const textureLoader = new THREE.TextureLoader()
 
@@ -149,6 +162,7 @@ export default function CyberBackground() {
         plane1.material.map = tex
         plane1.material.needsUpdate = true
         fitCover(plane1, tex)
+        if (reducedMotion) renderOnce()
       },
       undefined,
       () => console.warn('Failed to load base background image')
@@ -241,6 +255,7 @@ export default function CyberBackground() {
         plane2Material.uniforms.uTexture.value = tex
         plane2Material.needsUpdate = true
         fitCover(plane2, tex)
+        if (reducedMotion) renderOnce()
       },
       undefined,
       () => console.warn('Failed to load reveal background image')
@@ -250,7 +265,12 @@ export default function CyberBackground() {
     const lookTarget = new THREE.Vector3()
 
     let rafId = 0
+    let animating = false
     const tick = () => {
+      if (reducedMotion) {
+        animating = false
+        return
+      }
       const elapsedTime = clock.getElapsedTime()
       plane2Material.uniforms.uTime.value = elapsedTime
 
@@ -298,23 +318,45 @@ export default function CyberBackground() {
 
       rafId = requestAnimationFrame(tick)
     }
-    tick()
+
+    const startAnimation = () => {
+      if (animating || reducedMotion) return
+      animating = true
+      tick()
+    }
+    const stopAnimation = () => {
+      animating = false
+      cancelAnimationFrame(rafId)
+      renderOnce()
+    }
+    const applyMotionPreference = () => {
+      reducedMotion = motionQuery.matches
+      if (reducedMotion) {
+        stopAnimation()
+        detachPointer()
+      } else {
+        attachPointer()
+        startAnimation()
+      }
+    }
+
+    motionQuery.addEventListener('change', applyMotionPreference)
+    applyMotionPreference()
 
     const onResize = () => {
       updateCamera()
       renderer.setSize(window.innerWidth, window.innerHeight, false)
       if (plane1.material.map) fitCover(plane1, plane1.material.map)
       if (plane2Material.uniforms.uTexture.value) fitCover(plane2, plane2Material.uniforms.uTexture.value)
+      if (reducedMotion) renderOnce()
     }
     window.addEventListener('resize', onResize)
 
     return () => {
+      animating = false
       cancelAnimationFrame(rafId)
-      window.removeEventListener('mousemove', onMouseMove)
-      window.removeEventListener('mouseleave', onMouseLeave)
-      window.removeEventListener('touchstart', onTouchStart)
-      window.removeEventListener('touchmove', onTouchMove)
-      window.removeEventListener('touchend', onTouchEnd)
+      motionQuery.removeEventListener('change', applyMotionPreference)
+      detachPointer()
       window.removeEventListener('resize', onResize)
 
       plane1.geometry.dispose()
