@@ -1,5 +1,6 @@
 import { supabase } from '../supabase/client'
 import type { DailyNutrition, MealEntry, MacroEntry } from '../../shared/types/nutrition.types'
+import { localDayRange, parseLocalDate } from '../../shared/utils/dateHelpers'
 import type { BodyWeightRow, MealRow, NutritionGoalRow } from './rows'
 
 function mapMealRow(row: MealRow): MealEntry {
@@ -31,18 +32,27 @@ async function requireUserId(): Promise<string> {
   return data.user.id
 }
 
+/** Mediodía local del día pedido: evita que un `T12:00:00Z` caiga en otro día. */
+function localNoon(date: string): string {
+  const noon = parseLocalDate(date)
+  noon.setHours(12)
+  return noon.toISOString()
+}
+
 export const nutritionApi = {
   getDayNutrition: async (date: string): Promise<DailyNutrition> => {
     const userId = await requireUserId()
-    const dayStart = `${date}T00:00:00Z`
-    const dayEnd = `${date}T23:59:59Z`
+    // `logged_at` es timestamptz: el rango se calcula en la zona horaria del
+    // usuario y se envía en UTC. Con T00:00:00Z/T23:59:59Z las comidas de la
+    // tarde-noche caían en el día siguiente (o en el anterior).
+    const { start, end } = localDayRange(date)
 
     const { data: meals, error: mealsError } = await supabase
       .from('meals')
       .select('*')
       .eq('user_id', userId)
-      .gte('logged_at', dayStart)
-      .lt('logged_at', dayEnd)
+      .gte('logged_at', start)
+      .lt('logged_at', end)
       .order('logged_at', { ascending: true })
     if (mealsError) throw new Error(mealsError.message)
 
@@ -78,7 +88,7 @@ export const nutritionApi = {
         protein: meal.protein,
         carbs: meal.carbs,
         fat: meal.fat,
-        logged_at: meal.timestamp || `${date}T12:00:00Z`,
+        logged_at: meal.timestamp || localNoon(date),
       })
       .select()
       .single()

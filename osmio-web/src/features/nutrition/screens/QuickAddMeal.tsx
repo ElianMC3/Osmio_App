@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { nutritionApi } from '@/services/api/nutrition.api'
 import { useAuth } from '../../../shared/hooks/useAuth'
 import { findFoodMatch } from '@/shared/data/foodDatabase'
+import { toLocalDateString } from '@/shared/utils/dateHelpers'
 
 interface FoodEntry {
   id: number
@@ -27,7 +28,7 @@ export default function QuickAddMeal() {
   const navigate = useNavigate()
   const { date: paramDate } = useParams()
   const { user } = useAuth()
-  const today = new Date().toISOString().split('T')[0]
+  const today = toLocalDateString()
   const date = paramDate || today
   const storageKey = `osmio.customFoods.${user?.id ?? 'guest'}`
 

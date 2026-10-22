@@ -6,6 +6,7 @@ import { GreenProgress } from '../../../design-system/components/GreenProgress'
 import { PageBackdrop } from '../../../design-system/components/PageBackdrop'
 import { PageHeader } from '../../../design-system/components/PageHeader'
 import { sessionsApi } from '@/services/api/sessions.api'
+import { toLocalDateString } from '@/shared/utils/dateHelpers'
 
 type CombatType = 'competencia' | 'sparring' | 'clase'
 type Duration = '3:00' | '5:00' | 'personalizado'
@@ -38,7 +39,7 @@ export default function CombatLogForm() {
       const durationMinutes = duration === '3:00' ? 3 : duration === '5:00' ? 5 : 5
       const trainingTag = (trainingType ?? '').toUpperCase()
       await sessionsApi.createCombatSession({
-        date: new Date().toISOString().split('T')[0],
+        date: toLocalDateString(),
         type: discipline ?? (combatType === 'competencia' ? 'striking' : 'grappling'),
         rounds,
         durationMinutes,

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { nutritionApi } from '@/services/api/nutrition.api'
 import NutritionRecommendationCard from '../components/NutritionRecommendationCard'
 import type { DailyNutrition } from '@/shared/types/nutrition.types'
+import { toLocalDateString } from '@/shared/utils/dateHelpers'
 
 const quickAddPresets = [
   { icon: 'blender', name: 'Batido Proteico 1-Tap', kcal: 320, protein: 35, carbs: 20, fat: 5 },
@@ -15,7 +16,7 @@ export default function NutritionDashboard() {
   const navigate = useNavigate()
   const [nutrition, setNutrition] = useState<DailyNutrition | null>(null)
 
-  const today = new Date().toISOString().split('T')[0]
+  const today = toLocalDateString()
 
   useEffect(() => {
     async function fetchData() {

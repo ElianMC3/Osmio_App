@@ -7,6 +7,7 @@ import { PageBackdrop } from '../../../design-system/components/PageBackdrop'
 import { PageHeader } from '../../../design-system/components/PageHeader'
 import { sessionsApi } from '@/services/api/sessions.api'
 import { routinesApi } from '@/services/api/routines.api'
+import { toLocalDateString } from '@/shared/utils/dateHelpers'
 
 interface SetData {
   weight: number
@@ -172,7 +173,7 @@ export default function StrengthActiveSession() {
   const finishSession = async () => {
     setSaving(true)
     try {
-      const date = new Date().toISOString().split('T')[0]
+      const date = toLocalDateString()
       const trainingTag = (trainingType ?? '').toUpperCase()
       for (const ex of exercises) {
         const doneSets = ex.sets.filter((s) => s.done && (s.weight > 0 || s.reps > 0))
