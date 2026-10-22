@@ -39,10 +39,21 @@ La app queda disponible en `http://localhost:5173`.
 ```env
 VITE_SUPABASE_URL=https://<project-ref>.supabase.co
 VITE_SUPABASE_ANON_KEY=<anon-key>
-VITE_API_URL=http://localhost:3001/api   # opcional
 ```
 
-Las dos primeras son obligatorias: `src/services/supabase/client.ts` lanza error al cargar si faltan. `VITE_API_URL` es opcional y por defecto apunta a `http://localhost:3001/api`.
+Ambas son obligatorias: `src/services/supabase/client.ts` lanza error al cargar si faltan.
+
+### Autenticación (Supabase Auth)
+
+Los emails de confirmación y de recuperación de contraseña vuelven a la app. En
+**Authentication → URL Configuration** del proyecto:
+
+- `Site URL`: el origen de la app (`http://localhost:5173` en desarrollo).
+- `Redirect URLs`: ese origen con comodín (`http://localhost:5173/**`).
+
+Al desplegar, añade el dominio de producción a ambas listas. El enlace de recuperación
+apunta a `/reset-password`: si la sesión temporal del enlace falta o caducó, la pantalla
+lo indica y ofrece pedir uno nuevo.
 
 ### Scripts
 

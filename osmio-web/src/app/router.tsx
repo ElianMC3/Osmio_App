@@ -3,6 +3,7 @@ import { DesktopLayout } from '../design-system/components/DesktopLayout'
 import { AuthGuard } from '../shared/components/AuthGuard'
 import { useAuth } from '../shared/hooks/useAuth'
 import LoginScreen from '../features/auth/screens/LoginScreen'
+import ResetPasswordScreen from '../features/auth/screens/ResetPasswordScreen'
 import InitialSetupWizard from '../features/onboarding/screens/InitialSetupWizard'
 import DashboardHoy from '../features/home/screens/DashboardHoy'
 import DisciplineSelector from '../features/logging/screens/DisciplineSelector'
@@ -47,6 +48,7 @@ export function AppRouter() {
     <Routes>
       <Route path="/" element={<RootRedirect />} />
       <Route path="/login" element={<LoginScreen />} />
+      <Route path="/reset-password" element={<ResetPasswordScreen />} />
       <Route path="/setup" element={<ProtectedRoute><InitialSetupWizard /></ProtectedRoute>} />
       <Route path="/dashboard" element={<ProtectedRoute><DashboardHoy /></ProtectedRoute>} />
       <Route path="/logging" element={<ProtectedRoute><DisciplineSelector /></ProtectedRoute>} />

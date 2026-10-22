@@ -43,6 +43,25 @@ export function useAuth() {
     await supabase.auth.signOut()
   }, [])
 
+  const resetPassword = useCallback(async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    })
+    // Supabase no distingue si el email existe: no hay enumeración de cuentas.
+    if (error) throw error
+  }, [])
+
+  const updatePassword = useCallback(async (password: string) => {
+    const { error } = await supabase.auth.updateUser({ password })
+    if (error) throw error
+    try {
+      // Si la cuenta estaba comprometida, invalida el resto de sesiones.
+      await supabase.auth.signOut({ scope: 'others' })
+    } catch {
+      // Best effort: el cambio de contraseña ya se aplicó.
+    }
+  }, [])
+
   return {
     user: state.user,
     loading: state.loading,
@@ -50,5 +69,7 @@ export function useAuth() {
     login,
     register,
     logout,
+    resetPassword,
+    updatePassword,
   }
 }
