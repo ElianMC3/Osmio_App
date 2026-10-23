@@ -173,7 +173,7 @@ export default function MyRoutine() {
         ) : (
           <>
             {/* Create Routine */}
-            <GreenCard variant="glass" padding="md" effects={false}>
+            <GreenCard variant="glass" padding="md">
               <div className="flex flex-col sm:flex-row gap-3">
                 <input
                   type="text"
@@ -201,7 +201,7 @@ export default function MyRoutine() {
 
             {/* Routines */}
             {routines.map((routine) => (
-              <GreenCard key={routine.id} variant="default" padding="none" effects={false} className="relative overflow-hidden">
+              <GreenCard key={routine.id} variant="default" padding="none" className="relative overflow-hidden">
                 <span className="gradient-hairline" />
                 <header className="p-4 border-b border-outline-variant/25 flex items-center justify-between gap-3 flex-wrap bg-gradient-to-r from-green/[0.04] to-transparent">
                   <div className="min-w-0">

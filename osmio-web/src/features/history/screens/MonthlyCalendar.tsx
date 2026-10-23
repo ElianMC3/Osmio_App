@@ -42,7 +42,7 @@ function DayDetailPanel({ day, year, month, onClose, disciplines }: DayDetailPan
   const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
 
   return (
-    <GreenCard variant="glass" padding="md" effects={true} className="flex flex-col gap-md">
+    <GreenCard variant="glass" padding="md" className="flex flex-col gap-md">
       <header className="border-b border-green/20 pb-sm">
         <div className="flex justify-between items-center">
           <h4 className=" font-label-caps text-label-caps text-green mb-xs">INTEL DE HOY</h4>
@@ -57,7 +57,7 @@ function DayDetailPanel({ day, year, month, onClose, disciplines }: DayDetailPan
           disciplines.map((disc) => (
             <GreenCard
               key={disc}
-              variant="default" padding="md" effects={true}
+              variant="default" padding="md"
               className="flex flex-col gap-sm"
             >
               <div className="flex justify-between items-start">

@@ -153,7 +153,6 @@ export default function ExercisePicker() {
                   key={ex.id}
                   variant="interactive"
                   padding="sm"
-                  effects
                   onClick={() => addToRoutine(ex)}
                   className="flex items-center gap-3 cursor-pointer relative overflow-hidden"
                 >

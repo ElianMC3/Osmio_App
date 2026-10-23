@@ -92,7 +92,6 @@ export default function DisciplineSelector() {
                   key={d.id}
                   onClick={() => setSelectedDiscipline(d.id)}
                   padding="md"
-                  effects
                   className="relative flex flex-col items-center justify-center gap-3 cursor-pointer"
                   style={
                     isSelected
@@ -159,7 +158,7 @@ export default function DisciplineSelector() {
           </div>
         </section>
 
-        <GreenCard variant="glass" padding="md" effects>
+        <GreenCard variant="glass" padding="md">
           <div className="space-y-3">
             <p className="flex items-center gap-2 font-label-caps text-[12px] leading-none tracking-[0.1em] text-text-muted uppercase">
               <span className="w-1.5 h-1.5 bg-acid inline-block rotate-45" />

@@ -66,7 +66,7 @@ export default function ExerciseHistory() {
 
         <main className="p-md pt-4 space-y-3">
           {!exerciseId ? (
-            <GreenCard variant="glass" padding="lg" effects={false} className="text-center">
+            <GreenCard variant="glass" padding="lg" className="text-center">
               <p className="font-label-caps text-sm text-text-muted mb-md">
                 Selecciona un ejercicio desde "Mi Rutina" o la sesión activa para ver su historial.
               </p>
@@ -95,7 +95,7 @@ export default function ExerciseHistory() {
                   const topReps = sets.length > 0 ? Math.max(...sets.map((s) => s.reps)) : 0
                   const avgRpe = sets.length > 0 ? Math.round((sets.reduce((acc, s) => acc + (s.rpe ?? 0), 0) / sets.length) * 10) / 10 : 0
                   return (
-                    <GreenCard key={session.id} variant="default" padding="md" effects={false} className="relative overflow-hidden">
+                    <GreenCard key={session.id} variant="default" padding="md" className="relative overflow-hidden">
                       <span className="gradient-hairline" />
                       <div className="flex justify-between items-center mb-3 flex-wrap gap-2">
                         <span className="font-label-caps text-xs text-text-muted flex items-center gap-2">

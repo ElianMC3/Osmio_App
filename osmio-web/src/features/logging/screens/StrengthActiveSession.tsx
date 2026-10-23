@@ -213,7 +213,7 @@ export default function StrengthActiveSession() {
         />
 
         <div className="flex items-center gap-3">
-          <GreenCard variant="default" padding="sm" effects className="flex-1 relative overflow-hidden">
+          <GreenCard variant="default" padding="sm" className="flex-1 relative overflow-hidden">
             <span className="gradient-hairline" />
             <span className="font-label-caps text-[10px] leading-none tracking-[0.1em] text-text-muted block">
               STATUS
@@ -222,7 +222,7 @@ export default function StrengthActiveSession() {
               {formatTime(elapsed)}
             </span>
           </GreenCard>
-          <GreenCard variant="default" padding="sm" effects className="text-right relative overflow-hidden">
+          <GreenCard variant="default" padding="sm" className="text-right relative overflow-hidden">
             <span className="gradient-hairline" />
             <span className="font-label-caps text-[10px] leading-none tracking-[0.1em] text-text-muted block">
               VOLUMEN
@@ -270,7 +270,7 @@ export default function StrengthActiveSession() {
         </div>
 
         {showNotes && (
-          <GreenCard variant="glass" padding="md" effects>
+          <GreenCard variant="glass" padding="md">
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
@@ -281,7 +281,7 @@ export default function StrengthActiveSession() {
         )}
 
         {exercises.map((exercise, exIndex) => (
-          <GreenCard key={exercise.id} variant="default" padding="none" effects className="relative overflow-hidden">
+          <GreenCard key={exercise.id} variant="default" padding="none" className="relative overflow-hidden">
             <span className="gradient-hairline" />
             <header className="p-4 flex items-center justify-between gap-3 border-b border-outline-variant/25 bg-gradient-to-r from-green/[0.05] to-transparent">
               <div className="flex items-center gap-3 min-w-0">

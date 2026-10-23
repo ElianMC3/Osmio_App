@@ -73,7 +73,7 @@ export default function CombatLogForm() {
           }
         />
 
-        <GreenCard variant="glass" padding="lg" effects>
+        <GreenCard variant="glass" padding="lg">
           <div className="space-y-6">
             <p className="flex items-center gap-2 font-label-caps text-[12px] leading-none tracking-[0.1em] text-text-muted uppercase">
               <span className="w-1.5 h-1.5 bg-green inline-block rotate-45" />
@@ -179,7 +179,7 @@ export default function CombatLogForm() {
           </div>
         </GreenCard>
 
-        <GreenCard variant="glass" padding="lg" effects>
+        <GreenCard variant="glass" padding="lg">
           <div className="space-y-3">
             <p className="flex items-center gap-2 font-label-caps text-[12px] leading-none tracking-[0.1em] text-text-muted uppercase">
               <span className="w-1.5 h-1.5 bg-acid inline-block rotate-45" />

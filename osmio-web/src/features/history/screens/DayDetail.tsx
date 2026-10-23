@@ -73,14 +73,14 @@ export default function DayDetail() {
       <div className="p-md space-y-lg">
         {/* Summary Section */}
         <div className="grid grid-cols-2 gap-sm">
-          <GreenCard variant="default" padding="md" effects={true} className="flex items-center gap-md">
+          <GreenCard variant="default" padding="md" className="flex items-center gap-md">
             <span className="material-symbols-outlined text-green text-2xl">groups</span>
             <div>
               <p className="font-label-caps text-[9px] text-text-muted uppercase">Total Sessions</p>
               <p className="font-label-caps text-headline-md text-text-green">{sessions.length}</p>
             </div>
           </GreenCard>
-          <GreenCard variant="default" padding="md" effects={true} className="flex items-center gap-md">
+          <GreenCard variant="default" padding="md" className="flex items-center gap-md">
             <span className="material-symbols-outlined text-green text-2xl">fitness_center</span>
             <div>
               <p className="font-label-caps text-[9px] text-text-muted uppercase">Total Volume</p>
@@ -95,7 +95,7 @@ export default function DayDetail() {
             <p className="font-label-caps text-sm text-text-muted animate-pulse">Cargando sesiones…</p>
           </div>
         ) : sessions.length === 0 ? (
-          <GreenCard variant="glass" padding="md" effects={true} className="flex justify-center py-10">
+          <GreenCard variant="glass" padding="md" className="flex justify-center py-10">
             <p className="font-label-caps text-sm text-text-muted">SIN SESIONES REGISTRADAS</p>
           </GreenCard>
         ) : sessions.map((session) => {
@@ -112,7 +112,7 @@ export default function DayDetail() {
           return (
             <GreenCard
               key={session.id}
-              variant="glass" padding="md" effects={true}
+              variant="glass" padding="md"
               className={`border-l-4 ${color}`}
             >
               <div className="flex justify-between items-start mb-md">
@@ -140,15 +140,15 @@ export default function DayDetail() {
 
               {!isStrength && (
                 <div className="grid grid-cols-3 gap-sm mb-md">
-                  <GreenCard variant="default" padding="sm" effects={true}>
+                  <GreenCard variant="default" padding="sm">
                     <p className="font-label-caps text-[8px] text-text-muted">ROUNDS</p>
                     <p className="font-label-caps text-data-display">{(session as CombatSession).rounds}</p>
                   </GreenCard>
-                  <GreenCard variant="default" padding="sm" effects={true}>
+                  <GreenCard variant="default" padding="sm">
                     <p className="font-label-caps text-[8px] text-text-muted">RPE</p>
                     <p className="font-label-caps text-data-display">{(session as CombatSession).rpe}</p>
                   </GreenCard>
-                  <GreenCard variant="default" padding="sm" effects={true}>
+                  <GreenCard variant="default" padding="sm">
                     <p className="font-label-caps text-[8px] text-text-muted">DURACIÓN</p>
                     <p className="font-label-caps text-data-display">{(session as CombatSession).durationMinutes}MIN</p>
                   </GreenCard>
@@ -156,7 +156,7 @@ export default function DayDetail() {
               )}
 
               {isStrength && totalVol > 0 && (
-                <GreenCard variant="default" padding="md" effects={true} className="mt-sm">
+                <GreenCard variant="default" padding="md" className="mt-sm">
                   <p className="font-label-caps text-[9px] text-text-muted mb-xs">TOTAL VOLUME</p>
                   <p className="font-label-caps text-display-lg text-green leading-none">
                     {totalVol.toLocaleString()}<span className="text-sm"> KG</span>
@@ -169,21 +169,21 @@ export default function DayDetail() {
 
         {/* Metrics Row */}
         <div className="grid grid-cols-3 gap-sm">
-          <GreenCard variant="default" padding="sm" effects={true} className="flex items-center gap-sm">
+          <GreenCard variant="default" padding="sm" className="flex items-center gap-sm">
             <span className="material-symbols-outlined text-text-muted text-lg">monitor_heart</span>
             <div>
               <p className="font-label-caps text-[8px] text-text-muted uppercase">SESIONES</p>
               <p className="font-label-caps text-sm text-text-green">{sessions.length}</p>
             </div>
           </GreenCard>
-          <GreenCard variant="default" padding="sm" effects={true} className="flex items-center gap-sm">
+          <GreenCard variant="default" padding="sm" className="flex items-center gap-sm">
             <span className="material-symbols-outlined text-text-muted text-lg">fitness_center</span>
             <div>
               <p className="font-label-caps text-[8px] text-text-muted uppercase">VOLUMEN TOTAL</p>
               <p className="font-label-caps text-sm text-text-green">{totalVolume.toLocaleString()} KG</p>
             </div>
           </GreenCard>
-          <GreenCard variant="default" padding="sm" effects={true} className="flex items-center gap-sm">
+          <GreenCard variant="default" padding="sm" className="flex items-center gap-sm">
             <span className="material-symbols-outlined text-text-muted text-lg">restaurant</span>
             <div>
               <p className="font-label-caps text-[8px] text-text-muted uppercase">KCAL CONSUMIDAS</p>
@@ -194,7 +194,7 @@ export default function DayDetail() {
 
         {/* Nutrition Summary */}
         {nutrition && (
-          <GreenCard variant="glass" padding="md" effects={true} className="relative overflow-hidden">
+          <GreenCard variant="glass" padding="md" className="relative overflow-hidden">
             <div className="flex justify-between items-center mb-md">
               <div className="flex items-center gap-md">
                 <div className="w-10 h-10 bg-green/10 border border-green flex items-center justify-center">

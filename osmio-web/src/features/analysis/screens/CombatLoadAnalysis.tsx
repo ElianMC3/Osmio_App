@@ -69,16 +69,16 @@ export default function CombatLoadAnalysis() {
           <AnalysisTabs active="carga" />
 
           <div className="grid grid-cols-3 gap-sm">
-            <GreenCard variant="default" padding="sm" effects className="relative overflow-hidden">
+            <GreenCard variant="default" padding="sm" className="relative overflow-hidden">
               <span className="gradient-hairline" />
               <span className="font-label-caps text-[9px] text-text-muted block uppercase">% vs Semana Ant.</span>
               <span className="font-label-caps text-[18px] text-text-green font-bold">{changePct >= 0 ? '+' : ''}{changePct}%</span>
             </GreenCard>
-            <GreenCard variant="default" padding="sm" effects>
+            <GreenCard variant="default" padding="sm">
               <span className="font-label-caps text-[9px] text-text-muted block uppercase">Promedio/Día</span>
               <span className="font-label-caps text-[18px] text-green-dim font-bold">{avgPerDay}</span>
             </GreenCard>
-            <GreenCard variant="default" padding="sm" effects>
+            <GreenCard variant="default" padding="sm">
               <span className="font-label-caps text-[9px] text-text-muted block uppercase">Diferencia</span>
               <span className="font-label-caps text-[18px] text-acid font-bold">
                 {changePct !== 0 ? (changePct >= 0 ? '+' : '') + changePct : '—'}
@@ -101,7 +101,7 @@ export default function CombatLoadAnalysis() {
             </div>
           </div>
 
-          <GreenCard padding="md" effects className="relative overflow-hidden">
+          <GreenCard padding="md" className="relative overflow-hidden">
             <span className="gradient-hairline" />
             <SectionHeader kicker="VOLUMEN TÁCTICO" title="Rounds por Semana" />
             <div className="flex items-end justify-between gap-md h-48 mt-md">
@@ -128,22 +128,22 @@ export default function CombatLoadAnalysis() {
           </GreenCard>
 
           <div className="grid grid-cols-3 gap-sm">
-            <GreenCard variant="default" padding="sm" effects>
+            <GreenCard variant="default" padding="sm">
               <span className="font-label-caps text-[9px] text-text-muted block uppercase">Total Rounds</span>
               <span className="font-label-caps text-[18px] text-text-green font-bold">{totalRounds}</span>
               <span className="font-label-caps text-[8px] text-text-green-dim">{changePct >= 0 ? '+' : ''}{changePct}% vs prev.</span>
             </GreenCard>
-            <GreenCard variant="default" padding="sm" effects>
+            <GreenCard variant="default" padding="sm">
               <span className="font-label-caps text-[9px] text-text-muted block uppercase">Weeks</span>
               <span className="font-label-caps text-[18px] text-text-green font-bold">{data?.roundsByWeek.length ?? 0}</span>
             </GreenCard>
-            <GreenCard variant="default" padding="sm" effects>
+            <GreenCard variant="default" padding="sm">
               <span className="font-label-caps text-[9px] text-text-muted block uppercase">Striking</span>
               <span className="font-label-caps text-[18px] text-text-green font-bold">{strikingTotal}</span>
             </GreenCard>
           </div>
 
-          <GreenCard padding="md" effects className="relative overflow-hidden">
+          <GreenCard padding="md" className="relative overflow-hidden">
             <span className="gradient-hairline" />
             <SectionHeader kicker="DISTRIBUCIÓN" title="Sparring vs Técnica" />
             <div className="space-y-md mt-md">
@@ -178,7 +178,7 @@ export default function CombatLoadAnalysis() {
           </GreenCard>
 
           <div className="grid grid-cols-1 gap-sm">
-            <GreenCard variant="default" padding="md" effects className="relative overflow-hidden">
+            <GreenCard variant="default" padding="md" className="relative overflow-hidden">
               <span className="gradient-hairline" />
               <div className="flex items-center gap-md">
                 <div className="p-md rounded-full border border-outline-variant/30 bg-gradient-to-br from-green/[0.12] to-transparent text-green shadow-[0_0_18px_color-mix(in_srgb,var(--green)_20%,transparent)]">
@@ -191,7 +191,7 @@ export default function CombatLoadAnalysis() {
                 </div>
               </div>
             </GreenCard>
-            <GreenCard variant="default" padding="md" effects className="relative overflow-hidden">
+            <GreenCard variant="default" padding="md" className="relative overflow-hidden">
               <span className="gradient-hairline" />
               <div className="flex items-center gap-md">
                 <div className="p-md rounded-full border border-outline-variant/30 bg-gradient-to-br from-green/[0.12] to-transparent text-green-dim shadow-[0_0_18px_color-mix(in_srgb,var(--outline)_20%,transparent)]">
@@ -206,7 +206,7 @@ export default function CombatLoadAnalysis() {
                 </div>
               </div>
             </GreenCard>
-            <GreenCard variant="default" padding="md" effects className="relative overflow-hidden">
+            <GreenCard variant="default" padding="md" className="relative overflow-hidden">
               <span className="gradient-hairline" />
               <div className="flex items-center gap-md">
                 <div className="p-md rounded-full border border-outline-variant/30 bg-gradient-to-br from-acid/[0.14] to-transparent text-acid shadow-[0_0_18px_color-mix(in_srgb,var(--acid)_20%,transparent)]">

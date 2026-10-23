@@ -4,7 +4,6 @@ interface GreenCardProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode
   variant?: 'default' | 'interactive' | 'glass'
   padding?: 'none' | 'sm' | 'md' | 'lg'
-  effects?: boolean
 }
 
 const variantStyles: Record<string, string> = {
@@ -22,7 +21,7 @@ const paddingStyles: Record<string, string> = {
 }
 
 export const GreenCard = forwardRef<HTMLDivElement, GreenCardProps>(
-  ({ variant = 'default', padding = 'md', effects = false, className = '', children, ...props }, ref) => {
+  ({ variant = 'default', padding = 'md', className = '', children, ...props }, ref) => {
     return (
       <div
         ref={ref}

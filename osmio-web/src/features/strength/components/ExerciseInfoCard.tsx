@@ -10,7 +10,7 @@ export default function ExerciseInfoCard({ exercise }: { exercise: Exercise }) {
   const muscle = exercise.target || exercise.muscleGroup
 
   return (
-    <GreenCard variant="glass" padding="md" effects={false}>
+    <GreenCard variant="glass" padding="md">
       <div className="flex flex-col sm:flex-row gap-4">
         {(gif || image) && (
           <div className="shrink-0 self-start w-full sm:w-40">

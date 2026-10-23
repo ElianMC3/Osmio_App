@@ -189,7 +189,7 @@ export default function StrengthAnalysis() {
             </div>
           </div>
 
-          <GreenCard padding="md" effects className="relative overflow-hidden">
+          <GreenCard padding="md" className="relative overflow-hidden">
             <span className="gradient-hairline" />
             <div className="mb-4">
               <SectionHeader kicker="LOAD INTENSITY" title="Volumen Semanal" />
@@ -227,15 +227,15 @@ export default function StrengthAnalysis() {
           </GreenCard>
 
           <div className="grid grid-cols-3 gap-sm">
-            <GreenCard variant="default" padding="sm" effects>
+            <GreenCard variant="default" padding="sm">
               <span className="font-label-caps text-[9px] text-text-muted block uppercase">Total Volume</span>
               <span className="font-label-caps text-[18px] text-text-green font-bold">{totalVolume.toLocaleString()} KG</span>
             </GreenCard>
-            <GreenCard variant="default" padding="sm" effects>
+            <GreenCard variant="default" padding="sm">
               <span className="font-label-caps text-[9px] text-text-muted block uppercase">Weeks</span>
               <span className="font-label-caps text-[18px] text-text-green font-bold">{data?.volumeByWeek.length ?? 0}</span>
             </GreenCard>
-            <GreenCard variant="default" padding="sm" effects>
+            <GreenCard variant="default" padding="sm">
               <span className="font-label-caps text-[9px] text-text-muted block uppercase">PRs</span>
               <span className="font-label-caps text-[18px] text-text-green font-bold">{prCount}</span>
             </GreenCard>
