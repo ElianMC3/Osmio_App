@@ -4,7 +4,7 @@
 // Supabase (que tiene un límite de tamaño por query).
 // Uso: node scripts/generate-seed.mjs [ruta_a_exercises.json]
 
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
