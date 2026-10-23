@@ -438,6 +438,15 @@
     display: block;
   }
 
+  /* Mientras baja el chunk de three.js y hasta que el canvas pinta la primera
+     textura. Tonos tomados de b1/b2 (casi negro con brillos grises) para que el
+     relevo al canvas no se note. */
+  .cyber-background-fallback {
+    background:
+      radial-gradient(115% 85% at 50% 0%, #17181b 0%, #0b0c0d 42%, #000 100%),
+      #000;
+  }
+
   .inner-glow {
     box-shadow: inset 0 0 12px color-mix(in srgb, var(--primary) 15%, transparent);
   }
