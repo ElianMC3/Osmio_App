@@ -1,5 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import 'lenis/dist/lenis.css'
 import './index.css'
 import { initTheme } from './design-system/theme'
 import App from './app/App'

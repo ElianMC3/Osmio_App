@@ -1,4 +1,6 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { AnimatePresence, motion } from 'motion/react'
+import { useLenis } from 'lenis/react'
 import { DesktopLayout } from '../design-system/components/DesktopLayout'
 import { AuthGuard } from '../shared/components/AuthGuard'
 import { useAuth } from '../shared/hooks/useAuth'
@@ -43,30 +45,56 @@ function RootRedirect() {
   return <Navigate to={isAuthenticated ? '/dashboard' : '/login'} replace />
 }
 
-export function AppRouter() {
+const pageTransition = {
+  initial: { opacity: 0, y: 6 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -4 },
+  transition: { duration: 0.18, ease: [0.25, 0.1, 0.25, 1] as const },
+}
+
+function AnimatedRoutes() {
+  const location = useLocation()
+  const lenis = useLenis()
+
+  const scrollToTop = () => {
+    if (lenis) {
+      lenis.scrollTo(0, { immediate: true })
+      return
+    }
+    window.scrollTo(0, 0)
+  }
+
   return (
-    <Routes>
-      <Route path="/" element={<RootRedirect />} />
-      <Route path="/login" element={<LoginScreen />} />
-      <Route path="/reset-password" element={<ResetPasswordScreen />} />
-      <Route path="/setup" element={<ProtectedRoute><InitialSetupWizard /></ProtectedRoute>} />
-      <Route path="/dashboard" element={<ProtectedRoute><DashboardHoy /></ProtectedRoute>} />
-      <Route path="/logging" element={<ProtectedRoute><DisciplineSelector /></ProtectedRoute>} />
-      <Route path="/logging/strength" element={<ProtectedRoute><StrengthActiveSession /></ProtectedRoute>} />
-      <Route path="/logging/strength/picker" element={<ProtectedRoute><ExercisePicker /></ProtectedRoute>} />
-      <Route path="/logging/strength/history" element={<ProtectedRoute><ExerciseHistory /></ProtectedRoute>} />
-      <Route path="/strength/routine" element={<ProtectedRoute><MyRoutine /></ProtectedRoute>} />
-      <Route path="/logging/combat" element={<ProtectedRoute><CombatLogForm /></ProtectedRoute>} />
-      <Route path="/analysis/strength" element={<ProtectedRoute><StrengthAnalysis /></ProtectedRoute>} />
-      <Route path="/analysis/combat" element={<ProtectedRoute><CombatLoadAnalysis /></ProtectedRoute>} />
-      <Route path="/analysis/consistency" element={<ProtectedRoute><ConsistencyMap /></ProtectedRoute>} />
-      <Route path="/history" element={<ProtectedRoute><MonthlyCalendar /></ProtectedRoute>} />
-      <Route path="/history/:date" element={<ProtectedRoute><DayDetail /></ProtectedRoute>} />
-      <Route path="/nutrition" element={<ProtectedRoute><NutritionDashboard /></ProtectedRoute>} />
-      <Route path="/nutrition/quick-add" element={<ProtectedRoute><QuickAddMeal /></ProtectedRoute>} />
-      <Route path="/nutrition/:date" element={<ProtectedRoute><DayNutritionDetail /></ProtectedRoute>} />
-      <Route path="/profile" element={<ProtectedRoute><ProfileSettings /></ProtectedRoute>} />
-      <Route path="/settings" element={<ProtectedRoute><SettingsScreen /></ProtectedRoute>} />
-    </Routes>
+    <AnimatePresence mode="wait" initial={false} onExitComplete={scrollToTop}>
+      <motion.div key={location.pathname} {...pageTransition} className="min-h-screen">
+        <Routes location={location}>
+          <Route path="/" element={<RootRedirect />} />
+          <Route path="/login" element={<LoginScreen />} />
+          <Route path="/reset-password" element={<ResetPasswordScreen />} />
+          <Route path="/setup" element={<ProtectedRoute><InitialSetupWizard /></ProtectedRoute>} />
+          <Route path="/dashboard" element={<ProtectedRoute><DashboardHoy /></ProtectedRoute>} />
+          <Route path="/logging" element={<ProtectedRoute><DisciplineSelector /></ProtectedRoute>} />
+          <Route path="/logging/strength" element={<ProtectedRoute><StrengthActiveSession /></ProtectedRoute>} />
+          <Route path="/logging/strength/picker" element={<ProtectedRoute><ExercisePicker /></ProtectedRoute>} />
+          <Route path="/logging/strength/history" element={<ProtectedRoute><ExerciseHistory /></ProtectedRoute>} />
+          <Route path="/strength/routine" element={<ProtectedRoute><MyRoutine /></ProtectedRoute>} />
+          <Route path="/logging/combat" element={<ProtectedRoute><CombatLogForm /></ProtectedRoute>} />
+          <Route path="/analysis/strength" element={<ProtectedRoute><StrengthAnalysis /></ProtectedRoute>} />
+          <Route path="/analysis/combat" element={<ProtectedRoute><CombatLoadAnalysis /></ProtectedRoute>} />
+          <Route path="/analysis/consistency" element={<ProtectedRoute><ConsistencyMap /></ProtectedRoute>} />
+          <Route path="/history" element={<ProtectedRoute><MonthlyCalendar /></ProtectedRoute>} />
+          <Route path="/history/:date" element={<ProtectedRoute><DayDetail /></ProtectedRoute>} />
+          <Route path="/nutrition" element={<ProtectedRoute><NutritionDashboard /></ProtectedRoute>} />
+          <Route path="/nutrition/quick-add" element={<ProtectedRoute><QuickAddMeal /></ProtectedRoute>} />
+          <Route path="/nutrition/:date" element={<ProtectedRoute><DayNutritionDetail /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><ProfileSettings /></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute><SettingsScreen /></ProtectedRoute>} />
+        </Routes>
+      </motion.div>
+    </AnimatePresence>
   )
+}
+
+export function AppRouter() {
+  return <AnimatedRoutes />
 }

@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { AnimatePresence, LayoutGroup, motion } from 'motion/react'
+import { useLenis } from 'lenis/react'
 import { useAuth } from '../../shared/hooks/useAuth'
 
 interface SidebarItem {
@@ -44,6 +46,7 @@ export function Sidebar({ className = '' }: SidebarProps) {
   const location = useLocation()
   const navigate = useNavigate()
   const { user, logout } = useAuth()
+  const lenis = useLenis()
   const [isOpen, setIsOpen] = useState(false)
   const [signingOut, setSigningOut] = useState(false)
 
@@ -72,11 +75,16 @@ export function Sidebar({ className = '' }: SidebarProps) {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
+      lenis?.stop()
     } else {
       document.body.style.overflow = ''
+      lenis?.start()
     }
-    return () => { document.body.style.overflow = '' }
-  }, [isOpen])
+    return () => {
+      document.body.style.overflow = ''
+      lenis?.start()
+    }
+  }, [isOpen, lenis])
 
   const isActivePath = (path: string) => {
     const basePath = path.startsWith('/analysis') ? '/analysis' : path
@@ -102,58 +110,75 @@ export function Sidebar({ className = '' }: SidebarProps) {
       </div>
 
       {/* Nav sections */}
-      <nav className="flex-1 min-h-0 overflow-y-auto scrollbar-thin px-3 mt-2">
-        {navSections.map((section) => (
-          <div key={section.label} className="mb-1">
-            <p className="font-label-caps text-[9px] text-on-surface-variant/70 tracking-[0.18em] px-3.5 pt-5 pb-2">
-              {section.label.toUpperCase()}
-            </p>
-            <div className="space-y-1">
-              {section.items.map(({ icon, label, path }) => {
-                const isActive = isActivePath(path)
-                return (
-                  <button
-                    key={`${path}-${label}`}
-                    onClick={() => { navigate(path); setIsOpen(false) }}
-                    aria-current={isActive ? 'page' : undefined}
-                    className={`group relative flex items-center gap-3 w-full text-left px-3.5 py-2.5 rounded-xl border transition-all duration-200
-                      focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary
-                      active:scale-[0.98] cursor-pointer ${
-                        isActive
-                          ? 'text-primary bg-primary/12 border-primary/25 shadow-[inset_0_0_20px_color-mix(in_srgb,var(--primary)_8%,transparent)]'
-                          : 'text-on-surface-variant border-transparent hover:text-on-surface hover:bg-surface-container-high'
-                      }`}
-                  >
-                    {isActive && (
-                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 rounded-r-full bg-gradient-to-b from-primary via-green to-acid" />
-                    )}
-                    <span
-                      className="material-symbols-outlined text-[20px] shrink-0 transition-transform duration-200 group-hover:scale-110"
-                      style={{ fontVariationSettings: isActive ? '"FILL" 1' : undefined }}
+      <nav className="flex-1 min-h-0 overflow-y-auto scrollbar-thin px-3 mt-2" data-lenis-prevent>
+        <LayoutGroup id="sidebar-nav">
+          {navSections.map((section) => (
+            <div key={section.label} className="mb-1">
+              <p className="font-label-caps text-[9px] text-on-surface-variant/70 tracking-[0.18em] px-3.5 pt-5 pb-2">
+                {section.label.toUpperCase()}
+              </p>
+              <div className="space-y-1">
+                {section.items.map(({ icon, label, path }) => {
+                  const isActive = isActivePath(path)
+                  return (
+                    <motion.button
+                      key={`${path}-${label}`}
+                      onClick={() => { navigate(path); setIsOpen(false) }}
+                      aria-current={isActive ? 'page' : undefined}
+                      whileHover={{ x: 2 }}
+                      whileTap={{ scale: 0.98 }}
+                      className={`group relative flex items-center gap-3 w-full text-left px-3.5 py-2.5 rounded-xl border transition-colors duration-200
+                        focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary
+                        cursor-pointer ${
+                          isActive
+                            ? 'text-primary border-primary/25'
+                            : 'text-on-surface-variant border-transparent hover:text-on-surface'
+                        }`}
                     >
-                      {icon}
-                    </span>
-                    <span className="font-label-caps text-xs truncate">{label}</span>
-                  </button>
-                )
-              })}
+                      {isActive && (
+                        <>
+                          <motion.span
+                            layoutId="sidebar-active-bg"
+                            className="absolute inset-0 rounded-xl bg-primary/12 shadow-[inset_0_0_20px_color-mix(in_srgb,var(--primary)_8%,transparent)]"
+                            transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                          />
+                          <motion.span
+                            layoutId="sidebar-active-indicator"
+                            className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 rounded-r-full bg-gradient-to-b from-primary via-green to-acid"
+                            transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                          />
+                        </>
+                      )}
+                      <span
+                        className="relative z-10 material-symbols-outlined text-[20px] shrink-0 transition-transform duration-200 group-hover:scale-110"
+                        style={{ fontVariationSettings: isActive ? '"FILL" 1' : undefined }}
+                      >
+                        {icon}
+                      </span>
+                      <span className="relative z-10 font-label-caps text-xs truncate">{label}</span>
+                    </motion.button>
+                  )
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </LayoutGroup>
       </nav>
 
       {/* CTA + user */}
       <div className="px-3 pt-4 space-y-3">
-        <button
+        <motion.button
           onClick={() => { navigate('/logging'); setIsOpen(false) }}
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.98 }}
           className="w-full py-3 rounded-xl bg-gradient-to-r from-primary via-green to-acid
             font-label-caps text-xs font-bold tracking-[0.18em] text-on-primary text-center
             shadow-[0_4px_24px_color-mix(in_srgb,var(--primary)_30%,transparent)]
-            hover:brightness-110 active:scale-[0.98] transition-all duration-200
+            hover:brightness-110 transition-all duration-200
             focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer"
         >
           LOG WORKOUT
-        </button>
+        </motion.button>
 
         <div className="flex items-center gap-3 rounded-xl bg-surface-container/70 border border-outline-variant/20 p-3">
           <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-acid flex items-center justify-center shrink-0">
@@ -196,10 +221,12 @@ export function Sidebar({ className = '' }: SidebarProps) {
   return (
     <>
       {/* Mobile Hamburger Button */}
-      <button
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
         className="fixed top-4 left-4 z-[60] lg:hidden p-2 bg-surface-container/80 backdrop-blur-xl
           border border-outline-variant/30 rounded-xl
-          hover:bg-surface-container-high transition-all duration-200
+          hover:bg-surface-container-high transition-colors duration-200
           focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
         onClick={() => setIsOpen(!isOpen)}
         aria-label={isOpen ? 'Cerrar menú' : 'Abrir menú'}
@@ -208,16 +235,39 @@ export function Sidebar({ className = '' }: SidebarProps) {
         <span className="material-symbols-outlined text-on-surface">
           {isOpen ? 'close' : 'menu'}
         </span>
-      </button>
+      </motion.button>
 
-      {/* Mobile Overlay */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-scrim/50 backdrop-blur-sm lg:hidden"
-          onClick={() => setIsOpen(false)}
-          aria-hidden="true"
-        />
-      )}
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            {/* Mobile Overlay */}
+            <motion.div
+              key="sidebar-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-40 bg-scrim/50 backdrop-blur-sm lg:hidden"
+              onClick={() => setIsOpen(false)}
+              aria-hidden="true"
+            />
+
+            {/* Mobile Sidebar */}
+            <motion.aside
+              key="mobile-sidebar"
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', stiffness: 320, damping: 34 }}
+              className={`fixed inset-y-0 left-0 z-50 flex flex-col w-72 rounded-r-2xl bg-surface-container/95 backdrop-blur-2xl border-r border-outline-variant/25 shadow-2xl lg:hidden ${className}`}
+              role="navigation"
+              aria-label="Mobile navigation"
+            >
+              <div className="w-full h-full flex flex-col">{navContent}</div>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Desktop Sidebar */}
       <aside
@@ -228,18 +278,6 @@ export function Sidebar({ className = '' }: SidebarProps) {
         <div className="w-full h-full rounded-2xl bg-surface-container/70 backdrop-blur-2xl border border-outline-variant/25 shadow-2xl overflow-hidden flex flex-col">
           {navContent}
         </div>
-      </aside>
-
-      {/* Mobile Sidebar */}
-      <aside
-        className={`fixed inset-y-0 left-0 z-50 flex flex-col w-72 rounded-r-2xl bg-surface-container/95 backdrop-blur-2xl border-r border-outline-variant/25 shadow-2xl transform transition-transform duration-300 ease-in-out lg:hidden ${className} ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
-        role="navigation"
-        aria-label="Mobile navigation"
-        aria-hidden={!isOpen}
-      >
-        <div className="w-full h-full flex flex-col">{navContent}</div>
       </aside>
     </>
   )

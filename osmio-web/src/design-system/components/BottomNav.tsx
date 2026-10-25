@@ -1,5 +1,6 @@
 import { Home, Dumbbell, BarChart3, Utensils, Calendar, User } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { motion } from 'motion/react'
 
 interface NavItem {
   icon: typeof Home
@@ -33,28 +34,38 @@ export function BottomNav({ items = navItems, className = '' }: BottomNavProps) 
     >
       {items.map(({ icon: Icon, label, path }) => {
         const basePath = path.startsWith('/analysis') ? '/analysis' : path
-        const isActive = location.pathname === path || (basePath !== '/dashboard' && location.pathname.startsWith(basePath))
+        const isActive =
+          location.pathname === path || (basePath !== '/dashboard' && location.pathname.startsWith(basePath))
         return (
-          <button
+          <motion.button
             key={path}
             onClick={() => navigate(path)}
             aria-label={label}
+            whileTap={{ scale: 0.95 }}
             className={`
-              flex flex-col items-center pt-2 gap-1 flex-1
-              transition-all duration-200 cursor-pointer
-              active:scale-[0.98]
+              relative flex flex-col items-center pt-2 gap-1 flex-1
+              transition-colors duration-200 cursor-pointer
               focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary
-              ${
-                isActive
-                  ? 'text-on-surface border-t-2 border-on-surface'
-                  : 'text-on-surface-variant hover:text-on-surface'
-              }
+              ${isActive ? 'text-on-surface' : 'text-on-surface-variant hover:text-on-surface'}
             `}
             aria-current={isActive ? 'page' : undefined}
           >
-            <Icon size={22} />
+            {isActive && (
+              <motion.span
+                layoutId="bottomnav-active"
+                className="absolute top-0 h-0.5 w-8 bg-gradient-to-r from-primary via-green to-acid"
+                transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+              />
+            )}
+            <motion.span
+              animate={{ scale: isActive ? 1.05 : 1, y: isActive ? -1 : 0 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className="flex items-center justify-center"
+            >
+              <Icon size={22} />
+            </motion.span>
             <span className="font-label-sm text-label-sm uppercase">{label}</span>
-          </button>
+          </motion.button>
         )
       })}
     </nav>

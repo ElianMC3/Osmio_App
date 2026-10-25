@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { motion } from 'motion/react'
 import { nutritionApi } from '@/services/api/nutrition.api'
 import NutritionRecommendationCard from '../components/NutritionRecommendationCard'
 import type { DailyNutrition } from '@/shared/types/nutrition.types'
@@ -73,24 +74,34 @@ export default function NutritionDashboard() {
             Monitoreo táctico de macronutrientes e ingesta energética
           </p>
         </div>
-        <div className="flex items-center gap-2 bg-surface-container-low p-1 border border-outline-variant/40 rounded-xl">
+        <div className="relative flex items-center gap-2 bg-surface-container-low p-1 border border-outline-variant/40 rounded-xl">
           {[
             { key: 'dashboard', label: 'Diario', path: '/nutrition' },
             { key: 'quick', label: 'Registro Rápido', path: '/nutrition/quick-add' },
             { key: 'detail', label: 'Detalle del Día', path: '/nutrition/today' },
-          ].map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => navigate(tab.path)}
-              className={`px-4 py-2 font-label-caps text-xs rounded-lg transition-all active:scale-[0.98] cursor-pointer ${
-                tab.key === 'dashboard'
-                  ? 'bg-primary-fixed text-on-primary-fixed font-bold shadow-md'
-                  : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/50'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+          ].map((tab) => {
+            const isActive = tab.key === 'dashboard'
+            return (
+              <button
+                key={tab.key}
+                onClick={() => navigate(tab.path)}
+                className={`relative px-4 py-2 font-label-caps text-xs rounded-lg transition-colors active:scale-[0.98] cursor-pointer z-10 ${
+                  isActive
+                    ? 'text-on-primary-fixed font-bold'
+                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/50'
+                }`}
+              >
+                {isActive && (
+                  <motion.div
+                    layoutId="nutrition-tab-indicator"
+                    className="absolute inset-0 rounded-lg bg-primary-fixed shadow-md"
+                    transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                  />
+                )}
+                <span className="relative z-10">{tab.label}</span>
+              </button>
+            )
+          })}
         </div>
       </div>
 

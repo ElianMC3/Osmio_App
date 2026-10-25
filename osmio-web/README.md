@@ -16,6 +16,7 @@ Construida con React 19, TypeScript, Vite, Tailwind CSS v4 y Supabase (PostgreSQ
 | Estilos | Tailwind CSS v4 (tokens en `@theme`, sin config JS) |
 | Iconos | lucide-react |
 | Estado | Zustand |
+| Animaciones | Motion (`motion/react`) + Lenis (scroll suave) |
 | 3D / efectos | Three.js (`CyberBackground`) |
 | Datos / Auth | Supabase (PostgreSQL, Auth, RLS) |
 | Lint | oxlint |
@@ -197,6 +198,8 @@ Componentes base reutilizables: `Button`, `Card`, `GreenCard`, `GreenButton`, `G
 
 `AnalysisTabs` implementa las pestañas de la sección de análisis.
 
+Las animaciones de tabs, botones y navegación usan `motion/react` (indicadores con `layoutId`, `AnimatePresence` en el sidebar móvil y transiciones entre rutas). El scroll suave lo aporta `SmoothScroll` (`src/shared/components/SmoothScroll.tsx`), que monta Lenis sobre el scroll de la ventana, sincroniza su loop con Motion y se desactiva con `prefers-reduced-motion`. Al cambiar de ruta, la posición vuelve al inicio.
+
 ---
 
 ## Convenciones
@@ -213,7 +216,7 @@ Componentes base reutilizables: `Button`, `Card`, `GreenCard`, `GreenButton`, `G
 - La cadena de migraciones se puede reconstruir desde cero: `000` → `001` → `002` → `003` → `004` → `005` → `006`
 - Migraciones `004`, `005` y `006` aplicadas y verificadas en el proyecto de Supabase
 - `FINAL FOOD DATASET` en revisión para sustituir la base local de alimentos
-- Sin suite de tests configurada (solo `lint` + `tsc` + `build` en CI)
+- Suite de tests con Vitest (`npm test`); CI ejecuta `lint`, `typecheck`, `test` y `build`
 
 ---
 
