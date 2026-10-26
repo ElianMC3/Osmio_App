@@ -1,6 +1,7 @@
 import { type ReactNode } from 'react'
-import { Navigate, useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import { Redirect } from './Redirect'
 
 interface AuthGuardProps {
   children: ReactNode
@@ -19,7 +20,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />
+    return <Redirect to="/login" state={{ from: location }} replace />
   }
 
   return <>{children}</>

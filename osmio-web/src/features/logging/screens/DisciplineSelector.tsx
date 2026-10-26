@@ -6,6 +6,7 @@ import { GreenTag } from '../../../design-system/components/GreenTag'
 import { PageBackdrop } from '../../../design-system/components/PageBackdrop'
 import { PageHeader } from '../../../design-system/components/PageHeader'
 import { SectionHeader } from '../../../design-system/components/SectionHeader'
+import { Gallery3D } from '../../../design-system/components/Gallery3D'
 
 type Discipline = 'fuerza' | 'striking' | 'grappling'
 type TrainingType = 'tecnica' | 'fisica' | 'sparring'
@@ -15,10 +16,29 @@ const disciplines: {
   label: string
   icon: string
   subtitle: string
+  image: string
 }[] = [
-  { id: 'striking', label: 'Striking', icon: 'sports_mma', subtitle: 'Boxeo, Muay Thai, Kickboxing' },
-  { id: 'fuerza', label: 'Mixed', icon: 'swords', subtitle: 'Fuerza + Combate integrado' },
-  { id: 'grappling', label: 'Grappling', icon: 'front_hand', subtitle: 'BJJ, Lucha, Submission' },
+  {
+    id: 'striking',
+    label: 'Striking',
+    icon: 'sports_mma',
+    subtitle: 'Boxeo, Muay Thai, Kickboxing',
+    image: '/backgrounds/discipline-striking.jpeg',
+  },
+  {
+    id: 'fuerza',
+    label: 'Mixed',
+    icon: 'swords',
+    subtitle: 'Fuerza + Combate integrado',
+    image: '/backgrounds/discipline-fuerza.jpeg',
+  },
+  {
+    id: 'grappling',
+    label: 'Grappling',
+    icon: 'front_hand',
+    subtitle: 'BJJ, Lucha, Submission',
+    image: '/backgrounds/discipline-grappling.jpeg',
+  },
 ]
 
 const trainingTypes: {
@@ -84,55 +104,103 @@ export default function DisciplineSelector() {
 
         <section className="space-y-4">
           <SectionHeader kicker="01 · Disciplina" title="Qué vas a entrenar" />
-          <div className="grid grid-cols-3 gap-3">
-            {disciplines.map((d) => {
-              const isSelected = selectedDiscipline === d.id
-              return (
-                <GreenCard
-                  key={d.id}
-                  onClick={() => setSelectedDiscipline(d.id)}
-                  padding="md"
-                  className="relative flex flex-col items-center justify-center gap-3 cursor-pointer"
-                  style={
-                    isSelected
-                      ? {
-                          boxShadow:
-                            '0 0 0 1px color-mix(in srgb, var(--green) 45%, transparent), 0 0 30px color-mix(in srgb, var(--green) 22%, transparent)',
-                        }
-                      : undefined
-                  }
+          <Gallery3D
+            items={disciplines}
+            getKey={(discipline) => discipline.id}
+            getLabel={(discipline) => `Seleccionar ${discipline.label}`}
+            ariaLabel="Galería de disciplinas"
+            hint="Desliza o usa ← → para elegir modalidad"
+            selectionMode
+            selectedKey={selectedDiscipline}
+            onSelect={(discipline) => setSelectedDiscipline(discipline.id)}
+            cardWidthClassName="w-[268px] sm:w-[300px]"
+            viewportClassName="h-[300px] sm:h-[320px]"
+            cardClassName={(_, { selected }) =>
+              `h-[236px] transition-[border-color,box-shadow] duration-300 sm:h-[252px] ${
+                selected
+                  ? 'border-green/50 ring-green/30 shadow-[0_0_0_1px_color-mix(in_srgb,var(--green)_45%,transparent),0_0_40px_color-mix(in_srgb,var(--green)_22%,transparent)]'
+                  : ''
+              }`
+            }
+            renderCard={(discipline, { index, selected }) => (
+              <>
+                {/* Fallback si la imagen no existe: degradado del diseño original */}
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-surface-container-high via-panel to-black/60" />
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                  style={{ backgroundImage: `url('${discipline.image}')` }}
+                />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/95 via-black/55 to-black/15" />
+                <div
+                  className={`pointer-events-none absolute inset-0 transition-colors duration-300 ${
+                    selected ? 'bg-green/20' : 'bg-transparent'
+                  }`}
+                />
+
+                <span
+                  aria-hidden="true"
+                  className={`pointer-events-none absolute -right-8 -top-10 material-symbols-outlined text-[168px] leading-none transition-colors duration-300 ${
+                    selected ? 'text-green/15' : 'text-white/[0.06]'
+                  }`}
                 >
-                  {isSelected && <span className="gradient-hairline" />}
+                  {discipline.icon}
+                </span>
+
+                <span className="pointer-events-none absolute left-5 top-3 font-mono text-[11px] tracking-[0.25em] text-white/50">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+
+                {selected && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-black/55 text-green ring-1 ring-green/40"
+                  >
+                    <span
+                      className="material-symbols-outlined text-[18px]"
+                      style={{ fontVariationSettings: '"FILL" 1' }}
+                    >
+                      check_circle
+                    </span>
+                  </span>
+                )}
+
+                <div className="relative flex h-full flex-col p-5">
                   <div
-                    className={`flex items-center justify-center w-12 h-12 rounded-xl border transition-all duration-300 ${
-                      isSelected
-                        ? 'bg-green/10 border-green/40 text-green shadow-[0_0_18px_color-mix(in_srgb,var(--green)_30%,transparent)]'
-                        : 'bg-surface-container-high/60 border-outline-variant/40 text-text-muted'
+                    className={`grid h-12 w-12 place-items-center rounded-xl border transition-all duration-300 ${
+                      selected
+                        ? 'bg-green/15 border-green/50 text-green shadow-[0_0_18px_color-mix(in_srgb,var(--green)_30%,transparent)]'
+                        : 'bg-black/45 border-white/15 text-white/75'
                     }`}
                   >
                     <span
                       className="material-symbols-outlined text-[26px]"
-                      style={isSelected ? { fontVariationSettings: '"FILL" 1' } : undefined}
+                      style={selected ? { fontVariationSettings: '"FILL" 1' } : undefined}
                     >
-                      {d.icon}
+                      {discipline.icon}
                     </span>
                   </div>
-                  <div className="text-center">
+
+                  <div className="mt-auto">
                     <span
-                      className={`font-label-caps text-[12px] leading-none tracking-[0.1em] uppercase ${
-                        isSelected ? 'text-text-green' : 'text-text-muted'
+                      className={`font-label-caps text-[13px] leading-none tracking-[0.12em] uppercase transition-colors duration-300 ${
+                        selected ? 'text-text-green' : 'text-white drop-shadow-[0_1px_8px_rgba(0,0,0,0.8)]'
                       }`}
                     >
-                      {d.label}
+                      {discipline.label}
                     </span>
-                    <p className="font-label-sm text-[11px] leading-none text-text-muted mt-1.5 opacity-70">
-                      {d.subtitle}
+                    <p
+                      className={`mt-2 font-label-sm text-[11px] leading-snug ${
+                        selected ? 'text-white/80' : 'text-white/65'
+                      }`}
+                    >
+                      {discipline.subtitle}
                     </p>
                   </div>
-                </GreenCard>
-              )
-            })}
-          </div>
+                </div>
+              </>
+            )}
+          />
         </section>
 
         <section className="space-y-4">

@@ -1,7 +1,8 @@
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'
 import { useLenis } from 'lenis/react'
 import { DesktopLayout } from '../design-system/components/DesktopLayout'
+import { Redirect } from '../shared/components/Redirect'
 import { AuthGuard } from '../shared/components/AuthGuard'
 import { useAuth } from '../shared/hooks/useAuth'
 import LoginScreen from '../features/auth/screens/LoginScreen'
@@ -42,7 +43,7 @@ function RootRedirect() {
       </div>
     )
   }
-  return <Navigate to={isAuthenticated ? '/dashboard' : '/login'} replace />
+  return <Redirect to={isAuthenticated ? '/dashboard' : '/login'} replace />
 }
 
 const pageTransition = {
