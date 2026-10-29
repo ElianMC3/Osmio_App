@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from 'react-router-dom'
+import { Routes, Route, useLocation, useOutlet } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'
 import { useLenis } from 'lenis/react'
 import { Skeleton } from 'boneyard-js/react'
@@ -28,14 +28,6 @@ import DayNutritionDetail from '../features/nutrition/screens/DayNutritionDetail
 import ProfileSettings from '../features/profile/screens/ProfileSettings'
 import SettingsScreen from '../features/settings/screens/SettingsScreen'
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  return (
-    <AuthGuard>
-      <DesktopLayout>{children}</DesktopLayout>
-    </AuthGuard>
-  )
-}
-
 function RootRedirect() {
   const { isAuthenticated, loading } = useAuth()
   if (loading) {
@@ -63,9 +55,15 @@ const pageTransition = {
   transition: { duration: 0.18, ease: [0.25, 0.1, 0.25, 1] as const },
 }
 
-function AnimatedRoutes() {
+/**
+ * Outlet animado: congela el elemento de la ruta saliente con `useOutlet()`
+ * para que AnimatePresence reproduzca la salida sin que La ruta nueva
+ * se cuele dentro del subtree en salida.
+ */
+function PageOutlet() {
   const location = useLocation()
   const lenis = useLenis()
+  const outlet = useOutlet()
 
   const scrollToTop = () => {
     if (lenis) {
@@ -77,32 +75,55 @@ function AnimatedRoutes() {
 
   return (
     <AnimatePresence mode="wait" initial={false} onExitComplete={scrollToTop}>
-      <motion.div key={location.pathname} {...pageTransition} className="min-h-screen">
-        <Routes location={location}>
-          <Route path="/" element={<RootRedirect />} />
-          <Route path="/login" element={<LoginScreen />} />
-          <Route path="/reset-password" element={<ResetPasswordScreen />} />
-          <Route path="/setup" element={<ProtectedRoute><InitialSetupWizard /></ProtectedRoute>} />
-          <Route path="/dashboard" element={<ProtectedRoute><DashboardHoy /></ProtectedRoute>} />
-          <Route path="/logging" element={<ProtectedRoute><DisciplineSelector /></ProtectedRoute>} />
-          <Route path="/logging/strength" element={<ProtectedRoute><StrengthActiveSession /></ProtectedRoute>} />
-          <Route path="/logging/strength/picker" element={<ProtectedRoute><ExercisePicker /></ProtectedRoute>} />
-          <Route path="/logging/strength/history" element={<ProtectedRoute><ExerciseHistory /></ProtectedRoute>} />
-          <Route path="/strength/routine" element={<ProtectedRoute><MyRoutine /></ProtectedRoute>} />
-          <Route path="/logging/combat" element={<ProtectedRoute><CombatLogForm /></ProtectedRoute>} />
-          <Route path="/analysis/strength" element={<ProtectedRoute><StrengthAnalysis /></ProtectedRoute>} />
-          <Route path="/analysis/combat" element={<ProtectedRoute><CombatLoadAnalysis /></ProtectedRoute>} />
-          <Route path="/analysis/consistency" element={<ProtectedRoute><ConsistencyMap /></ProtectedRoute>} />
-          <Route path="/history" element={<ProtectedRoute><MonthlyCalendar /></ProtectedRoute>} />
-          <Route path="/history/:date" element={<ProtectedRoute><DayDetail /></ProtectedRoute>} />
-          <Route path="/nutrition" element={<ProtectedRoute><NutritionDashboard /></ProtectedRoute>} />
-          <Route path="/nutrition/quick-add" element={<ProtectedRoute><QuickAddMeal /></ProtectedRoute>} />
-          <Route path="/nutrition/:date" element={<ProtectedRoute><DayNutritionDetail /></ProtectedRoute>} />
-          <Route path="/profile" element={<ProtectedRoute><ProfileSettings /></ProtectedRoute>} />
-          <Route path="/settings" element={<ProtectedRoute><SettingsScreen /></ProtectedRoute>} />
-        </Routes>
+      <motion.div key={location.pathname} {...pageTransition} className="min-h-dvh">
+        {outlet}
       </motion.div>
     </AnimatePresence>
+  )
+}
+
+/**
+ * Shell persistente: AuthGuard + DesktopLayout + Outlet animado en una ruta
+ * de layout sin path. El chrome (Header, tab bar, cápsula flotante, sidebar)
+ * se monta una vez y sobrevive a los cambios de ruta; solo la página transita.
+ */
+function AppShell() {
+  return (
+    <AuthGuard>
+      <DesktopLayout>
+        <PageOutlet />
+      </DesktopLayout>
+    </AuthGuard>
+  )
+}
+
+function AnimatedRoutes() {
+  return (
+    <Routes>
+      <Route path="/" element={<RootRedirect />} />
+      <Route path="/login" element={<LoginScreen />} />
+      <Route path="/reset-password" element={<ResetPasswordScreen />} />
+      <Route element={<AppShell />}>
+        <Route path="/setup" element={<InitialSetupWizard />} />
+        <Route path="/dashboard" element={<DashboardHoy />} />
+        <Route path="/logging" element={<DisciplineSelector />} />
+        <Route path="/logging/strength" element={<StrengthActiveSession />} />
+        <Route path="/logging/strength/picker" element={<ExercisePicker />} />
+        <Route path="/logging/strength/history" element={<ExerciseHistory />} />
+        <Route path="/strength/routine" element={<MyRoutine />} />
+        <Route path="/logging/combat" element={<CombatLogForm />} />
+        <Route path="/analysis/strength" element={<StrengthAnalysis />} />
+        <Route path="/analysis/combat" element={<CombatLoadAnalysis />} />
+        <Route path="/analysis/consistency" element={<ConsistencyMap />} />
+        <Route path="/history" element={<MonthlyCalendar />} />
+        <Route path="/history/:date" element={<DayDetail />} />
+        <Route path="/nutrition" element={<NutritionDashboard />} />
+        <Route path="/nutrition/quick-add" element={<QuickAddMeal />} />
+        <Route path="/nutrition/:date" element={<DayNutritionDetail />} />
+        <Route path="/profile" element={<ProfileSettings />} />
+        <Route path="/settings" element={<SettingsScreen />} />
+      </Route>
+    </Routes>
   )
 }
 

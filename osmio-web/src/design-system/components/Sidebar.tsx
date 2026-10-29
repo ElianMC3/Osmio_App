@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { AnimatePresence, LayoutGroup, motion } from 'motion/react'
-import { useLenis } from 'lenis/react'
+import { LayoutGroup, motion } from 'motion/react'
 import { useAuth } from '../../shared/hooks/useAuth'
 
 interface SidebarItem {
@@ -46,45 +45,13 @@ export function Sidebar({ className = '' }: SidebarProps) {
   const location = useLocation()
   const navigate = useNavigate()
   const { user, logout } = useAuth()
-  const lenis = useLenis()
-  const [isOpen, setIsOpen] = useState(false)
   const [signingOut, setSigningOut] = useState(false)
-
-  // Close menu on route change
-  useEffect(() => {
-    setIsOpen(false)
-  }, [location.pathname])
 
   const handleLogout = async () => {
     setSigningOut(true)
-    setIsOpen(false)
     await logout()
     navigate('/login', { replace: true })
   }
-
-  // Close on escape key
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsOpen(false)
-    }
-    document.addEventListener('keydown', handleEscape)
-    return () => document.removeEventListener('keydown', handleEscape)
-  }, [])
-
-  // Prevent body scroll when mobile menu is open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden'
-      lenis?.stop()
-    } else {
-      document.body.style.overflow = ''
-      lenis?.start()
-    }
-    return () => {
-      document.body.style.overflow = ''
-      lenis?.start()
-    }
-  }, [isOpen, lenis])
 
   const isActivePath = (path: string) => {
     const basePath = path.startsWith('/analysis') ? '/analysis' : path
@@ -94,191 +61,135 @@ export function Sidebar({ className = '' }: SidebarProps) {
     )
   }
 
-  const navContent = (
-    <div className="flex flex-col flex-1 min-h-0">
-      {/* Brand */}
-      <div className="flex items-center gap-3 px-5 pt-6 pb-2">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary via-green to-acid flex items-center justify-center shadow-[0_0_24px_color-mix(in_srgb,var(--primary)_35%,transparent)]">
-          <span className="material-symbols-outlined text-xl text-on-primary" style={{ fontVariationSettings: '"FILL" 1' }}>
-            fitness_center
-          </span>
-        </div>
-        <div className="min-w-0">
-          <p className="font-data-display text-lg font-bold tracking-tight text-on-surface leading-none">OSMIO</p>
-          <p className="font-label-caps text-[9px] text-on-surface-variant tracking-[0.2em] mt-1">COMBAT INTEL</p>
-        </div>
-      </div>
+  return (
+    <aside
+      className={`hidden lg:flex h-dvh w-72 fixed left-0 top-0 z-40 p-3 pb-4 ${className}`}
+      role="navigation"
+      aria-label="Main navigation"
+    >
+      <div className="w-full h-full rounded-2xl bg-surface-container/70 backdrop-blur-2xl border border-outline-variant/25 shadow-2xl overflow-hidden flex flex-col">
+        <div className="flex flex-col flex-1 min-h-0">
+          {/* Brand */}
+          <div className="flex items-center gap-3 px-5 pt-6 pb-2">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary via-green to-acid flex items-center justify-center shadow-[0_0_24px_color-mix(in_srgb,var(--primary)_35%,transparent)]">
+              <span className="material-symbols-outlined text-xl text-on-primary" style={{ fontVariationSettings: '"FILL" 1' }}>
+                fitness_center
+              </span>
+            </div>
+            <div className="min-w-0">
+              <p className="font-data-display text-lg font-bold tracking-tight text-on-surface leading-none">OSMIO</p>
+              <p className="font-label-caps text-[9px] text-on-surface-variant tracking-[0.2em] mt-1">COMBAT INTEL</p>
+            </div>
+          </div>
 
-      {/* Nav sections */}
-      <nav className="flex-1 min-h-0 overflow-y-auto scrollbar-thin px-3 mt-2" data-lenis-prevent>
-        <LayoutGroup id="sidebar-nav">
-          {navSections.map((section) => (
-            <div key={section.label} className="mb-1">
-              <p className="font-label-caps text-[9px] text-on-surface-variant/70 tracking-[0.18em] px-3.5 pt-5 pb-2">
-                {section.label.toUpperCase()}
-              </p>
-              <div className="space-y-1">
-                {section.items.map(({ icon, label, path }) => {
-                  const isActive = isActivePath(path)
-                  return (
-                    <motion.button
-                      key={`${path}-${label}`}
-                      onClick={() => { navigate(path); setIsOpen(false) }}
-                      aria-current={isActive ? 'page' : undefined}
-                      whileHover={{ x: 2 }}
-                      whileTap={{ scale: 0.98 }}
-                      className={`group relative flex items-center gap-3 w-full text-left px-3.5 py-2.5 rounded-xl border transition-colors duration-200
-                        focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary
-                        cursor-pointer ${
-                          isActive
-                            ? 'text-primary border-primary/25'
-                            : 'text-on-surface-variant border-transparent hover:text-on-surface'
-                        }`}
-                    >
-                      {isActive && (
-                        <>
-                          <motion.span
-                            layoutId="sidebar-active-bg"
-                            className="absolute inset-0 rounded-xl bg-primary/12 shadow-[inset_0_0_20px_color-mix(in_srgb,var(--primary)_8%,transparent)]"
-                            transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                          />
-                          <motion.span
-                            layoutId="sidebar-active-indicator"
-                            className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 rounded-r-full bg-gradient-to-b from-primary via-green to-acid"
-                            transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                          />
-                        </>
-                      )}
-                      <span
-                        className="relative z-10 material-symbols-outlined text-[20px] shrink-0 transition-transform duration-200 group-hover:scale-110"
-                        style={{ fontVariationSettings: isActive ? '"FILL" 1' : undefined }}
-                      >
-                        {icon}
-                      </span>
-                      <span className="relative z-10 font-label-caps text-xs truncate">{label}</span>
-                    </motion.button>
-                  )
-                })}
+          {/* Nav sections */}
+          <nav className="flex-1 min-h-0 overflow-y-auto scrollbar-thin px-3 mt-2" data-lenis-prevent>
+            <LayoutGroup id="sidebar-nav">
+              {navSections.map((section) => (
+                <div key={section.label} className="mb-1">
+                  <p className="font-label-caps text-[9px] text-on-surface-variant/70 tracking-[0.18em] px-3.5 pt-5 pb-2">
+                    {section.label.toUpperCase()}
+                  </p>
+                  <div className="space-y-1">
+                    {section.items.map(({ icon, label, path }) => {
+                      const isActive = isActivePath(path)
+                      return (
+                        <motion.button
+                          key={`${path}-${label}`}
+                          onClick={() => navigate(path)}
+                          aria-current={isActive ? 'page' : undefined}
+                          whileHover={{ x: 2 }}
+                          whileTap={{ scale: 0.98 }}
+                          className={`group relative flex items-center gap-3 w-full text-left px-3.5 py-2.5 rounded-xl border transition-colors duration-200
+                            focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary
+                            cursor-pointer ${
+                              isActive
+                                ? 'text-primary border-primary/25'
+                                : 'text-on-surface-variant border-transparent hover:text-on-surface'
+                            }`}
+                        >
+                          {isActive && (
+                            <>
+                              <motion.span
+                                layoutId="sidebar-active-bg"
+                                className="absolute inset-0 rounded-xl bg-primary/12 shadow-[inset_0_0_20px_color-mix(in_srgb,var(--primary)_8%,transparent)]"
+                                transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                              />
+                              <motion.span
+                                layoutId="sidebar-active-indicator"
+                                className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 rounded-r-full bg-gradient-to-b from-primary via-green to-acid"
+                                transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                              />
+                            </>
+                          )}
+                          <span
+                            className="relative z-10 material-symbols-outlined text-[20px] shrink-0 transition-transform duration-200 group-hover:scale-110"
+                            style={{ fontVariationSettings: isActive ? '"FILL" 1' : undefined }}
+                          >
+                            {icon}
+                          </span>
+                          <span className="relative z-10 font-label-caps text-xs truncate">{label}</span>
+                        </motion.button>
+                      )
+                    })}
+                  </div>
+                </div>
+              ))}
+            </LayoutGroup>
+          </nav>
+
+          {/* CTA + user */}
+          <div className="px-3 pt-4 space-y-3">
+            <motion.button
+              onClick={() => navigate('/logging')}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-primary via-green to-acid
+                font-label-caps text-xs font-bold tracking-[0.18em] text-on-primary text-center
+                shadow-[0_4px_24px_color-mix(in_srgb,var(--primary)_30%,transparent)]
+                hover:brightness-110 transition-all duration-200
+                focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer"
+            >
+              LOG WORKOUT
+            </motion.button>
+
+            <div className="flex items-center gap-3 rounded-xl bg-surface-container/70 border border-outline-variant/20 p-3">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-acid flex items-center justify-center shrink-0">
+                <span className="font-data-display text-sm font-bold text-on-primary uppercase">
+                  {(user?.email ? user.email[0] : 'O')}
+                </span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-on-surface truncate leading-tight">
+                  {(user?.email ?? 'Invitado').split('@')[0]}
+                </p>
+                <p className="text-[11px] text-on-surface-variant truncate">{user?.email ?? 'Sin sesión'}</p>
+              </div>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => navigate('/settings')}
+                  aria-label="Configuración"
+                  title="Configuración"
+                  className="p-1.5 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors cursor-pointer
+                    focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                >
+                  <span className="material-symbols-outlined text-[18px]">settings</span>
+                </button>
+                <button
+                  onClick={handleLogout}
+                  disabled={signingOut}
+                  aria-label="Cerrar sesión"
+                  title="Cerrar sesión"
+                  className="p-1.5 rounded-lg text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors cursor-pointer disabled:opacity-50
+                    focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                >
+                  <span className="material-symbols-outlined text-[18px]">{signingOut ? 'hourglass_empty' : 'logout'}</span>
+                </button>
               </div>
             </div>
-          ))}
-        </LayoutGroup>
-      </nav>
-
-      {/* CTA + user */}
-      <div className="px-3 pt-4 space-y-3">
-        <motion.button
-          onClick={() => { navigate('/logging'); setIsOpen(false) }}
-          whileHover={{ scale: 1.01 }}
-          whileTap={{ scale: 0.98 }}
-          className="w-full py-3 rounded-xl bg-gradient-to-r from-primary via-green to-acid
-            font-label-caps text-xs font-bold tracking-[0.18em] text-on-primary text-center
-            shadow-[0_4px_24px_color-mix(in_srgb,var(--primary)_30%,transparent)]
-            hover:brightness-110 transition-all duration-200
-            focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer"
-        >
-          LOG WORKOUT
-        </motion.button>
-
-        <div className="flex items-center gap-3 rounded-xl bg-surface-container/70 border border-outline-variant/20 p-3">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-acid flex items-center justify-center shrink-0">
-            <span className="font-data-display text-sm font-bold text-on-primary uppercase">
-              {(user?.email ? user.email[0] : 'O')}
-            </span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-on-surface truncate leading-tight">
-              {(user?.email ?? 'Invitado').split('@')[0]}
-            </p>
-            <p className="text-[11px] text-on-surface-variant truncate">{user?.email ?? 'Sin sesión'}</p>
-          </div>
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => { navigate('/settings'); setIsOpen(false) }}
-              aria-label="Configuración"
-              title="Configuración"
-              className="p-1.5 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors cursor-pointer
-                focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-            >
-              <span className="material-symbols-outlined text-[18px]">settings</span>
-            </button>
-            <button
-              onClick={handleLogout}
-              disabled={signingOut}
-              aria-label="Cerrar sesión"
-              title="Cerrar sesión"
-              className="p-1.5 rounded-lg text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors cursor-pointer disabled:opacity-50
-                focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-            >
-              <span className="material-symbols-outlined text-[18px]">{signingOut ? 'hourglass_empty' : 'logout'}</span>
-            </button>
           </div>
         </div>
       </div>
-    </div>
-  )
-
-  return (
-    <>
-      {/* Mobile Hamburger Button */}
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        className="fixed top-4 left-4 z-[60] lg:hidden p-2 bg-surface-container/80 backdrop-blur-xl
-          border border-outline-variant/30 rounded-xl
-          hover:bg-surface-container-high transition-colors duration-200
-          focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-        onClick={() => setIsOpen(!isOpen)}
-        aria-label={isOpen ? 'Cerrar menú' : 'Abrir menú'}
-        aria-expanded={isOpen}
-      >
-        <span className="material-symbols-outlined text-on-surface">
-          {isOpen ? 'close' : 'menu'}
-        </span>
-      </motion.button>
-
-      <AnimatePresence>
-        {isOpen && (
-          <>
-            {/* Mobile Overlay */}
-            <motion.div
-              key="sidebar-overlay"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-40 bg-scrim/50 backdrop-blur-sm lg:hidden"
-              onClick={() => setIsOpen(false)}
-              aria-hidden="true"
-            />
-
-            {/* Mobile Sidebar */}
-            <motion.aside
-              key="mobile-sidebar"
-              initial={{ x: '-100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
-              transition={{ type: 'spring', stiffness: 320, damping: 34 }}
-              className={`fixed inset-y-0 left-0 z-50 flex flex-col w-72 rounded-r-2xl bg-surface-container/95 backdrop-blur-2xl border-r border-outline-variant/25 shadow-2xl lg:hidden ${className}`}
-              role="navigation"
-              aria-label="Mobile navigation"
-            >
-              <div className="w-full h-full flex flex-col">{navContent}</div>
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* Desktop Sidebar */}
-      <aside
-        className={`hidden lg:flex h-screen w-72 fixed left-0 top-0 z-40 p-3 pb-4 ${className}`}
-        role="navigation"
-        aria-label="Desktop navigation"
-      >
-        <div className="w-full h-full rounded-2xl bg-surface-container/70 backdrop-blur-2xl border border-outline-variant/25 shadow-2xl overflow-hidden flex flex-col">
-          {navContent}
-        </div>
-      </aside>
-    </>
+    </aside>
   )
 }
