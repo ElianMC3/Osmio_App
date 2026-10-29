@@ -12,7 +12,7 @@
  *
  * 1. Copiar las clases reales de la pantalla (aunque alguna resuelva a 0): la
  *    geometría del esqueleto debe coincidir con la del contenido que sustituye.
- * 2. Nada de alturas dependientes del viewport (`vh`/`svh`) ni `min-h-screen`:
+ * 2. Nada de alturas dependientes del viewport (`vh`/`svh`) ni `min-h-dvh`:
  *    boneyard escala en vertical con `altura_del_contenedor / altura_capturada`
  *    y una captura dependiente del viewport deforma los huesos.
  * 3. Los bloques hoja usan `bg-surface-container-high`; boneyard descarta los
@@ -49,16 +49,6 @@ export function StatusPillBone() {
       <span className="status-dot bg-surface-container-high" />
       <span className="block h-2 w-14 animate-pulse motion-reduce:animate-none rounded-full bg-surface-container-high" />
     </span>
-  )
-}
-
-/** Cabecera de sección (`SectionHeader`) sin copy. */
-function SectionTitleBone() {
-  return (
-    <div className="space-y-1">
-      <Bone className="h-2.5 w-28 rounded-full" />
-      <Bone className="h-5 w-44 rounded-md" />
-    </div>
   )
 }
 
@@ -194,91 +184,88 @@ export function SessionCardSkeleton() {
 export function DashboardHoySkeletonFixture() {
   return (
     <div className="space-y-lg">
-      {/* 01 · Sesión de hoy */}
-      <section className="space-y-md">
-        <SectionTitleBone />
+      {/* 01 · Sesión de hoy — TodayCard: header con estado dentro de la card */}
+      <section>
         <Card className="p-6">
-          <ul className="divide-y divide-green/15">
+          <div className="mb-5 flex items-center justify-between gap-sm">
+            <Bone className="h-5 w-28 rounded-md" />
+            <div className="flex items-center gap-1.5">
+              <Bone className="h-1.5 w-1.5 rounded-full" />
+              <Bone className="h-2.5 w-16 rounded-full" />
+            </div>
+          </div>
+          <ul className="divide-y divide-outline-variant/20">
             {[0, 1].map((row) => (
-              <li key={row} className="flex items-center gap-md py-sm first:pt-0 last:pb-0">
-                <Bone className="h-11 w-11 shrink-0 rounded-xl" />
+              <li key={row} className="flex items-center gap-sm py-3 first:pt-0 last:pb-0">
+                <Bone className="h-10 w-10 shrink-0 rounded-xl" />
                 <div className="min-w-0 flex-1 space-y-1.5">
                   <Bone className="h-3 w-40 rounded-full" />
                   <Bone className="h-2.5 w-52 rounded-full" />
                 </div>
-                <Bone className="h-5 w-16 rounded-full" />
+                <Bone className="h-2.5 w-12 rounded-full" />
               </li>
             ))}
           </ul>
-          <div className="mt-md flex flex-wrap items-center justify-between gap-sm border-t border-outline-variant/25 pt-md">
+          <div className="mt-5 flex items-center justify-between gap-3">
             <Bone className="h-2.5 w-36 rounded-full" />
             <Bone className="h-8 w-36 rounded-lg" />
           </div>
         </Card>
       </section>
 
-      {/* 02 · Resumen semanal */}
-      <section className="space-y-md">
-        <SectionTitleBone />
-        <div className="grid grid-cols-1 gap-sm md:grid-cols-12">
-          <Card className="p-4 md:col-span-7">
-            <div className="mb-md flex items-center justify-between">
-              <Bone className="h-2.5 w-44 rounded-full" />
-              <Bone className="h-2 w-14 rounded-full" />
+      {/* 02 · Rendimiento */}
+      <section className="space-y-sm">
+        <Bone className="h-5 w-32 rounded-md" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+          <Card className="p-6">
+            <div className="flex items-baseline justify-between gap-sm">
+              <Bone className="h-3 w-20 rounded-full" />
+              <Bone className="h-2.5 w-28 rounded-full" />
             </div>
-            <div className="space-y-md">
+            <div className="mt-4 flex items-baseline gap-2">
+              <Bone className="h-9 w-28 rounded-md" />
+              <Bone className="h-2.5 w-20 rounded-full" />
+            </div>
+            <div className="mt-4 space-y-3">
+              {[0, 1, 2].map((row) => (
+                <ProgressBone key={row} />
+              ))}
+            </div>
+            <Bone className="mt-4 h-2.5 w-40 rounded-full" />
+          </Card>
+
+          <Card className="p-6">
+            <div className="flex items-baseline justify-between gap-sm">
+              <Bone className="h-3 w-20 rounded-full" />
+              <Bone className="h-2.5 w-24 rounded-full" />
+            </div>
+            <div className="mt-4 space-y-4">
               {[0, 1].map((row) => (
-                <div key={row} className="space-y-xs">
-                  <div className="flex items-end justify-between">
-                    <Bone className="h-2.5 w-20 rounded-full" />
-                    <Bone className="h-2.5 w-16 rounded-full" />
+                <div key={row} className="space-y-1.5">
+                  <div className="flex items-baseline justify-between">
+                    <Bone className="h-3 w-16 rounded-full" />
+                    <Bone className="h-3 w-8 rounded-full" />
                   </div>
-                  <div className="flex h-5 gap-1">
+                  <div className="flex h-4 gap-1.5">
                     {Array.from({ length: 7 }).map((_, bar) => (
-                      <Bone key={bar} className="flex-1 rounded-[2px]" />
+                      <Bone key={bar} className="flex-1 rounded-[3px]" />
                     ))}
                   </div>
                 </div>
               ))}
             </div>
-            <div className="mt-md flex items-baseline justify-between border-t border-outline-variant/25 pt-sm">
-              <Bone className="h-2 w-20 rounded-full" />
-              <Bone className="h-3 w-12 rounded-full" />
-            </div>
-          </Card>
-
-          <Card className="p-4 md:col-span-5">
-            <div className="mb-md text-center">
-              <Bone className="mx-auto h-10 w-24 rounded-md" />
-              <Bone className="mx-auto mt-2 h-2 w-24 rounded-full" />
-              <Bone className="mx-auto mt-2 h-2.5 w-32 rounded-full" />
-            </div>
-            <div className="space-y-sm">
-              {[0, 1, 2].map((row) => (
-                <ProgressBone key={row} />
-              ))}
-            </div>
-            <div className="mt-md grid grid-cols-2 gap-sm border-t border-outline-variant/25 pt-sm">
-              <div className="space-y-1">
-                <Bone className="h-2 w-16 rounded-full" />
-                <Bone className="h-3 w-10 rounded-full" />
-              </div>
-              <div className="ml-auto space-y-1 text-right">
-                <Bone className="ml-auto h-2 w-14 rounded-full" />
-                <Bone className="ml-auto h-3 w-6 rounded-full" />
-              </div>
-            </div>
+            <Bone className="mt-4 h-2.5 w-36 rounded-full" />
           </Card>
         </div>
       </section>
 
       {/* 03 · Consistencia */}
-      <section className="space-y-md">
-        <SectionTitleBone />
-        <Card className="p-4">
-          <div className="mb-md flex items-center justify-between gap-sm">
-            <Bone className="h-3 w-44 rounded-full" />
-            <Bone className="h-2.5 w-28 rounded-full" />
+      <section className="space-y-sm">
+        <Bone className="h-5 w-32 rounded-md" />
+        <Card className="p-6">
+          <div className="mb-4 flex items-baseline justify-between gap-sm">
+            <Bone className="h-3 w-40 rounded-full" />
+            <Bone className="h-2.5 w-24 rounded-full" />
           </div>
           <div className="flex gap-1">
             <Bone className="w-7 shrink-0" />
@@ -286,36 +273,18 @@ export function DashboardHoySkeletonFixture() {
               {Array.from({ length: 12 }).map((_, week) => (
                 <div key={week} className="grid gap-1" style={{ gridTemplateRows: 'repeat(7, 12px)' }}>
                   {Array.from({ length: 7 }).map((_, day) => (
-                    <Bone key={day} className="h-3 rounded-[2px]" />
+                    <Bone key={day} className="h-3 rounded-[3px]" />
                   ))}
                 </div>
               ))}
             </div>
           </div>
-          <Bone className="mt-sm h-2 w-48 rounded-full" />
-        </Card>
-
-        <div className="grid grid-cols-3 gap-sm">
-          {[0, 1, 2].map((card) => (
-            <Card key={card} className="p-3">
-              <Bone className="h-2 w-16 rounded-full" />
-              <Bone className="mt-1.5 h-7 w-12 rounded-md" />
-              <Bone className="mt-1.5 h-2 w-8 rounded-full" />
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      {/* 04 · Calendario del mes */}
-      <section className="space-y-md">
-        <SectionTitleBone />
-        <Card className="p-4">
-          <div className="grid grid-cols-7 gap-1">
-            {Array.from({ length: 7 }).map((_, day) => (
-              <Bone key={`label-${day}`} className="mx-auto h-2 w-6 rounded-full" />
-            ))}
-            {Array.from({ length: 35 }).map((_, cell) => (
-              <Bone key={cell} className="aspect-square w-full rounded-lg" />
+          <div className="mt-sm grid grid-cols-3 border-t border-outline-variant/20 pt-sm">
+            {[0, 1, 2].map((stat) => (
+              <div key={stat} className="flex flex-col items-center gap-1.5 px-2">
+                <Bone className="h-2.5 w-16 rounded-full" />
+                <Bone className="h-4 w-14 rounded-md" />
+              </div>
             ))}
           </div>
         </Card>
@@ -996,7 +965,7 @@ export function ProfileSettingsSkeletonFixture() {
 /** Silueta del layout protegido mientras `useAuth` resuelve la sesión. */
 export function AppShellSkeleton() {
   return (
-    <div className="relative min-h-screen bg-surface">
+    <div className="relative min-h-dvh bg-surface">
       <div className="fixed inset-x-0 top-0 z-40 h-16 border-b border-outline-variant/20 bg-surface/80 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto flex h-full max-w-[1440px] items-center gap-3">
           <Bone className="size-9 rounded-xl" />
@@ -1013,7 +982,7 @@ export function AppShellSkeleton() {
         </div>
       </aside>
 
-      <main className="mx-auto min-h-screen max-w-[1440px] px-4 pb-28 pt-24 sm:px-6 lg:ml-72 lg:px-8">
+      <main className="mx-auto min-h-dvh max-w-[1440px] px-4 pb-28 pt-24 sm:px-6 lg:ml-72 lg:px-8">
         <div className="space-y-4">
           <Bone className="h-4 w-40 rounded-full" />
           <Bone className="h-8 w-64 rounded-md" />

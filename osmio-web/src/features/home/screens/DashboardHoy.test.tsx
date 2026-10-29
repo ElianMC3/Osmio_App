@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
@@ -13,6 +13,7 @@ const mocks = vi.hoisted(() => ({
   getCombatAnalytics: vi.fn(),
   getConsistency: vi.fn(),
   getDayNutrition: vi.fn(),
+  getProfile: vi.fn(),
 }))
 
 vi.mock('react-router-dom', async () => {
@@ -36,6 +37,10 @@ vi.mock('@/services/api/analytics.api', () => ({
 
 vi.mock('@/services/api/nutrition.api', () => ({
   nutritionApi: { getDayNutrition: mocks.getDayNutrition },
+}))
+
+vi.mock('@/services/api/profiles.api', () => ({
+  profilesApi: { getProfile: mocks.getProfile },
 }))
 
 import DashboardHoy from './DashboardHoy'
@@ -81,9 +86,54 @@ function renderDashboard() {
   )
 }
 
+/**
+ * Bklit mide el ancho del contenedor con ResizeObserver. jsdom no calcula
+ * layout, así que sin este stub el heatmap recibe `width: 0` y no pinta celdas.
+ */
+function stubHeatmapSize(width = 640, height = 240) {
+  const original = window.ResizeObserver
+
+  class MeasuredResizeObserver {
+    private readonly callback: ResizeObserverCallback
+
+    constructor(callback: ResizeObserverCallback) {
+      this.callback = callback
+    }
+
+    observe(target: Element) {
+      const rect = {
+        x: 0,
+        y: 0,
+        width,
+        height,
+        top: 0,
+        right: width,
+        bottom: height,
+        left: 0,
+        toJSON: () => ({}),
+      }
+      this.callback(
+        [{ target, contentRect: rect } as unknown as ResizeObserverEntry],
+        this as unknown as ResizeObserver,
+      )
+    }
+
+    unobserve() {}
+    disconnect() {}
+  }
+
+  window.ResizeObserver = MeasuredResizeObserver as unknown as typeof ResizeObserver
+  return () => {
+    window.ResizeObserver = original
+  }
+}
+
 describe('DashboardHoy', () => {
+  let restoreResizeObserver: () => void
+
   beforeEach(() => {
     vi.clearAllMocks()
+    restoreResizeObserver = stubHeatmapSize()
     mocks.getSessionsByDate.mockResolvedValue([])
     mocks.getCombatAnalytics.mockResolvedValue({
       roundsByWeek: [],
@@ -91,16 +141,21 @@ describe('DashboardHoy', () => {
     })
     mocks.getConsistency.mockResolvedValue([])
     mocks.getDayNutrition.mockResolvedValue(emptyNutrition)
+    mocks.getProfile.mockResolvedValue({ name: 'Elian' })
+  })
+
+  afterEach(() => {
+    restoreResizeObserver()
   })
 
   it('muestra el estado vacío y permite registrar una sesión', async () => {
     const user = userEvent.setup()
     renderDashboard()
 
-    expect(await screen.findByText('SIN SESIONES REGISTRADAS')).toBeInTheDocument()
-    expect(screen.getByText('Panel de')).toBeInTheDocument()
+    expect(await screen.findByText('Sin sesiones registradas')).toBeInTheDocument()
+    expect(screen.getAllByText('Panel de').length).toBeGreaterThan(0)
 
-    await user.click(screen.getByRole('button', { name: /REGISTRAR SESIÓN/ }))
+    await user.click(screen.getByRole('button', { name: /Registrar sesión/i }))
     expect(mocks.navigate).toHaveBeenCalledWith('/logging')
   })
 
@@ -124,20 +179,23 @@ describe('DashboardHoy', () => {
     expect(await screen.findByText('Sentadilla')).toBeInTheDocument()
     const row = screen.getByText('Sentadilla').closest('li') as HTMLElement
 
-    expect(screen.getByText('STRIKING TRAINING')).toBeInTheDocument()
+    expect(screen.getByText('striking training')).toBeInTheDocument()
     expect(row).toHaveTextContent('2 series')
     expect(row).toHaveTextContent(/1[.,]?000 kg/)
     expect(screen.getByText('6 rounds · 45 min')).toBeInTheDocument()
 
-    expect(screen.getByText('KCAL RESTANTES').parentElement).toHaveTextContent(/1[.,]?500/)
+    const nutritionCard = screen.getByText('kcal restantes').parentElement
+    expect(nutritionCard).toHaveTextContent(/1[.,]?500/)
     expect(screen.getByText('65 / 180 g')).toBeInTheDocument()
-    expect(screen.getByText('COMIDAS').parentElement).toHaveTextContent('2')
+    expect(screen.getByText('900 kcal consumidas · 2 comidas')).toBeInTheDocument()
 
-    const streak = screen.getByText('RACHA ACTUAL').parentElement
+    const streak = screen.getByText('Racha actual').parentElement
     expect(within(streak as HTMLElement).getByText('2')).toBeInTheDocument()
 
     await waitFor(() => {
-      expect(document.querySelector(`[title="${today} · activo"]`)).not.toBeNull()
+      expect(
+        document.querySelectorAll('rect[fill="var(--chart-scale-02)"]').length,
+      ).toBeGreaterThan(0)
     })
   })
 
