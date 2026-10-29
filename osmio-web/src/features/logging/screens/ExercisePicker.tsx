@@ -1,13 +1,25 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { GreenCard } from '@/design-system/components/GreenCard'
-import { GreenTag } from '@/design-system/components/GreenTag'
+import { Skeleton } from 'boneyard-js/react'
 import { PageBackdrop } from '@/design-system/components/PageBackdrop'
 import { PageHeader } from '@/design-system/components/PageHeader'
 import { sessionsApi } from '@/services/api/sessions.api'
 import { routinesApi } from '@/services/api/routines.api'
-import ExerciseThumb from '@/features/strength/components/ExerciseThumb'
+import ExerciseCarousel3D from '../components/ExerciseCarousel3D'
+import ExerciseDetailPanel from '../components/ExerciseDetailPanel'
+import { Bone, PickerSkeletonFixture, StatusPillBone } from '@/design-system/skeletons/fixtures'
 import type { Exercise } from '@/shared/types/session.types'
+
+/**
+ * El dataset real tiene ~1.300 movimientos. El reel solo monta los primeros
+ * 40: el resto se alcanza afinando la búsqueda o los filtros.
+ */
+const REEL_LIMIT = 40
+
+interface DetailState {
+  exercise: Exercise
+  source: HTMLElement | null
+}
 
 export default function ExercisePicker() {
   const [search, setSearch] = useState('')
@@ -16,6 +28,7 @@ export default function ExercisePicker() {
   const [exercises, setExercises] = useState<Exercise[]>([])
   const [loading, setLoading] = useState(true)
   const [addingId, setAddingId] = useState<number | null>(null)
+  const [detail, setDetail] = useState<DetailState | null>(null)
   const navigate = useNavigate()
   const location = useLocation()
   const { routineId } = (location.state ?? {}) as { routineId?: string }
@@ -57,6 +70,28 @@ export default function ExercisePicker() {
     })
   }, [exercises, search, category, equipment])
 
+  const reelExercises = useMemo(() => filtered.slice(0, REEL_LIMIT), [filtered])
+  const hasFilters = search.trim() !== '' || category !== 'todas' || equipment !== 'todos'
+
+  const openDetail = useCallback((exercise: Exercise, source: HTMLElement | null) => {
+    setDetail({ exercise, source })
+  }, [])
+
+  const closeDetail = useCallback(() => setDetail(null), [])
+
+  const openHistory = useCallback(
+    (exercise: Exercise) => {
+      navigate(`/logging/strength/history?exerciseId=${exercise.id}`)
+    },
+    [navigate]
+  )
+
+  const resetFilters = () => {
+    setSearch('')
+    setCategory('todas')
+    setEquipment('todos')
+  }
+
   const addToRoutine = async (exercise: Exercise) => {
     if (addingId !== null) return
     setAddingId(exercise.id)
@@ -89,101 +124,137 @@ export default function ExercisePicker() {
   return (
     <div className="relative min-h-screen pb-24">
       <PageBackdrop />
-      <div className="relative z-10 max-w-3xl mx-auto">
-        <div className="px-5 pt-6">
-          <PageHeader
-            kicker="BIBLIOTECA DE MOVIMIENTOS"
-            title="Seleccionar"
-            titleAccent="Ejercicio"
-            subtitle="Busca en la base de datos de movimientos y añádelo a tu rutina."
-            onBack={() => navigate(-1)}
-            status={
+
+      <div className="relative z-10 mx-auto max-w-3xl px-5 pt-6">
+        <PageHeader
+          kicker="Biblioteca de movimientos"
+          title="Seleccionar"
+          titleAccent="Ejercicio"
+          subtitle="Explora el carrusel, abre la ficha de cada movimiento y añádelo a tu rutina."
+          onBack={() => navigate(-1)}
+          status={
+            loading ? (
+              <StatusPillBone />
+            ) : (
               <span className="status-pill">
                 <span className="status-dot bg-green" />
-                {exercises.length.toLocaleString()} EJERCICIOS
+                {exercises.length.toLocaleString('es-ES')} EJERCICIOS
               </span>
-            }
+            )
+          }
+        />
+      </div>
+
+      <div className="relative z-10 mx-auto mt-4 max-w-3xl px-5">
+        <div className="relative">
+          <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted text-[18px]">
+            search
+          </span>
+          <input
+            type="text"
+            placeholder="Buscar por nombre, músculo, equipo…"
+            value={search}
+            autoComplete="off"
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-surface-container/60 backdrop-blur-xl border border-outline-variant/40 rounded-xl py-3 pl-11 pr-4 text-sm text-text-green placeholder:text-text-muted placeholder:opacity-50 focus:outline-none focus:border-green focus:shadow-[0_0_0_1px_color-mix(in_srgb,var(--green)_35%,transparent),0_0_22px_color-mix(in_srgb,var(--green)_18%,transparent)] transition-all"
           />
         </div>
 
-        <main className="p-md space-y-3">
-          <div className="relative">
-            <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted text-[18px]">
-              search
-            </span>
-            <input
-              type="text"
-              placeholder="Buscar por nombre, músculo, equipo…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-surface-container/60 backdrop-blur-xl border border-outline-variant/40 rounded-xl py-3 pl-11 pr-4 text-sm text-text-green placeholder:text-text-muted placeholder:opacity-50 focus:outline-none focus:border-green focus:shadow-[0_0_0_1px_color-mix(in_srgb,var(--green)_35%,transparent),0_0_22px_color-mix(in_srgb,var(--green)_18%,transparent)] transition-all"
-            />
-          </div>
+        <div className="mt-2.5 flex gap-2 overflow-x-auto pb-1">
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            aria-label="Filtrar por categoría"
+            className="min-w-0 flex-1 cursor-pointer rounded-lg border border-outline-variant/40 bg-surface-container/60 px-3 py-2 text-xs text-text-green backdrop-blur-xl transition-all focus:border-green focus:outline-none"
+          >
+            {categories.map((c) => (
+              <option key={c} value={c}>
+                {c === 'todas' ? 'Todas las categorías' : c}
+              </option>
+            ))}
+          </select>
+          <select
+            value={equipment}
+            onChange={(e) => setEquipment(e.target.value)}
+            aria-label="Filtrar por equipamiento"
+            className="min-w-0 flex-1 cursor-pointer rounded-lg border border-outline-variant/40 bg-surface-container/60 px-3 py-2 text-xs text-text-green backdrop-blur-xl transition-all focus:border-green focus:outline-none"
+          >
+            {equipments.map((c) => (
+              <option key={c} value={c}>
+                {c === 'todos' ? 'Todo equipo' : c}
+              </option>
+            ))}
+          </select>
+        </div>
 
-          <div className="flex gap-2 overflow-x-auto pb-1">
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="bg-surface-container/60 backdrop-blur-xl border border-outline-variant/40 rounded-lg px-3 py-2 text-xs text-text-green focus:outline-none focus:border-green transition-all cursor-pointer"
+        <div className="mt-2 flex items-center justify-between gap-3 font-label-caps text-[9px] uppercase tracking-[0.2em] text-text-muted">
+          <span className="truncate">
+            {loading ? (
+              <Bone className="inline-block h-2 w-28 rounded-full" />
+            ) : (
+              <>
+                {filtered.length.toLocaleString('es-ES')} movimientos
+                {filtered.length > REEL_LIMIT ? ` · viendo ${REEL_LIMIT}` : ''}
+              </>
+            )}
+          </span>
+          {hasFilters && (
+            <button
+              type="button"
+              onClick={resetFilters}
+              className="shrink-0 text-green/80 transition-colors hover:text-green"
             >
-              {categories.map((c) => (
-                <option key={c} value={c}>{c === 'todas' ? 'Todas las categorías' : c}</option>
-              ))}
-            </select>
-            <select
-              value={equipment}
-              onChange={(e) => setEquipment(e.target.value)}
-              className="bg-surface-container/60 backdrop-blur-xl border border-outline-variant/40 rounded-lg px-3 py-2 text-xs text-text-green focus:outline-none focus:border-green transition-all cursor-pointer"
-            >
-              {equipments.map((c) => (
-                <option key={c} value={c}>{c === 'todos' ? 'Todo equipo' : c}</option>
-              ))}
-            </select>
-          </div>
-
-          {loading ? (
-            <p className="font-label-caps text-sm text-text-muted animate-pulse text-center py-10">Cargando ejercicios…</p>
-          ) : (
-            <div className="space-y-2">
-              {filtered.length === 0 && (
-                <p className="font-label-caps text-sm text-text-muted opacity-50 text-center py-10">Sin resultados</p>
-              )}
-              {filtered.map((ex) => (
-                <GreenCard
-                  key={ex.id}
-                  variant="interactive"
-                  padding="sm"
-                  onClick={() => addToRoutine(ex)}
-                  className="flex items-center gap-3 cursor-pointer relative overflow-hidden"
-                >
-                  <span className="gradient-hairline" />
-                  <ExerciseThumb
-                    exercise={ex}
-                    onInfo={() => navigate(`/logging/strength/history?exerciseId=${ex.id}`)}
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-label-caps text-sm font-semibold truncate text-text-green">
-                      {ex.name}
-                    </p>
-                    <div className="flex flex-wrap gap-1.5 mt-1.5">
-                      <GreenTag color="green" variant="outlined" effects={false}>{ex.category}</GreenTag>
-                      {ex.equipment && <GreenTag color="muted" variant="ghost" effects={false}>{ex.equipment}</GreenTag>}
-                    </div>
-                  </div>
-                  <span
-                    className={`material-symbols-outlined text-[20px] transition-colors ${
-                      addingId === ex.id ? 'text-green animate-pulse' : 'text-text-muted group-hover:text-green'
-                    }`}
-                    style={addingId === ex.id ? { fontVariationSettings: '"FILL" 1' } : undefined}
-                  >
-                    {addingId === ex.id ? 'sync' : 'add_circle'}
-                  </span>
-                </GreenCard>
-              ))}
-            </div>
+              Limpiar
+            </button>
           )}
-        </main>
+        </div>
       </div>
+
+      <div className="relative z-10 mt-2">
+        <Skeleton
+          name="exercise-picker"
+          loading={loading}
+          select="viewport"
+          transition={180}
+          className="block"
+          fixture={<PickerSkeletonFixture />}
+          fallback={<PickerSkeletonFixture />}
+        >
+          {loading ? null : reelExercises.length === 0 ? (
+            <div className="flex min-h-[46svh] flex-col items-center justify-center gap-4 px-5 text-center">
+              <p className="font-label-caps text-sm text-text-muted opacity-60">
+                Sin resultados para esta combinación de filtros.
+              </p>
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="font-label-caps text-xs uppercase tracking-[0.24em] text-green transition-opacity hover:opacity-80"
+              >
+                Limpiar filtros
+              </button>
+            </div>
+          ) : (
+            <ExerciseCarousel3D
+              exercises={reelExercises}
+              addingId={addingId}
+              onOpen={openDetail}
+              onAdd={addToRoutine}
+              onHistory={openHistory}
+            />
+          )}
+        </Skeleton>
+      </div>
+
+      {detail && (
+        <ExerciseDetailPanel
+          exercise={detail.exercise}
+          sourceEl={detail.source}
+          adding={addingId === detail.exercise.id}
+          onAdd={() => addToRoutine(detail.exercise)}
+          onHistory={() => openHistory(detail.exercise)}
+          onClose={closeDetail}
+        />
+      )}
     </div>
   )
 }

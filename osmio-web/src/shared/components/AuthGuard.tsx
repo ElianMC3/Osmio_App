@@ -1,7 +1,9 @@
 import { type ReactNode } from 'react'
 import { useLocation } from 'react-router-dom'
+import { Skeleton } from 'boneyard-js/react'
 import { useAuth } from '../hooks/useAuth'
 import { Redirect } from './Redirect'
+import { AppShellSkeleton } from '@/design-system/skeletons/fixtures'
 
 interface AuthGuardProps {
   children: ReactNode
@@ -13,9 +15,17 @@ export function AuthGuard({ children }: AuthGuardProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="font-label-caps text-sm text-text-muted animate-pulse">Cargando…</p>
-      </div>
+      <Skeleton
+        name="app-shell"
+        loading
+        select="viewport"
+        transition={180}
+        className="block"
+        fixture={<AppShellSkeleton />}
+        fallback={<AppShellSkeleton />}
+      >
+        {null}
+      </Skeleton>
     )
   }
 

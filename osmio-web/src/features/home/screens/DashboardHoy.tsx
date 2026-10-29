@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Skeleton } from 'boneyard-js/react'
 import { GreenButton } from '@/design-system/components/GreenButton'
 import { GreenCard } from '@/design-system/components/GreenCard'
 import { GreenProgress } from '@/design-system/components/GreenProgress'
@@ -7,6 +8,7 @@ import { GreenTag } from '@/design-system/components/GreenTag'
 import { PageBackdrop } from '@/design-system/components/PageBackdrop'
 import { PageHeader } from '@/design-system/components/PageHeader'
 import { SectionHeader } from '@/design-system/components/SectionHeader'
+import { DashboardHoySkeletonFixture } from '@/design-system/skeletons/fixtures'
 import { analyticsApi, type CombatAnalytics } from '@/services/api/analytics.api'
 import { nutritionApi } from '@/services/api/nutrition.api'
 import { sessionsApi } from '@/services/api/sessions.api'
@@ -166,12 +168,17 @@ export default function DashboardHoy() {
             </GreenCard>
           )}
 
-          {loading ? (
-            <div className="flex justify-center py-16">
-              <p className="font-label-caps text-sm text-text-muted animate-pulse">CARGANDO PANEL…</p>
-            </div>
-          ) : (
-            <>
+          <Skeleton
+            name="dashboard-hoy"
+            loading={loading}
+            select="viewport"
+            transition={180}
+            className="block"
+            fixture={<DashboardHoySkeletonFixture />}
+            fallback={<DashboardHoySkeletonFixture />}
+          >
+            {loading ? null : (
+            <div className="space-y-lg">
               <section className="space-y-md">
                 <SectionHeader
                   kicker="01 · Operaciones"
@@ -484,8 +491,9 @@ export default function DashboardHoy() {
                   </div>
                 </GreenCard>
               </section>
-            </>
-          )}
+            </div>
+            )}
+          </Skeleton>
         </main>
       </div>
     </div>

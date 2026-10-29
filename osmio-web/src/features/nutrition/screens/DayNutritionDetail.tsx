@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { Skeleton } from 'boneyard-js/react'
 import { nutritionApi } from '@/services/api/nutrition.api'
 import type { DailyNutrition } from '@/shared/types/nutrition.types'
+import { DayNutritionSkeletonFixture } from '@/design-system/skeletons/fixtures'
 
 export default function DayNutritionDetail() {
   const { date } = useParams()
@@ -84,6 +86,17 @@ export default function DayNutritionDetail() {
       </div>
 
       {/* Main Grid */}
+      <Skeleton
+        name="day-nutrition-detail"
+        loading={loading}
+        select="viewport"
+        transition={180}
+        className="block"
+        fixture={<DayNutritionSkeletonFixture />}
+        fallback={<DayNutritionSkeletonFixture />}
+      >
+        {loading ? null : (
+        <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
         {/* Calorie Ring Section */}
         <div className="md:col-span-5 bg-surface-container/50 backdrop-blur-xl border border-outline-variant/30 rounded-2xl p-6 flex flex-col items-center justify-center relative overflow-hidden">
@@ -175,11 +188,7 @@ export default function DayNutritionDetail() {
           Cronograma de Comidas del Día
         </h3>
         <div className="space-y-4">
-          {loading ? (
-            <div className="flex justify-center py-10">
-              <p className="font-label-caps text-sm text-text-muted animate-pulse">Cargando…</p>
-            </div>
-          ) : Object.keys(mealSections).length === 0 ? (
+          {Object.keys(mealSections).length === 0 ? (
             <div className="bg-surface-container/50 border border-outline-variant/30 rounded-2xl p-6 text-center">
               <p className="font-label-caps text-sm text-on-surface-variant">Sin comidas registradas</p>
             </div>
@@ -236,6 +245,9 @@ export default function DayNutritionDetail() {
           })}
         </div>
       </div>
+        </div>
+        )}
+      </Skeleton>
     </div>
   )
 }

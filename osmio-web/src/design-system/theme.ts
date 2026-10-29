@@ -48,6 +48,9 @@ export function applyTheme(settings: ThemeSettings) {
   const root = document.documentElement
   root.dataset.theme = settings.mode
   root.dataset.accent = settings.accent
+  // Convención Tailwind: las librerías de terceros (boneyard, shadcn, etc.)
+  // detectan el modo oscuro por la clase `.dark` en <html>.
+  root.classList.toggle('dark', settings.mode === 'dark')
 }
 
 export function initTheme() {

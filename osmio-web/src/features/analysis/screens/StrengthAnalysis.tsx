@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Skeleton } from 'boneyard-js/react'
 import { GreenCard } from '@/design-system/components/GreenCard'
 import { GreenButton } from '@/design-system/components/GreenButton'
 import { PageBackdrop } from '@/design-system/components/PageBackdrop'
@@ -10,6 +11,7 @@ import { useProgression } from '../../strength/hooks/useProgression'
 import type { ProgressionRecommendation } from '../../strength/lib/progression'
 import type { StrengthAnalytics } from '@/services/api/analytics.api'
 import AnalysisTabs from '../components/AnalysisTabs'
+import { StrengthAnalysisSkeletonFixture, StatusPillBone } from '@/design-system/skeletons/fixtures'
 
 export default function StrengthAnalysis() {
   const navigate = useNavigate()
@@ -80,10 +82,14 @@ export default function StrengthAnalysis() {
             subtitle="Volumen, rendimiento y recomendaciones de progresión."
             onBack={() => navigate(-1)}
             status={
-              <span className="status-pill">
-                <span className="status-dot bg-green" />
-                {weekLabel.toUpperCase()}
-              </span>
+              progressionLoading || !data ? (
+                <StatusPillBone />
+              ) : (
+                <span className="status-pill">
+                  <span className="status-dot bg-green" />
+                  {weekLabel.toUpperCase()}
+                </span>
+              )
             }
           />
         </div>
@@ -109,6 +115,17 @@ export default function StrengthAnalysis() {
             ))}
           </div>
 
+          <Skeleton
+            name="strength-analysis"
+            loading={!data || progressionLoading}
+            select="viewport"
+            transition={180}
+            className="block"
+            fixture={<StrengthAnalysisSkeletonFixture />}
+            fallback={<StrengthAnalysisSkeletonFixture />}
+          >
+            {!data || progressionLoading ? null : (
+            <div className="space-y-lg">
           {data && (
             <div className="grid grid-cols-3 gap-sm">
               <GreenCard variant="default" padding="sm"  className="relative overflow-hidden">
@@ -160,9 +177,7 @@ export default function StrengthAnalysis() {
               <SectionHeader kicker="PROGRESSION ENGINE" title="Recomendaciones de Peso" />
             </div>
             <div className="space-y-sm">
-              {progressionLoading ? (
-                <div className="font-label-caps text-sm text-text-muted opacity-40 text-center py-6">CARGANDO…</div>
-              ) : recList.length > 0 ? (
+              {recList.length > 0 ? (
                 recList.map((item) => {
                   const badge = recBadge(item.rec.action, item.rec.suggestedWeight)
                   return (
@@ -240,6 +255,9 @@ export default function StrengthAnalysis() {
               <span className="font-label-caps text-[18px] text-text-green font-bold">{prCount}</span>
             </GreenCard>
           </div>
+            </div>
+            )}
+          </Skeleton>
         </main>
       </div>
     </div>

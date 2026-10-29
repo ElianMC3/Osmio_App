@@ -1,0 +1,27 @@
+{
+  "out": "./src/bones",
+  "breakpoints": [390, 768, 1280],
+  "wait": 1200,
+  "animate": "shimmer",
+  "speed": "1.8s",
+  "shimmerAngle": 110,
+  "color": "#e7e5da",
+  "shimmerColor": "#f2f0e7",
+  "darkColor": "#26241f",
+  "darkShimmerColor": "#332f29",
+  "transition": 180,
+  "routes": [
+    "/logging/strength/picker",
+    "/logging/strength/history?exerciseId=1",
+    "/dashboard",
+    "/strength/routine",
+    "/history",
+    "/history/2026-10-20",
+    "/nutrition",
+    "/nutrition/2026-10-20",
+    "/analysis/strength",
+    "/analysis/combat",
+    "/analysis/consistency",
+    "/profile"
+  ]
+}

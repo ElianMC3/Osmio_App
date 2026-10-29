@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Skeleton } from 'boneyard-js/react'
 import { GreenCard } from '@/design-system/components/GreenCard'
 import { GreenButton } from '@/design-system/components/GreenButton'
 import { GreenTag } from '@/design-system/components/GreenTag'
@@ -8,6 +9,7 @@ import { PageBackdrop } from '@/design-system/components/PageBackdrop'
 import { PageHeader } from '@/design-system/components/PageHeader'
 import { useProgression } from '../hooks/useProgression'
 import ExerciseThumb from '../components/ExerciseThumb'
+import { MyRoutineSkeletonFixture, StatusPillBone } from '@/design-system/skeletons/fixtures'
 import type { RoutineExercise } from '@/shared/types/session.types'
 import type { ProgressionRecommendation } from '../lib/progression'
 
@@ -159,20 +161,31 @@ export default function MyRoutine() {
             subtitle="Planificación de pesos, series y recomendaciones inteligentes de progresión."
             onBack={() => navigate(-1)}
             status={
-              <span className="status-pill">
-                <span className="status-dot bg-green" />
-                {routines.length} RUTINAS
-              </span>
+              loading ? (
+                <StatusPillBone />
+              ) : (
+                <span className="status-pill">
+                  <span className="status-dot bg-green" />
+                  {routines.length} RUTINAS
+                </span>
+              )
             }
           />
         </div>
 
         <main className="p-md pt-lg space-y-lg">
-        {loading ? (
-          <p className="font-label-caps text-sm text-text-muted animate-pulse text-center py-10">Cargando rutinas…</p>
-        ) : (
-          <>
-            {/* Create Routine */}
+        <Skeleton
+          name="my-routine"
+          loading={loading}
+          select="viewport"
+          transition={180}
+          className="block"
+          fixture={<MyRoutineSkeletonFixture />}
+          fallback={<MyRoutineSkeletonFixture />}
+        >
+          {loading ? null : (
+            <div className="space-y-lg">
+              {/* Create Routine */}
             <GreenCard variant="glass" padding="md">
               <div className="flex flex-col sm:flex-row gap-3">
                 <input
@@ -355,8 +368,9 @@ export default function MyRoutine() {
                 )}
               </GreenCard>
             ))}
-</>
-      )}
+            </div>
+          )}
+        </Skeleton>
       </main>
       </div>
     </div>

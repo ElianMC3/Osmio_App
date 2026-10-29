@@ -1,11 +1,13 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Skeleton } from 'boneyard-js/react'
 import { GreenCard } from '@/design-system/components/GreenCard'
 import { GreenProgress } from '@/design-system/components/GreenProgress'
 import { PageBackdrop } from '@/design-system/components/PageBackdrop'
 import { PageHeader } from '@/design-system/components/PageHeader'
 import { analyticsApi } from '@/services/api/analytics.api'
 import AnalysisTabs from '../components/AnalysisTabs'
+import { ConsistencyMapSkeletonFixture, StatusPillBone } from '@/design-system/skeletons/fixtures'
 
 const dayLabels = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
@@ -18,6 +20,7 @@ function getHeatColor(active: boolean): string {
 export default function ConsistencyMap() {
   const navigate = useNavigate()
   const [consistency, setConsistency] = useState<{ date: string; active: boolean }[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function fetchData() {
@@ -26,6 +29,8 @@ export default function ConsistencyMap() {
         setConsistency(data)
       } catch (e) {
         console.error('Error loading consistency:', e)
+      } finally {
+        setLoading(false)
       }
     }
     fetchData()
@@ -93,16 +98,31 @@ export default function ConsistencyMap() {
             subtitle="Tu patrón de entrenamiento a lo largo del tiempo."
             onBack={() => navigate(-1)}
             status={
-              <span className="status-pill">
-                <span className="status-dot bg-green" />
-                {consistency.length} DÍAS
-              </span>
+              loading ? (
+                <StatusPillBone />
+              ) : (
+                <span className="status-pill">
+                  <span className="status-dot bg-green" />
+                  {consistency.length} DÍAS
+                </span>
+              )
             }
           />
         </div>
 
         <main className="p-md pt-6 space-y-lg">
           <AnalysisTabs active="consistencia" />
+          <Skeleton
+            name="consistency-map"
+            loading={loading}
+            select="viewport"
+            transition={180}
+            className="block"
+            fixture={<ConsistencyMapSkeletonFixture />}
+            fallback={<ConsistencyMapSkeletonFixture />}
+          >
+            {loading ? null : (
+            <div className="space-y-lg">
 
           <p className="font-label-caps text-[10px] text-text-muted uppercase tracking-widest flex items-center gap-2">
             <span className="w-1.5 h-1.5 bg-acid inline-block rotate-45" />
@@ -288,6 +308,9 @@ export default function ConsistencyMap() {
               </div>
             ))}
           </div>
+            </div>
+            )}
+          </Skeleton>
         </main>
       </div>
     </div>

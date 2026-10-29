@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Skeleton } from 'boneyard-js/react'
 import { GreenCard } from '@/design-system/components/GreenCard'
 import { GreenButton } from '@/design-system/components/GreenButton'
 import { GreenTag } from '@/design-system/components/GreenTag'
@@ -8,6 +9,7 @@ import { PageBackdrop } from '@/design-system/components/PageBackdrop'
 import { PageHeader } from '@/design-system/components/PageHeader'
 import { sessionsApi } from '@/services/api/sessions.api'
 import type { StrengthSession, CombatSession } from '@/shared/types/session.types'
+import { MonthlyCalendarSkeletonFixture, StatusPillBone } from '@/design-system/skeletons/fixtures'
 const WEEKDAYS = ['LUN', 'MAR', 'MIE', 'JUE', 'VIE', 'SAB', 'DOM']
 const MONTH_NAMES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -99,6 +101,7 @@ export default function MonthlyCalendar() {
   const [month, setMonth] = useState(now.getMonth())
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
   const [allSessions, setAllSessions] = useState<(StrengthSession | CombatSession)[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function fetchSessions() {
@@ -113,6 +116,8 @@ export default function MonthlyCalendar() {
       } catch (e) {
         console.error('Error loading sessions:', e)
         setAllSessions([])
+      } finally {
+        setLoading(false)
       }
     }
     fetchSessions()
@@ -195,15 +200,29 @@ export default function MonthlyCalendar() {
             subtitle="Registro de entrenamientos mes a mes."
             onBack={() => navigate(-1)}
             status={
-              <span className="status-pill">
-                <span className="status-dot bg-green" />
-                {allSessions.length} SESIONES
-              </span>
+              loading ? (
+                <StatusPillBone />
+              ) : (
+                <span className="status-pill">
+                  <span className="status-dot bg-green" />
+                  {allSessions.length} SESIONES
+                </span>
+              )
             }
           />
         </div>
 
-      <div className="p-md space-y-lg">
+      <Skeleton
+        name="monthly-calendar"
+        loading={loading}
+        select="viewport"
+        transition={180}
+        className="block"
+        fixture={<MonthlyCalendarSkeletonFixture />}
+        fallback={<MonthlyCalendarSkeletonFixture />}
+      >
+        {loading ? null : (
+        <div className="p-md space-y-lg">
         {/* Month Navigation */}
         <div className="flex justify-between items-center px-xs">
           <div className="flex items-center gap-md">
@@ -326,6 +345,8 @@ export default function MonthlyCalendar() {
             </div>
         </div>
       </div>
+        )}
+      </Skeleton>
       </div>
 
     </div>

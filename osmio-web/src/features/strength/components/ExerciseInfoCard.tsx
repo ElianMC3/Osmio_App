@@ -1,9 +1,16 @@
+import type { Ref } from 'react'
 import { GreenCard } from '@/design-system/components/GreenCard'
 import { GreenTag } from '@/design-system/components/GreenTag'
 import { exerciseGifUrl, exerciseImageUrl } from '@/shared/lib/media'
 import type { Exercise } from '@/shared/types/session.types'
 
-export default function ExerciseInfoCard({ exercise }: { exercise: Exercise }) {
+interface ExerciseInfoCardProps {
+  exercise: Exercise
+  /** Permite que el picker haga un morph Flip desde la placa del reel. */
+  imageRef?: Ref<HTMLImageElement>
+}
+
+export default function ExerciseInfoCard({ exercise, imageRef }: ExerciseInfoCardProps) {
   const gif = exerciseGifUrl(exercise.gifUrl)
   const image = exerciseImageUrl(exercise.image)
   const instructionsEs = exercise.instructions?.es?.trim()
@@ -15,6 +22,7 @@ export default function ExerciseInfoCard({ exercise }: { exercise: Exercise }) {
         {(gif || image) && (
           <div className="shrink-0 self-start w-full sm:w-40">
             <img
+              ref={imageRef}
               src={gif ?? image}
               alt={exercise.name}
               loading="lazy"

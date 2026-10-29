@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Skeleton } from 'boneyard-js/react'
 import { GreenCard } from '@/design-system/components/GreenCard'
 import { GreenProgress } from '@/design-system/components/GreenProgress'
 import { PageBackdrop } from '@/design-system/components/PageBackdrop'
@@ -8,10 +9,12 @@ import { SectionHeader } from '@/design-system/components/SectionHeader'
 import { analyticsApi } from '@/services/api/analytics.api'
 import type { CombatAnalytics } from '@/services/api/analytics.api'
 import AnalysisTabs from '../components/AnalysisTabs'
+import { CombatLoadAnalysisSkeletonFixture, StatusPillBone } from '@/design-system/skeletons/fixtures'
 
 export default function CombatLoadAnalysis() {
   const navigate = useNavigate()
   const [data, setData] = useState<CombatAnalytics | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function fetchData() {
@@ -20,6 +23,8 @@ export default function CombatLoadAnalysis() {
         setData(result)
       } catch (e) {
         console.error('Error loading combat analytics:', e)
+      } finally {
+        setLoading(false)
       }
     }
     fetchData()
@@ -57,16 +62,31 @@ export default function CombatLoadAnalysis() {
             subtitle="Volumen táctico e intensidad acumulada."
             onBack={() => navigate(-1)}
             status={
-              <span className="status-pill">
-                <span className="status-dot bg-acid" />
-                {totalRounds} ROUNDS
-              </span>
+              loading ? (
+                <StatusPillBone />
+              ) : (
+                <span className="status-pill">
+                  <span className="status-dot bg-acid" />
+                  {totalRounds} ROUNDS
+                </span>
+              )
             }
           />
         </div>
 
         <main className="p-md pt-6 space-y-lg">
           <AnalysisTabs active="carga" />
+          <Skeleton
+            name="combat-load-analysis"
+            loading={loading}
+            select="viewport"
+            transition={180}
+            className="block"
+            fixture={<CombatLoadAnalysisSkeletonFixture />}
+            fallback={<CombatLoadAnalysisSkeletonFixture />}
+          >
+            {loading ? null : (
+            <div className="space-y-lg">
 
           <div className="grid grid-cols-3 gap-sm">
             <GreenCard variant="default" padding="sm" className="relative overflow-hidden">
@@ -222,6 +242,9 @@ export default function CombatLoadAnalysis() {
               </div>
             </GreenCard>
           </div>
+            </div>
+            )}
+          </Skeleton>
         </main>
       </div>
     </div>

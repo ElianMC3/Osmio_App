@@ -1,6 +1,8 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'
 import { useLenis } from 'lenis/react'
+import { Skeleton } from 'boneyard-js/react'
+import { AppShellSkeleton } from '@/design-system/skeletons/fixtures'
 import { DesktopLayout } from '../design-system/components/DesktopLayout'
 import { Redirect } from '../shared/components/Redirect'
 import { AuthGuard } from '../shared/components/AuthGuard'
@@ -38,9 +40,17 @@ function RootRedirect() {
   const { isAuthenticated, loading } = useAuth()
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="font-label-caps text-sm text-text-muted animate-pulse">Cargando…</p>
-      </div>
+      <Skeleton
+        name="app-shell"
+        loading={loading}
+        select="viewport"
+        transition={180}
+        className="block"
+        fixture={<AppShellSkeleton />}
+        fallback={<AppShellSkeleton />}
+      >
+        {null}
+      </Skeleton>
     )
   }
   return <Redirect to={isAuthenticated ? '/dashboard' : '/login'} replace />

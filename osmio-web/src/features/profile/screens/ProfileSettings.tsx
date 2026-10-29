@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Skeleton } from 'boneyard-js/react'
 import { profilesApi } from '@/services/api/profiles.api'
 import { supabase } from '@/services/supabase/client'
 import { useUserStore } from '@/store/userStore'
 import { useAuth } from '@/shared/hooks/useAuth'
+import { ProfileSettingsSkeletonFixture } from '@/design-system/skeletons/fixtures'
 
 const dayLabels = ['L', 'M', 'X', 'J', 'V', 'S', 'D'] as const
 
@@ -91,19 +93,19 @@ export default function ProfileSettings() {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="space-y-6 max-w-4xl mx-auto pb-12">
-        <div className="flex items-center justify-center py-20">
-          <p className="font-label-caps text-sm text-on-surface-variant animate-pulse">Cargando perfil…</p>
-        </div>
-      </div>
-    )
-  }
-
   const bmi = (parseFloat(weight) / Math.pow(parseFloat(height) / 100, 2)).toFixed(1)
 
   return (
+    <Skeleton
+      name="profile-settings"
+      loading={loading}
+      select="viewport"
+      transition={180}
+      className="block"
+      fixture={<ProfileSettingsSkeletonFixture />}
+      fallback={<ProfileSettingsSkeletonFixture />}
+    >
+      {loading ? null : (
     <div className="space-y-6 max-w-4xl mx-auto pb-12">
       {/* Page Title */}
       <div className="border-b border-outline-variant/30 pb-4">
@@ -384,5 +386,7 @@ export default function ProfileSettings() {
         Cerrar Sesión
       </button>
     </div>
+      )}
+    </Skeleton>
   )
 }

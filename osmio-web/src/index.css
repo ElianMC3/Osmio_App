@@ -695,3 +695,120 @@ input[type="range"]::-moz-range-track {
   background: var(--color-surface-variant);
   border-radius: 9999px;
 }
+/* ---------------------------------------------------------------------------
+   Exercise carousel (picker de ejercicios) — gallery helix 3D tipo Motion
+   Tarjetas en círculo 3D: la activa al frente (rotateY=0), las demás giran
+   sobre Y y retroceden en Z formando una hélice. Motion anima rotateY,
+   translateZ, scale y opacity; GSAP Observer solo detecta el input.
+--------------------------------------------------------------------------- */
+.exercise-carousel-3d {
+  --card-width: min(78vw, 330px);
+  --perspective: 1200px;
+}
+
+@media (min-width: 640px) {
+  .exercise-carousel-3d {
+    --card-width: min(52vw, 380px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .exercise-carousel-3d {
+    --card-width: min(34vw, 420px);
+  }
+}
+
+.carousel-helix-container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: var(--perspective);
+  transform-style: flat;
+}
+
+.carousel-card-helix {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* Centra la tarjeta sobre el contenedor. `translate` es una propiedad
+     independiente de `transform`, así Motion puede animar rotateY/scale/
+     translateZ sin pisar el centrado. */
+  translate: -50% -50%;
+  width: var(--card-width);
+  aspect-ratio: 1 / 1;
+  transform-origin: center center;
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+}
+
+.carousel-card-helix[data-active='false'] {
+  filter: grayscale(0.45) brightness(0.72);
+}
+
+.carousel-card-helix > [data-plate],
+.carousel-flat-card > [data-plate] {
+  box-shadow: 0 28px 70px -24px rgba(0, 0, 0, 0.9);
+  transition:
+    box-shadow 0.5s ease,
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.carousel-card-helix[data-active='true'] > [data-plate] {
+  box-shadow:
+    0 38px 90px -28px rgba(0, 0, 0, 0.95),
+    0 0 0 1px color-mix(in srgb, var(--green) 50%, transparent),
+    0 0 64px color-mix(in srgb, var(--green) 16%, transparent);
+}
+
+@media (hover: hover) {
+  .carousel-card-helix[data-active='true']:hover > [data-plate] {
+    transform: scale(1.02);
+  }
+}
+
+/* Modo reduced motion: pista plana con scroll nativo. */
+.carousel-flat {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  padding: 1.25rem 1.25rem 1.5rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+@media (min-width: 640px) {
+  .carousel-flat {
+    gap: 1.5rem;
+    padding-inline: 1.5rem;
+  }
+}
+
+.carousel-flat::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel-flat-card {
+  flex: 0 0 auto;
+  width: var(--card-width);
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carousel-card-helix,
+  .carousel-flat-card > [data-plate] {
+    transition: none;
+  }
+
+  /* boneyard aplica el shimmer en un `animation` inline sin consultar la
+     preferencia; la clase global (main.tsx) permite anularlo. */
+  .boneyard-bone,
+  [data-boneyard-overlay] {
+    animation: none !important;
+    transition: none !important;
+  }
+}

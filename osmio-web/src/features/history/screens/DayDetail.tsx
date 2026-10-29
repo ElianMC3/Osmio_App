@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { Skeleton } from 'boneyard-js/react'
 import { GreenCard } from '@/design-system/components/GreenCard'
 import { sessionsApi } from '@/services/api/sessions.api'
 import { nutritionApi } from '@/services/api/nutrition.api'
 import type { StrengthSession, CombatSession } from '@/shared/types/session.types'
 import type { DailyNutrition } from '@/shared/types/nutrition.types'
+import { DayDetailSkeletonFixture } from '@/design-system/skeletons/fixtures'
 
 export default function DayDetail() {
   const { date } = useParams()
@@ -70,7 +72,17 @@ export default function DayDetail() {
         </button>
       </header>
 
-      <div className="p-md space-y-lg">
+      <Skeleton
+        name="day-detail"
+        loading={loading}
+        select="viewport"
+        transition={180}
+        className="block"
+        fixture={<DayDetailSkeletonFixture />}
+        fallback={<DayDetailSkeletonFixture />}
+      >
+        {loading ? null : (
+        <div className="p-md space-y-lg">
         {/* Summary Section */}
         <div className="grid grid-cols-2 gap-sm">
           <GreenCard variant="default" padding="md" className="flex items-center gap-md">
@@ -90,11 +102,7 @@ export default function DayDetail() {
         </div>
 
         {/* Session Cards */}
-        {loading ? (
-          <div className="flex justify-center py-10">
-            <p className="font-label-caps text-sm text-text-muted animate-pulse">Cargando sesiones…</p>
-          </div>
-        ) : sessions.length === 0 ? (
+        {sessions.length === 0 ? (
           <GreenCard variant="glass" padding="md" className="flex justify-center py-10">
             <p className="font-label-caps text-sm text-text-muted">SIN SESIONES REGISTRADAS</p>
           </GreenCard>
@@ -262,6 +270,8 @@ export default function DayDetail() {
           </div>
         </div>
       </div>
+        )}
+      </Skeleton>
 
     </div>
   )

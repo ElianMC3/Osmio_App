@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Skeleton } from 'boneyard-js/react'
 import { motion } from 'motion/react'
 import { nutritionApi } from '@/services/api/nutrition.api'
 import NutritionRecommendationCard from '../components/NutritionRecommendationCard'
 import type { DailyNutrition } from '@/shared/types/nutrition.types'
 import { toLocalDateString } from '@/shared/utils/dateHelpers'
+import { NutritionDashboardSkeletonFixture } from '@/design-system/skeletons/fixtures'
 
 const quickAddPresets = [
   { icon: 'blender', name: 'Batido Proteico 1-Tap', kcal: 320, protein: 35, carbs: 20, fat: 5 },
@@ -16,6 +18,7 @@ const quickAddPresets = [
 export default function NutritionDashboard() {
   const navigate = useNavigate()
   const [nutrition, setNutrition] = useState<DailyNutrition | null>(null)
+  const [loading, setLoading] = useState(true)
 
   const today = toLocalDateString()
 
@@ -26,6 +29,8 @@ export default function NutritionDashboard() {
         setNutrition(data)
       } catch (e) {
         console.error('Error loading nutrition:', e)
+      } finally {
+        setLoading(false)
       }
     }
     fetchData()
@@ -109,6 +114,16 @@ export default function NutritionDashboard() {
       <NutritionRecommendationCard />
 
       {/* Main Grid Section */}
+      <Skeleton
+        name="nutrition-dashboard"
+        loading={loading}
+        select="viewport"
+        transition={180}
+        className="block"
+        fixture={<NutritionDashboardSkeletonFixture />}
+        fallback={<NutritionDashboardSkeletonFixture />}
+      >
+        {loading ? null : (
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
         {/* Calorie Summary Ring Card */}
         <div className="md:col-span-5 bg-surface-container/50 backdrop-blur-xl border border-outline-variant/30 rounded-2xl p-6 flex flex-col items-center justify-center relative overflow-hidden">
@@ -226,6 +241,8 @@ export default function NutritionDashboard() {
           </div>
         </div>
       </div>
+        )}
+      </Skeleton>
 
       {/* 1-Tap Presets Section */}
       <div className="space-y-4 pt-4">

@@ -76,7 +76,7 @@ export default function SplashWelcome() {
       {/* CTA Footer — quote + buttons + metadata */}
       <footer className="relative z-20 w-full flex-shrink-0 flex flex-col items-center border-t border-outline-variant/20 px-8 pt-6 pb-8 gap-5">
         {/* Single unified column, wide enough to not word-wrap */}
-        <div className="w-full max-w-xl flex flex-col gap-5">
+        <div className="w-full max-w-[36rem] flex flex-col gap-5">
           {/* Quote */}
           <p className="text-sm sm:text-base leading-relaxed border-l-2 border-primary-fixed pl-4 text-left italic text-on-surface-variant opacity-85">
             "El cuaderno de un peleador, con esteroides tecnológicos."

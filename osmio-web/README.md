@@ -63,6 +63,7 @@ npm run dev       # servidor de desarrollo
 npm run build     # tsc -b + build de producción
 npm run lint      # oxlint
 npm run preview   # previsualiza el build
+npm run bones     # regenera los skeleton loaders (ver más abajo)
 ```
 
 ---
@@ -199,6 +200,64 @@ Componentes base reutilizables: `Button`, `Card`, `GreenCard`, `GreenButton`, `G
 `AnalysisTabs` implementa las pestañas de la sección de análisis.
 
 Las animaciones de tabs, botones y navegación usan `motion/react` (indicadores con `layoutId`, `AnimatePresence` en el sidebar móvil y transiciones entre rutas). El scroll suave lo aporta `SmoothScroll` (`src/shared/components/SmoothScroll.tsx`), que monta Lenis sobre el scroll de la ventana, sincroniza su loop con Motion y se desactiva con `prefers-reduced-motion`. Al cambiar de ruta, la posición vuelve al inicio.
+
+### Skeleton loaders
+
+Los estados de carga usan [boneyard-js](https://boneyard.vercel.app): el contenido real se envuelve en `<Skeleton name="..." loading={...}>` y, mientras `loading` es `true`, se pintan huesos medidos del layout de verdad (no placeholders inventados a mano). Configuración en `boneyard.config.json`; la salida vive en `src/bones/` y se registra una sola vez en `src/main.tsx`.
+
+La estructura que se mide se declara en `fixture`, que solo se renderiza durante el build (`window.__BONEYARD_BUILD`). Todos los fixtures viven en `src/design-system/skeletons/fixtures.tsx` y deben mantenerse alineados con el layout real de cada pantalla:
+
+- Copia las clases reales del contenido (radios, bordes, paddings, grid) para que los huesos caigan donde caerá el contenido.
+- Nada de `vh` ni `min-h-screen` (salvo `AppShellSkeleton`, que representa el shell): boneyard reescala según la altura del contenedor y una captura dependiente del viewport deformaría la tarjeta.
+- Las hojas usan `bg-surface-container-high`; sin texto de relleno, porque el hueso ya comunica la forma.
+
+Patrón de uso:
+
+```tsx
+<Skeleton
+  name="dashboard-hoy"
+  loading={loading}
+  select="viewport"
+  transition={180}
+  className="block"
+  fixture={<DashboardHoySkeletonFixture />}
+  fallback={<DashboardHoySkeletonFixture />}
+>
+  {loading ? null : <div>…contenido real…</div>}
+</Skeleton>
+```
+
+`select="viewport"` hace que el breakpoint se resuelva por el ancho de ventana (el CLI captura así), no por el contenedor. `{loading ? null : …}` mantiene la altura del host determinista para que el paso de huesos a contenido no salte. `fallback` cubre el caso de un hueso no registrado (build de producción sin captura): se ve el mismo fixture, estático.
+
+Los encabezados (`PageHeader`) y las pestañas de análisis (`AnalysisTabs`) se renderizan siempre; los contadores dinámicos se sustituyen por `StatusPillBone` mientras cargan, fuera del host de boneyard. `AppShellSkeleton` (auth/redirect) y `SessionCardSkeleton` (historial del panel de detalle, que vive dentro de una hoja y no es capturable) están escritos a mano.
+
+| Skeleton | Ruta | Pantalla |
+|----------|------|----------|
+| `dashboard-hoy` | `/dashboard` | `DashboardHoy` |
+| `my-routine` | `/strength/routine` | `MyRoutine` |
+| `monthly-calendar` | `/history` | `MonthlyCalendar` |
+| `day-detail` | `/history/:date` | `DayDetail` |
+| `nutrition-dashboard` | `/nutrition` | `NutritionDashboard` (solo la rejilla principal) |
+| `nutrition-recommendation` | `/nutrition` | `NutritionRecommendationCard` |
+| `day-nutrition-detail` | `/nutrition/:date` | `DayNutritionDetail` |
+| `strength-analysis` | `/analysis/strength` | `StrengthAnalysis` |
+| `combat-load-analysis` | `/analysis/combat` | `CombatLoadAnalysis` |
+| `consistency-map` | `/analysis/consistency` | `ConsistencyMap` |
+| `profile-settings` | `/profile` | `ProfileSettings` |
+| `exercise-picker` | `/logging/strength/picker` | `ExercisePicker` |
+| `exercise-history` | `/logging/strength/history` | `ExerciseHistory` |
+
+Regeneración (el CLI necesita una sesión iniciada, por eso reutiliza un Chrome ya autenticado). Las rutas que recorre están en `boneyard.config.json` → `routes`; si añades una pantalla con skeleton, añádela también ahí:
+
+```bash
+# 1. Chrome con puerto de depuración y perfil propio
+google-chrome --remote-debugging-port=9222 --user-data-dir=/tmp/chrome-bones
+
+# 2. Inicia sesión en http://localhost:5173 y luego (con `npm run dev` activo):
+npm run bones -- --cdp 9222
+```
+
+`boneyard-js` detecta el modo oscuro por la clase `.dark` en `<html>`; `applyTheme` la sincroniza con `data-theme`. Los huesos de `Bone`/`StatusPillBone` pulsan con `animate-pulse` y respetan `prefers-reduced-motion` (`motion-reduce:animate-none`); el shimmer de boneyard se desactiva con la preferencia del sistema.
 
 ---
 

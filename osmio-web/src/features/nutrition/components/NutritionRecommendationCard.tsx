@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Skeleton } from 'boneyard-js/react'
 import { profilesApi } from '@/services/api/profiles.api'
 import { nutritionApi } from '@/services/api/nutrition.api'
 import { ACTIVITY_MULTIPLIERS, DEFAULT_AGE } from '@/shared/utils/calorieCalculator'
 import { useCalorieGoal } from '../hooks/useCalorieGoal'
+import { NutritionRecommendationSkeletonFixture } from '@/design-system/skeletons/fixtures'
 
 export default function NutritionRecommendationCard() {
   const navigate = useNavigate()
@@ -67,16 +69,17 @@ export default function NutritionRecommendationCard() {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="bg-surface-container/50 backdrop-blur-xl border border-outline-variant/30 rounded-2xl p-5">
-        <p className="font-label-caps text-sm text-on-surface-variant animate-pulse">Calculando recomendación…</p>
-      </div>
-    )
-  }
-
-  if (!hasData) {
-    return (
+  return (
+    <Skeleton
+      name="nutrition-recommendation"
+      loading={loading}
+      select="viewport"
+      transition={180}
+      className="block"
+      fixture={<NutritionRecommendationSkeletonFixture />}
+      fallback={<NutritionRecommendationSkeletonFixture />}
+    >
+      {loading ? null : !hasData ? (
       <div className="bg-surface-container/50 backdrop-blur-xl border border-outline-variant/30 rounded-2xl p-5 flex items-center justify-between gap-4">
         <div>
           <p className="font-label-caps text-sm text-on-surface font-bold">Recomendación nutricional</p>
@@ -91,10 +94,7 @@ export default function NutritionRecommendationCard() {
           COMPLETAR PERFIL
         </button>
       </div>
-    )
-  }
-
-  return (
+      ) : (
     <div className="bg-gradient-to-br from-primary-fixed/10 to-secondary/5 backdrop-blur-xl border border-primary-fixed/30 rounded-2xl p-6 relative overflow-hidden">
       <div className="absolute -right-14 -top-14 opacity-10 w-48 h-48 bg-primary-fixed blur-[80px] pointer-events-none" />
 
@@ -166,5 +166,7 @@ export default function NutritionRecommendationCard() {
         </button>
       </div>
     </div>
+      )}
+    </Skeleton>
   )
 }
