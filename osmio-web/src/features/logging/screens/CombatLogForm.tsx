@@ -56,7 +56,7 @@ export default function CombatLogForm() {
   }
 
   return (
-    <div className="relative min-h-screen pb-32">
+    <div className="relative min-h-dvh pb-[calc(9rem+env(safe-area-inset-bottom,0px))]">
       <PageBackdrop />
       <main className="relative z-10 px-5 pt-6 space-y-6 max-w-4xl mx-auto">
         <PageHeader

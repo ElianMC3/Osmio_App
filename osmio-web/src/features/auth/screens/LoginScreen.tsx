@@ -69,9 +69,9 @@ export default function LoginScreen() {
   }
 
   return (
-    <div className="relative min-h-screen bg-surface overflow-hidden">
+    <div className="relative min-h-dvh bg-surface overflow-hidden">
       <CyberBackground />
-      <div className="relative z-10 min-h-screen flex items-center justify-center p-6">
+      <div className="relative z-10 min-h-dvh flex items-center justify-center p-6">
         <div className="w-full max-w-md glass-panel rounded-2xl p-8">
           <div className="text-center mb-10">
             <h1 className="font-headline-md text-4xl text-green mb-3 tracking-tight">OSMIO</h1>

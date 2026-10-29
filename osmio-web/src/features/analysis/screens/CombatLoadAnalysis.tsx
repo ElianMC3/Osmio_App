@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useReducedMotion } from 'motion/react'
 import { Skeleton } from 'boneyard-js/react'
+import { Area, AreaChart } from '@/components/charts/area-chart'
+import { Grid } from '@/components/charts/grid'
+import { XAxis } from '@/components/charts/x-axis'
+import { ChartTooltip } from '@/components/charts/tooltip'
 import { GreenCard } from '@/design-system/components/GreenCard'
 import { GreenProgress } from '@/design-system/components/GreenProgress'
 import { PageBackdrop } from '@/design-system/components/PageBackdrop'
@@ -8,11 +13,13 @@ import { PageHeader } from '@/design-system/components/PageHeader'
 import { SectionHeader } from '@/design-system/components/SectionHeader'
 import { analyticsApi } from '@/services/api/analytics.api'
 import type { CombatAnalytics } from '@/services/api/analytics.api'
+import { isoWeekToDate } from '@/shared/utils/heatmap'
 import AnalysisTabs from '../components/AnalysisTabs'
 import { CombatLoadAnalysisSkeletonFixture, StatusPillBone } from '@/design-system/skeletons/fixtures'
 
 export default function CombatLoadAnalysis() {
   const navigate = useNavigate()
+  const reduceMotion = useReducedMotion()
   const [data, setData] = useState<CombatAnalytics | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -36,10 +43,17 @@ export default function CombatLoadAnalysis() {
     grappling: w.grappling,
   }))
 
-  const maxRounds = Math.max(1, ...weeklyData.map((d) => d.striking + d.grappling))
   const totalRounds = (data?.totalRounds.striking ?? 0) + (data?.totalRounds.grappling ?? 0)
   const avgPerDay = weeklyData.length > 0 ? Math.round(totalRounds / (weeklyData.length * 7)) : 0
   const roundsByWeek = data?.roundsByWeek ?? []
+  const combatChartData = roundsByWeek.slice(-8).map((week) => ({
+    date: isoWeekToDate(week.week),
+    striking: week.striking,
+    grappling: week.grappling,
+  }))
+  const combatLabels = combatChartData.map((point) =>
+    point.date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }),
+  )
   const prev = roundsByWeek.length > 1 ? roundsByWeek[roundsByWeek.length - 2] : null
   const prevStriking = prev?.striking ?? 0
   const prevGrappling = prev?.grappling ?? 0
@@ -51,7 +65,7 @@ export default function CombatLoadAnalysis() {
   const grapplingPct = totalRounds > 0 ? Math.round((grapplingTotal / totalRounds) * 100) : 50
 
   return (
-    <div className="relative min-h-screen pb-24">
+    <div className="relative min-h-dvh pb-[calc(7.25rem+env(safe-area-inset-bottom,0px))]">
       <PageBackdrop />
       <div className="relative z-10 max-w-4xl mx-auto">
         <div className="px-5 pt-6">
@@ -115,36 +129,45 @@ export default function CombatLoadAnalysis() {
               <span className="w-3 h-3 bg-outline rounded-[3px]" />
               <span className="font-label-sm text-label-sm text-text-green">GRAPPLING</span>
             </div>
-            <div className="flex items-center gap-xs ml-auto">
-              <span className="w-3 h-0.5 bg-acid" />
-              <span className="font-label-sm text-label-sm text-text-green">INTENSIDAD (1-10)</span>
-            </div>
           </div>
 
           <GreenCard padding="md" className="relative overflow-hidden">
             <span className="gradient-hairline" />
             <SectionHeader kicker="VOLUMEN TÁCTICO" title="Rounds por Semana" />
-            <div className="flex items-end justify-between gap-md h-48 mt-md">
-              {weeklyData.map((d) => {
-                const strikingH = (d.striking / maxRounds) * 100
-                const grapplingH = (d.grappling / maxRounds) * 100
-                return (
-                  <div key={d.label} className="flex-1 flex flex-col justify-end items-center gap-1 group">
-                    <div className="flex flex-col gap-unit w-full items-center">
-                      <div
-                        className="w-10 bg-outline group-hover:opacity-100 transition-opacity rounded-t-sm"
-                        style={{ height: `${grapplingH}%`, minHeight: d.grappling > 0 ? 8 : 0 }}
-                      />
-                      <div
-                        className="w-10 bg-gradient-to-t from-primary via-green to-acid group-hover:opacity-100 transition-opacity rounded-t-sm shadow-[0_0_10px_color-mix(in_srgb,var(--green)_30%,transparent)]"
-                        style={{ height: `${strikingH}%`, minHeight: d.striking > 0 ? 8 : 0 }}
-                      />
-                    </div>
-                    <span className="font-label-caps text-label-caps mt-sm text-text-muted">{d.label}</span>
-                  </div>
-                )
-              })}
-            </div>
+            {combatChartData.length > 1 ? (
+              <div className="mt-md">
+                <AreaChart
+                  data={combatChartData}
+                  xDataKey="date"
+                  aspectRatio="5 / 2"
+                  animationDuration={reduceMotion ? 0 : 800}
+                  margin={{ top: 20, right: 16, bottom: 24, left: 16 }}
+                >
+                  <Grid horizontal strokeDasharray="3,5" />
+                  <Area
+                    dataKey="striking"
+                    fill="var(--chart-line-primary)"
+                    fillOpacity={0.35}
+                    strokeWidth={2}
+                    animate={!reduceMotion}
+                  />
+                  <Area
+                    dataKey="grappling"
+                    fill="var(--outline)"
+                    stroke="var(--outline)"
+                    fillOpacity={0.2}
+                    strokeWidth={2}
+                    animate={!reduceMotion}
+                  />
+                  <XAxis labels={combatLabels} numTicks={5} />
+                  <ChartTooltip />
+                </AreaChart>
+              </div>
+            ) : (
+              <div className="py-8 text-center font-label-caps text-sm text-text-muted opacity-40">
+                SIN DATOS DE ROUNDS
+              </div>
+            )}
           </GreenCard>
 
           <div className="grid grid-cols-3 gap-sm">

@@ -190,13 +190,16 @@ export default function StrengthActiveSession() {
       navigate(-1)
     } catch (e) {
       console.error('Error saving strength session:', e)
+      toast.error('No se pudo guardar la sesión', 'Revisa tu conexión y vuelve a intentarlo.', {
+        action: { label: 'Reintentar', onClick: finishSession },
+      })
     } finally {
       setSaving(false)
     }
   }
 
   return (
-    <div className="relative min-h-screen pb-32">
+    <div className="relative min-h-dvh pb-[calc(9rem+env(safe-area-inset-bottom,0px))]">
       <PageBackdrop />
       <main className="relative z-10 px-5 pt-6 space-y-5 max-w-4xl mx-auto">
         <PageHeader

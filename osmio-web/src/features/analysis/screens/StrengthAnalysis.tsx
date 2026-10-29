@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useReducedMotion } from 'motion/react'
 import { Skeleton } from 'boneyard-js/react'
+import { Area, AreaChart } from '@/components/charts/area-chart'
+import { Grid } from '@/components/charts/grid'
+import { XAxis } from '@/components/charts/x-axis'
+import { ChartTooltip } from '@/components/charts/tooltip'
 import { GreenCard } from '@/design-system/components/GreenCard'
 import { GreenButton } from '@/design-system/components/GreenButton'
 import { PageBackdrop } from '@/design-system/components/PageBackdrop'
@@ -10,11 +15,13 @@ import { analyticsApi } from '@/services/api/analytics.api'
 import { useProgression } from '../../strength/hooks/useProgression'
 import type { ProgressionRecommendation } from '../../strength/lib/progression'
 import type { StrengthAnalytics } from '@/services/api/analytics.api'
+import { isoWeekToDate } from '@/shared/utils/heatmap'
 import AnalysisTabs from '../components/AnalysisTabs'
 import { StrengthAnalysisSkeletonFixture, StatusPillBone } from '@/design-system/skeletons/fixtures'
 
 export default function StrengthAnalysis() {
   const navigate = useNavigate()
+  const reduceMotion = useReducedMotion()
   const [data, setData] = useState<StrengthAnalytics | null>(null)
   const [activeChip, setActiveChip] = useState<'technical' | 'physical' | 'sparring'>('physical')
   const { routines, recommendations, loading: progressionLoading } = useProgression()
@@ -31,15 +38,17 @@ export default function StrengthAnalysis() {
     fetchData()
   }, [])
 
-  const weeklyBars = ['L', 'M', 'X', 'J', 'V', 'S', 'D'].map((label, i) => {
-    const vol = data?.volumeByWeek[i]
-    return { label, height: vol ? Math.min(Math.round(vol.load / 500), 100) : 0 }
-  })
-
   const totalVolume = data?.volumeByWeek.reduce((s, w) => s + w.load, 0) ?? 0
   const prCount = data?.prs.length ?? 0
-  const avgDaily = weeklyBars.length > 0 ? Math.round(totalVolume / weeklyBars.length) : 0
   const weeks = data?.volumeByWeek ?? []
+  const avgDaily = weeks.length > 0 ? Math.round(totalVolume / weeks.length) : 0
+  const strengthChartData = weeks.map((week) => ({
+    date: isoWeekToDate(week.week),
+    volume: week.load,
+  }))
+  const strengthLabels = strengthChartData.map((point) =>
+    point.date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }),
+  )
   const prevVolume = weeks.length > 1 ? weeks[weeks.length - 2].load : 0
   const lastVolume = weeks.length > 0 ? weeks[weeks.length - 1].load : 0
   const changePct = prevVolume > 0 ? Math.round(((lastVolume - prevVolume) / prevVolume) * 100) : 0
@@ -71,7 +80,7 @@ export default function StrengthAnalysis() {
   }
 
   return (
-    <div className="relative min-h-screen pb-24">
+    <div className="relative min-h-dvh pb-[calc(7.25rem+env(safe-area-inset-bottom,0px))]">
       <PageBackdrop />
       <div className="relative z-10 max-w-4xl mx-auto">
         <div className="px-5 pt-6">
@@ -209,29 +218,30 @@ export default function StrengthAnalysis() {
             <div className="mb-4">
               <SectionHeader kicker="LOAD INTENSITY" title="Volumen Semanal" />
             </div>
-            <div className="flex items-end justify-between gap-xs h-40">
-              {weeklyBars.map((bar, i) => (
-                <div key={bar.label} className="flex flex-col items-center flex-1 group">
-                  <div className="w-full bg-surface-container-low h-full relative rounded-t-sm">
-                    <div
-                      className={`absolute bottom-0 w-full transition-all rounded-t-sm ${
-                        i === weeklyBars.length - 1
-                          ? 'bg-gradient-to-t from-primary via-green to-acid shadow-[0_0_16px_color-mix(in_srgb,var(--green)_45%,transparent)]'
-                          : 'bg-green/40 group-hover:bg-green/60'
-                      }`}
-                      style={{ height: `${bar.height}%` }}
-                    />
-                  </div>
-                  <span
-                    className={`font-label-caps text-[8px] mt-xs ${
-                      i === weeklyBars.length - 1 ? 'text-green' : 'text-text-muted'
-                    }`}
-                  >
-                    {bar.label}
-                  </span>
-                </div>
-              ))}
-            </div>
+            {strengthChartData.length > 1 ? (
+              <AreaChart
+                data={strengthChartData}
+                xDataKey="date"
+                aspectRatio="5 / 2"
+                animationDuration={reduceMotion ? 0 : 800}
+                margin={{ top: 20, right: 16, bottom: 24, left: 16 }}
+              >
+                <Grid horizontal strokeDasharray="3,5" />
+                <Area
+                  dataKey="volume"
+                  fill="var(--chart-line-primary)"
+                  fillOpacity={0.35}
+                  strokeWidth={2}
+                  animate={!reduceMotion}
+                />
+                <XAxis labels={strengthLabels} numTicks={5} />
+                <ChartTooltip />
+              </AreaChart>
+            ) : (
+              <div className="py-8 text-center font-label-caps text-sm text-text-muted opacity-40">
+                SIN DATOS DE VOLUMEN
+              </div>
+            )}
             <div className="pt-md border-t border-outline-variant/25 flex justify-between items-baseline mt-md">
               <span className="font-label-caps text-label-caps text-text-muted">TOTAL TONNAGE</span>
               <div className="flex items-baseline gap-xs">

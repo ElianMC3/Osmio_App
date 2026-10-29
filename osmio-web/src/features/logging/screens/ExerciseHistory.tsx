@@ -43,7 +43,7 @@ export default function ExerciseHistory() {
   }, [exerciseId])
 
   return (
-    <div className="relative min-h-screen pb-24">
+    <div className="relative min-h-dvh pb-[calc(7.25rem+env(safe-area-inset-bottom,0px))]">
       <PageBackdrop />
       <div className="relative z-10 max-w-3xl mx-auto">
         <div className="px-5 pt-6">

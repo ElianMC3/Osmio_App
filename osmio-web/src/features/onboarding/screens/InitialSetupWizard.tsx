@@ -56,7 +56,7 @@ export default function InitialSetupWizard() {
   }
 
   return (
-    <div className="min-h-screen grid-bg relative">
+    <div className="min-h-dvh grid-bg relative">
       <style>{`
         .grid-bg {
           background-image:

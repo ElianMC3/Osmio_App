@@ -44,6 +44,11 @@ export function writeThemeSettings(settings: ThemeSettings) {
   }
 }
 
+const SURFACE_BY_MODE: Record<ThemeMode, string> = {
+  dark: '#0f0e0e',
+  light: '#f7f7f0',
+}
+
 export function applyTheme(settings: ThemeSettings) {
   const root = document.documentElement
   root.dataset.theme = settings.mode
@@ -51,6 +56,13 @@ export function applyTheme(settings: ThemeSettings) {
   // Convención Tailwind: las librerías de terceros (boneyard, shadcn, etc.)
   // detectan el modo oscuro por la clase `.dark` en <html>.
   root.classList.toggle('dark', settings.mode === 'dark')
+  // El chrome del navegador (status bar) sigue al tema de la app, que se cambia
+  // por clase y no por la preferencia del sistema.
+  document
+    .querySelector('meta[name="theme-color"]')
+    ?.setAttribute('content', SURFACE_BY_MODE[settings.mode])
+  // Listeners externos (Toaster de Sonner) reaccionan al cambio de tema.
+  window.dispatchEvent(new CustomEvent('osmio:themechange', { detail: settings }))
 }
 
 export function initTheme() {

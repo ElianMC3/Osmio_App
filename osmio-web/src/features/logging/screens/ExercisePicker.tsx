@@ -122,7 +122,7 @@ export default function ExercisePicker() {
   }
 
   return (
-    <div className="relative min-h-screen pb-24">
+    <div className="relative min-h-dvh pb-[calc(7.25rem+env(safe-area-inset-bottom,0px))]">
       <PageBackdrop />
 
       <div className="relative z-10 mx-auto max-w-3xl px-5 pt-6">

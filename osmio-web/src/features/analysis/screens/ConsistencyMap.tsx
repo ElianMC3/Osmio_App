@@ -1,24 +1,30 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useReducedMotion } from 'motion/react'
 import { Skeleton } from 'boneyard-js/react'
+import {
+  HeatmapCells,
+  HeatmapChart,
+  HeatmapInteractionBoundary,
+  HeatmapInteractionProvider,
+  HeatmapLegend,
+  HeatmapTooltip,
+  HeatmapXAxis,
+  HeatmapYAxis,
+} from '@/components/charts/heatmap'
 import { GreenCard } from '@/design-system/components/GreenCard'
 import { GreenProgress } from '@/design-system/components/GreenProgress'
 import { PageBackdrop } from '@/design-system/components/PageBackdrop'
 import { PageHeader } from '@/design-system/components/PageHeader'
 import { analyticsApi } from '@/services/api/analytics.api'
+import { buildConsistencyHeatmap } from '@/shared/utils/heatmap'
 import AnalysisTabs from '../components/AnalysisTabs'
 import { ConsistencyMapSkeletonFixture, StatusPillBone } from '@/design-system/skeletons/fixtures'
 
-const dayLabels = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
-
-function getHeatColor(active: boolean): string {
-  return active
-    ? 'bg-gradient-to-br from-green to-acid shadow-[0_0_8px_color-mix(in_srgb,var(--green)_45%,transparent)]'
-    : 'bg-surface-container-low'
-}
-
 export default function ConsistencyMap() {
   const navigate = useNavigate()
+  const reduceMotion = useReducedMotion()
+  const today = useMemo(() => new Date(), [])
   const [consistency, setConsistency] = useState<{ date: string; active: boolean }[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -36,21 +42,10 @@ export default function ConsistencyMap() {
     fetchData()
   }, [])
 
-  const heatmapData = useMemo(() => {
-    const weeks: { active: boolean }[][] = []
-    let currentWeek: { active: boolean }[] = []
-    for (const entry of consistency) {
-      const dayOfWeek = new Date(entry.date).getDay()
-      const adjustedDay = dayOfWeek === 0 ? 6 : dayOfWeek - 1
-      if (adjustedDay === 0 && currentWeek.length > 0) {
-        weeks.push(currentWeek)
-        currentWeek = []
-      }
-      currentWeek.push(entry)
-    }
-    if (currentWeek.length > 0) weeks.push(currentWeek)
-    return weeks.slice(-20)
-  }, [consistency])
+  const heatmapData = useMemo(
+    () => buildConsistencyHeatmap(consistency, today, 20),
+    [consistency, today],
+  )
 
   const totalActive = consistency.filter((c) => c.active).length
   const totalDays = consistency.length || 1
@@ -87,7 +82,7 @@ export default function ConsistencyMap() {
   ]
 
   return (
-    <div className="relative min-h-screen pb-24">
+    <div className="relative min-h-dvh pb-[calc(7.25rem+env(safe-area-inset-bottom,0px))]">
       <PageBackdrop />
       <div className="relative z-10 max-w-4xl mx-auto">
         <div className="px-5 pt-6">
@@ -129,68 +124,67 @@ export default function ConsistencyMap() {
             {consistency.length} días registrados
           </p>
 
-          <GreenCard padding="md"  className="relative overflow-hidden">
+          <GreenCard padding="md" className="relative overflow-hidden">
             <span className="gradient-hairline" />
-            <div className="flex items-center justify-between mb-md flex-wrap gap-sm">
-              <div className="flex items-center gap-sm">
-                <span className="material-symbols-outlined text-green" style={{ fontVariationSettings: '"FILL" 1' }}>calendar_view_month</span>
-                <h3 className="font-label-caps text-text-green">VOLUMEN DE ENTRENAMIENTO</h3>
-              </div>
-              <div className="flex items-center gap-xs">
-                <span className="font-label-caps text-[8px] text-text-muted mr-xs">MENOS</span>
-                {[
-                  'bg-surface-container-low',
-                  'bg-green/25',
-                  'bg-green-dim',
-                  'bg-green',
-                  'bg-gradient-to-br from-green to-acid',
-                ].map((color, i) => (
-                  <div key={i} className={`w-2.5 h-2.5 rounded-[2px] ${color}`} />
-                ))}
-                <span className="font-label-caps text-[8px] text-text-muted ml-xs">MÁS</span>
-              </div>
+            <div className="flex items-center gap-sm mb-md">
+              <span className="material-symbols-outlined text-green" style={{ fontVariationSettings: '"FILL" 1' }}>calendar_view_month</span>
+              <h3 className="font-label-caps text-text-green">VOLUMEN DE ENTRENAMIENTO</h3>
             </div>
 
-            <div className="overflow-x-auto scrollbar-thin pb-sm">
-              <div className="min-w-[600px]">
-                <div className="grid gap-[2px]" style={{ gridTemplateColumns: 'auto 1fr' }}>
-                  <div className="grid gap-[2px]" style={{ gridTemplateRows: 'repeat(7, 1fr)' }}>
-                    {dayLabels.map((label, i) => (
-                      <div key={label} className="h-3 flex items-center text-[8px] font-label-caps text-text-muted">
-                        {i % 2 === 0 ? label : ''}
-                      </div>
-                    ))}
-                  </div>
-
-                  {heatmapData.length > 0 ? (
-                    <div
-                      className="grid gap-[2px]"
-                      style={{
-                        gridTemplateColumns: `repeat(${heatmapData.length}, 1fr)`,
-                        gridTemplateRows: 'repeat(7, 1fr)',
-                      }}
+            {consistency.length > 0 ? (
+              <div className="overflow-x-auto scrollbar-thin pb-sm">
+                <HeatmapInteractionProvider>
+                  <HeatmapInteractionBoundary className="min-w-[480px]">
+                    <HeatmapChart
+                      data={heatmapData}
+                      weekStartDay={1}
+                      layout="fluid"
+                      cellHeight={28}
+                      gap={3}
+                      margin={{ top: 24, right: 0, bottom: 0, left: 32 }}
+                      animate={!reduceMotion}
+                      animationDuration={reduceMotion ? 0 : 900}
                     >
-                      {Array.from({ length: 7 }, (_, dayIndex) =>
-                        heatmapData.map((week, weekIndex) => {
-                          const entry = week[dayIndex]
-                          return (
-                            <div
-                              key={`${weekIndex}-${dayIndex}`}
-                              className={`aspect-square rounded-[3px] ${getHeatColor(entry?.active ?? false)} transition-all hover:scale-125 cursor-pointer`}
-                              title={`Sem ${weekIndex + 1}, ${dayLabels[dayIndex]}: ${entry?.active ? 'Activo' : 'Inactivo'}`}
-                            />
-                          )
-                        })
-                      )}
+                      <HeatmapCells cornerRadius={3} />
+                      <HeatmapXAxis className="font-label-caps text-[8px] text-text-muted uppercase" />
+                      <HeatmapYAxis
+                        tickFilter="odd"
+                        labelFormat="full"
+                        className="font-label-caps text-[8px] text-text-muted uppercase"
+                      />
+                      <HeatmapTooltip
+                        formatHeader={(date) =>
+                          date.toLocaleDateString('es-ES', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                          })
+                        }
+                        formatWeekday={(date) =>
+                          date.toLocaleDateString('es-ES', { weekday: 'long' })
+                        }
+                        formatLabel={(count) =>
+                          count > 0 ? 'Día activo' : 'Sin actividad'
+                        }
+                      />
+                    </HeatmapChart>
+                    <div className="mt-sm flex justify-end">
+                      <HeatmapLegend
+                        lessLabel="MENOS"
+                        moreLabel="MÁS"
+                        cellSize={10}
+                        fontSize={8}
+                        labelClassName="font-label-caps text-[8px] text-text-muted uppercase"
+                      />
                     </div>
-                  ) : (
-                    <div className="py-6 text-center font-label-caps text-sm text-text-muted opacity-40">
-                      SIN DATOS DE CONSISTENCIA
-                    </div>
-                  )}
-                </div>
+                  </HeatmapInteractionBoundary>
+                </HeatmapInteractionProvider>
               </div>
-            </div>
+            ) : (
+              <div className="py-6 text-center font-label-caps text-sm text-text-muted opacity-40">
+                SIN DATOS DE CONSISTENCIA
+              </div>
+            )}
           </GreenCard>
 
           <div className="grid grid-cols-2 gap-sm">

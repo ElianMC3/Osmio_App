@@ -2,6 +2,8 @@
 @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap");
 @import "tailwindcss";
 
+@custom-variant dark (&:is([data-theme="dark"] *));
+
 /* ---------------------------------------------------------------------------
    Theme system (Tailwind v4)
    All color tokens reference runtime CSS vars so dark/light mode and the
@@ -208,6 +210,41 @@
   --paper: #d7dcc5;
   --text-green: #e9eddc;
   --text-muted: #aab497;
+  --chart-1: var(--green);
+  --chart-2: var(--acid);
+  --chart-3: var(--green-dim);
+  --chart-4: var(--text-muted);
+  --chart-5: var(--on-surface);
+  --chart-positive: var(--green);
+  --chart-negative: var(--error);
+  --chart-background: var(--surface-container);
+  --chart-foreground: var(--on-surface);
+  --chart-foreground-muted: var(--on-surface-variant);
+  --chart-line-primary: var(--green);
+  --chart-line-secondary: var(--acid);
+  --chart-crosshair: var(--green);
+  --chart-grid: color-mix(in srgb, var(--outline-variant) 45%, transparent);
+  --chart-brush-border: var(--chart-grid);
+  --chart-tooltip-background: var(--surface-container-high);
+  --chart-tooltip-foreground: var(--on-surface);
+  --chart-tooltip-muted: var(--text-muted);
+  --chart-marker-background: var(--surface-container-high);
+  --chart-marker-border: var(--outline-variant);
+  --chart-marker-foreground: var(--on-surface);
+  --chart-label: var(--text-muted);
+  --chart-scale-mix: var(--surface-container);
+  --chart-scale-01: var(--surface-container-low);
+  --chart-scale-02: color-mix(in srgb, var(--green) 35%, var(--chart-scale-mix));
+  --chart-scale-03: color-mix(in srgb, var(--green) 55%, var(--chart-scale-mix));
+  --chart-scale-04: color-mix(in srgb, var(--green) 78%, var(--chart-scale-mix));
+  --chart-scale-05: var(--green);
+  --chart-scale-pattern-color: var(--surface-container);
+  --chart-indicator-color: var(--green);
+  --chart-indicator-secondary-color: var(--surface-container-low);
+  --chart-marker-badge-background: var(--green);
+  --chart-marker-badge-foreground: var(--on-green);
+  --chart-segment-background: color-mix(in srgb, var(--green) 8%, transparent);
+  --chart-segment-line: color-mix(in srgb, var(--green) 35%, transparent);
 }
 
 /* ---------------------------------------------------------------------------
@@ -407,6 +444,32 @@
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* App de pantalla completa: sin fade gris/azul al tocar y sin
+       pull-to-refresh / rubber-band que roben el scroll. */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    overscroll-behavior: none;
+  }
+
+  /* Controles: respuesta inmediata sin doble-tap-zoom y sin selección de
+     texto al mantener pulsado. El body text sigue siendo copiable. */
+  button,
+  a,
+  [role="button"] {
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  /* iOS auto-zooma al enfocar inputs menores de 16px; solo subimos el tamaño
+     donde hay dedo, no en todo el sistema tipográfico. */
+  @media (pointer: coarse) {
+    input,
+    textarea,
+    select {
+      font-size: 16px;
+    }
   }
 
   ::selection {
@@ -812,3 +875,52 @@ input[type="range"]::-moz-range-track {
     transition: none !important;
   }
 }
+
+@theme inline {
+  --color-chart-line-primary: var(--chart-line-primary);
+  --color-chart-line-secondary: var(--chart-line-secondary);
+  --color-chart-brush-border: var(--chart-brush-border);
+  --color-chart-tooltip-background: var(--chart-tooltip-background);
+  --color-chart-tooltip-foreground: var(--chart-tooltip-foreground);
+  --color-chart-tooltip-muted: var(--chart-tooltip-muted);
+  --color-chart-scale-02: var(--chart-scale-02);
+  --color-chart-scale-03: var(--chart-scale-03);
+  --color-chart-scale-04: var(--chart-scale-04);
+  --color-chart-scale-05: var(--chart-scale-05);
+  --color-chart-segment-line: var(--chart-segment-line);
+  --color-chart-segment-background: var(--chart-segment-background);
+  --color-chart-marker-badge-foreground: var(--chart-marker-badge-foreground);
+  --color-chart-marker-badge-background: var(--chart-marker-badge-background);
+  --color-chart-indicator-secondary-color: var(--chart-indicator-secondary-color);
+  --color-chart-indicator-color: var(--chart-indicator-color);
+  --color-chart-scale-pattern-color: var(--chart-scale-pattern-color);
+  --chart-scale-05: var(--chart-scale-05);
+  --chart-scale-04: var(--chart-scale-04);
+  --chart-scale-03: var(--chart-scale-03);
+  --chart-scale-02: var(--chart-scale-02);
+  --color-chart-scale-01: var(--chart-scale-01);
+  --color-chart-scale-mix: var(--chart-scale-mix);
+  --color-chart-label: var(--chart-label);
+  --color-chart-marker-foreground: var(--chart-marker-foreground);
+  --color-chart-marker-border: var(--chart-marker-border);
+  --color-chart-marker-background: var(--chart-marker-background);
+  --chart-tooltip-muted: var(--chart-tooltip-muted);
+  --chart-tooltip-foreground: var(--chart-tooltip-foreground);
+  --chart-tooltip-background: var(--chart-tooltip-background);
+  --chart-brush-border: var(--chart-brush-border);
+  --color-chart-grid: var(--chart-grid);
+  --color-chart-crosshair: var(--chart-crosshair);
+  --chart-line-secondary: var(--chart-line-secondary);
+  --chart-line-primary: var(--chart-line-primary);
+  --color-chart-foreground-muted: var(--chart-foreground-muted);
+  --color-chart-foreground: var(--chart-foreground);
+  --color-chart-background: var(--chart-background);
+  --color-chart-negative: var(--chart-negative);
+  --color-chart-positive: var(--chart-positive);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+}
+

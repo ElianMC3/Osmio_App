@@ -47,7 +47,7 @@ export default function DayDetail() {
   const targetPct = nutrition ? Math.round((nutrition.totals.calories / nutrition.goal.calories) * 100) : 0
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-dvh pb-[calc(6.75rem+env(safe-area-inset-bottom,0px))]">
       {/* Header */}
       <header className="mx-md px-md h-14 flex items-center justify-between rounded-2xl bg-panel/80 backdrop-blur-xl border border-green/20 shadow-lg shadow-black/20">
         <div className="flex items-center gap-md">
