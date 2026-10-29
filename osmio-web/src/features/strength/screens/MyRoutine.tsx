@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Skeleton } from 'boneyard-js/react'
+import { toast } from '@/design-system/toast'
 import { GreenCard } from '@/design-system/components/GreenCard'
 import { GreenButton } from '@/design-system/components/GreenButton'
 import { GreenTag } from '@/design-system/components/GreenTag'
@@ -120,10 +121,12 @@ export default function MyRoutine() {
     setError(null)
     try {
       await routinesApi.createRoutine(newName.trim())
+      toast.success('Rutina creada', newName.trim())
       setNewName('')
       refresh()
     } catch (e) {
       console.error('Error creating routine:', e)
+      toast.error('No se pudo crear la rutina')
       setError(e instanceof Error ? e.message : 'No se pudo crear la rutina')
     } finally {
       setBusy(false)
@@ -131,9 +134,19 @@ export default function MyRoutine() {
   }
 
   const handleDeleteRoutine = async (id: string) => {
-    if (!window.confirm('¿Eliminar esta rutina?')) return
-    await routinesApi.deleteRoutine(id)
-    refresh()
+    toast.confirm('¿Eliminar esta rutina?', 'La rutina y sus ejercicios se borran. No se puede deshacer.', {
+      label: 'Eliminar',
+      onClick: async () => {
+        try {
+          await routinesApi.deleteRoutine(id)
+          refresh()
+          toast.success('Rutina eliminada')
+        } catch (e) {
+          console.error('Error deleting routine:', e)
+          toast.error('No se pudo eliminar la rutina')
+        }
+      },
+    })
   }
 
   const commitWeight = async (rex: RoutineExercise, value: string) => {

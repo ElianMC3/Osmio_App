@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Skeleton } from 'boneyard-js/react'
 import { motion } from 'motion/react'
 import { nutritionApi } from '@/services/api/nutrition.api'
+import { toast } from '@/design-system/toast'
 import NutritionRecommendationCard from '../components/NutritionRecommendationCard'
 import type { DailyNutrition } from '@/shared/types/nutrition.types'
 import { toLocalDateString } from '@/shared/utils/dateHelpers'
@@ -66,6 +67,7 @@ export default function NutritionDashboard() {
       } : null)
     } catch (e) {
       console.error('Error adding meal:', e)
+      toast.error('No se pudo registrar la comida')
     }
   }
 
