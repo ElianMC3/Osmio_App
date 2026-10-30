@@ -5,6 +5,7 @@ import { GreenButton } from '../../../design-system/components/GreenButton'
 import { GreenProgress } from '../../../design-system/components/GreenProgress'
 import { PageBackdrop } from '../../../design-system/components/PageBackdrop'
 import { PageHeader } from '../../../design-system/components/PageHeader'
+import { toast } from '../../../design-system/toast'
 import { sessionsApi } from '@/services/api/sessions.api'
 import { toLocalDateString } from '@/shared/utils/dateHelpers'
 
@@ -38,7 +39,7 @@ export default function CombatLogForm() {
     try {
       const durationMinutes = duration === '3:00' ? 3 : duration === '5:00' ? 5 : 5
       const trainingTag = (trainingType ?? '').toUpperCase()
-      await sessionsApi.createCombatSession({
+      const saved = await sessionsApi.createCombatSession({
         date: toLocalDateString(),
         type: discipline ?? (combatType === 'competencia' ? 'striking' : 'grappling'),
         rounds,
@@ -47,6 +48,9 @@ export default function CombatLogForm() {
         positions: [],
         notes: `${trainingTag ? `[${trainingTag}] ` : ''}${notes || `Resultado: ${result}`}`,
       })
+      if (saved.pending) {
+        toast.info('Guardada sin conexión', 'La sesión se sincronizará sola al volver la red.')
+      }
       navigate(-1)
     } catch (e) {
       console.error('Error saving combat session:', e)

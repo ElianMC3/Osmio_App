@@ -176,16 +176,26 @@ export default function StrengthActiveSession() {
     try {
       const date = toLocalDateString()
       const trainingTag = (trainingType ?? '').toUpperCase()
+      let pending = 0
       for (const ex of exercises) {
         const doneSets = ex.sets.filter((s) => s.done && (s.weight > 0 || s.reps > 0))
         if (doneSets.length === 0) continue
-        await sessionsApi.createStrengthSession({
+        const result = await sessionsApi.createStrengthSession({
           date,
           exerciseId: Number(ex.id),
           exerciseName: ex.name,
           sets: doneSets.map((s) => ({ reps: s.reps, weight: s.weight, rpe: 7 })),
           notes: `${trainingTag ? `[${trainingTag}] ` : ''}${notes}`.trim(),
         })
+        if (result.pending) pending += 1
+      }
+      if (pending > 0) {
+        toast.info(
+          'Guardada sin conexión',
+          pending === 1
+            ? 'La sesión se sincronizará sola al volver la red.'
+            : `${pending} sesiones se sincronizarán solas al volver la red.`,
+        )
       }
       navigate(-1)
     } catch (e) {

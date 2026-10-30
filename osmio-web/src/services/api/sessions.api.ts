@@ -1,179 +1,100 @@
-import { supabase } from '../supabase/client'
-import type { StrengthSession, CombatSession, Exercise } from '../../shared/types/session.types'
-import type {
-  CombatSessionRow,
-  ExerciseRow,
-  SetEntryRow,
-  StrengthSessionRow,
-  StrengthSessionWithSetsRow,
-} from './rows'
+import { isNetworkError } from '@/services/offline/network'
+import { sessionQueue } from '@/services/offline/sessionQueue'
+import type { CombatSession, Session, StrengthSession } from '../../shared/types/session.types'
+import { sessionsRemote } from './sessions.remote'
 
-function mapStrengthRow(row: StrengthSessionRow, sets?: StrengthSession['sets']): StrengthSession {
-  return {
-    id: row.id,
-    date: row.date,
-    exerciseId: row.exercise_id ?? 0,
-    exerciseName: row.exercise_name,
-    sets: sets ?? [],
-    notes: row.notes ?? '',
+/**
+ * API pública de sesiones para las pantallas.
+ *
+ * Escrituras: van primero a la cola de IndexedDB y luego se intenta subir. Si
+ * no hay red (o falla), la sesión queda pendiente y se sincroniza sola al
+ * volver la conexión. Lecturas: se mezclan el servidor y las pendientes, así lo
+ * que acabas de guardar offline aparece igual en el dashboard y el historial.
+ */
+
+export interface SaveResult<T> {
+  session: T
+  /** `true` si quedó en la cola esperando conexión. */
+  pending: boolean
+}
+
+function newSessionId(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID()
   }
+  // Contextos no seguros (http sin localhost) no exponen randomUUID.
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (char) => {
+    const random = (Math.random() * 16) | 0
+    const value = char === 'x' ? random : (random & 0x3) | 0x8
+    return value.toString(16)
+  })
 }
 
-function mapCombatRow(row: CombatSessionRow): CombatSession {
-  return {
-    id: row.id,
-    date: row.date,
-    type: row.type,
-    rounds: row.rounds,
-    durationMinutes: row.duration_minutes,
-    rpe: row.rpe ?? 0,
-    positions: row.positions ?? [],
-    notes: row.notes ?? '',
+function isStrength(session: Session): session is StrengthSession {
+  return 'sets' in session
+}
+
+/**
+ * Combina la respuesta del servidor con las sesiones pendientes. Si la red
+ * falla pero hay algo pendiente que mostrar, se devuelve eso en vez de romper
+ * la pantalla; si no hay nada pendiente, el error se propaga.
+ */
+async function mergePending<T extends Session>(
+  loadRemote: () => Promise<T[]>,
+  keep: (session: Session) => boolean,
+): Promise<T[]> {
+  // Si IndexedDB no está disponible, la app debe seguir funcionando online:
+  // la cola es una mejora, no un requisito para leer.
+  const pending = await sessionQueue
+    .pending()
+    .then((entries) => entries.map((entry) => entry.payload).filter(keep))
+    .catch(() => [] as Session[])
+
+  let remote: T[] = []
+  try {
+    remote = await loadRemote()
+  } catch (error) {
+    if (pending.length === 0 || !isNetworkError(error)) throw error
   }
-}
 
-function mapSets(entries: SetEntryRow[] | null | undefined): StrengthSession['sets'] {
-  return (entries ?? [])
-    .sort((a, b) => a.set_order - b.set_order)
-    .map((s) => ({ reps: s.reps, weight: s.weight, rpe: s.rpe ?? 0 }))
-}
+  const byId = new Map<string, Session>()
+  for (const session of remote) byId.set(session.id, session)
+  for (const session of pending) byId.set(session.id, session)
 
-async function requireUserId(): Promise<string> {
-  const { data, error } = await supabase.auth.getUser()
-  if (error || !data.user) throw new Error('Not authenticated')
-  return data.user.id
-}
-
-function mapExerciseRow(row: ExerciseRow): Exercise {
-  return {
-    id: row.id,
-    name: row.name,
-    category: row.category ?? '',
-    bodyPart: row.body_part ?? '',
-    equipment: row.equipment ?? '',
-    muscleGroup: row.muscle_group ?? '',
-    target: row.target ?? '',
-    secondaryMuscles: row.secondary_muscles ?? [],
-    instructions: (row.instructions ?? {}) as Record<string, string>,
-    image: row.image ?? '',
-    gifUrl: row.gif_url ?? '',
-    attribution: row.attribution ?? '',
-  }
+  return [...byId.values()] as T[]
 }
 
 export const sessionsApi = {
-  getExercises: async (): Promise<Exercise[]> => {
-    const { data, error } = await supabase
-      .from('exercises')
-      .select('id, name, category, body_part, equipment, muscle_group, target, secondary_muscles, instructions, image, gif_url, attribution')
-      .order('name')
-    if (error) throw new Error(error.message)
-    return ((data ?? []) as ExerciseRow[]).map(mapExerciseRow)
+  getExercises: sessionsRemote.getExercises,
+
+  getExercise: sessionsRemote.getExercise,
+
+  getSessionsByExercise: (exerciseId: number): Promise<StrengthSession[]> =>
+    mergePending(
+      () => sessionsRemote.getSessionsByExercise(exerciseId),
+      (session) => isStrength(session) && session.exerciseId === exerciseId,
+    ),
+
+  getStrengthSessions: (): Promise<StrengthSession[]> =>
+    mergePending(() => sessionsRemote.getStrengthSessions(), isStrength),
+
+  getCombatSessions: (): Promise<CombatSession[]> =>
+    mergePending(() => sessionsRemote.getCombatSessions(), (session) => !isStrength(session)),
+
+  getSessionsByDate: (date: string): Promise<Session[]> =>
+    mergePending(() => sessionsRemote.getSessionsByDate(date), (session) => session.date === date),
+
+  async createStrengthSession(input: Omit<StrengthSession, 'id'>): Promise<SaveResult<StrengthSession>> {
+    const session: StrengthSession = { ...input, id: newSessionId() }
+    await sessionQueue.enqueueStrength(session)
+    const synced = await sessionQueue.flushOne(session.id)
+    return { session, pending: !synced }
   },
 
-  getExercise: async (id: number): Promise<Exercise | null> => {
-    const { data, error } = await supabase
-      .from('exercises')
-      .select('id, name, category, body_part, equipment, muscle_group, target, secondary_muscles, instructions, image, gif_url, attribution')
-      .eq('id', id)
-      .maybeSingle()
-    if (error) throw new Error(error.message)
-    return data ? mapExerciseRow(data as ExerciseRow) : null
-  },
-
-  getSessionsByExercise: async (exerciseId: number): Promise<StrengthSession[]> => {
-    const { data, error } = await supabase
-      .from('strength_sessions')
-      .select('*, set_entries(reps, weight, rpe, set_order)')
-      .eq('exercise_id', exerciseId)
-      .order('date', { ascending: false })
-      .limit(50)
-    if (error) throw new Error(error.message)
-    return ((data ?? []) as StrengthSessionWithSetsRow[]).map((row) => mapStrengthRow(row, mapSets(row.set_entries)))
-  },
-
-  getStrengthSessions: async (): Promise<StrengthSession[]> => {
-    const { data, error } = await supabase
-      .from('strength_sessions')
-      .select('*, set_entries(reps, weight, rpe, set_order)')
-      .order('date', { ascending: false })
-    if (error) throw new Error(error.message)
-    return ((data ?? []) as StrengthSessionWithSetsRow[]).map((row) => mapStrengthRow(row, mapSets(row.set_entries)))
-  },
-
-  getCombatSessions: async (): Promise<CombatSession[]> => {
-    const { data, error } = await supabase
-      .from('combat_sessions')
-      .select('*')
-      .order('date', { ascending: false })
-    if (error) throw new Error(error.message)
-    return ((data ?? []) as CombatSessionRow[]).map(mapCombatRow)
-  },
-
-  createStrengthSession: async (session: Omit<StrengthSession, 'id'>): Promise<StrengthSession> => {
-    const userId = await requireUserId()
-    const { data, error } = await supabase
-      .from('strength_sessions')
-      .insert({
-        user_id: userId,
-        date: session.date,
-        exercise_id: session.exerciseId,
-        exercise_name: session.exerciseName,
-        notes: session.notes,
-      })
-      .select()
-      .single()
-    if (error) throw new Error(error.message)
-
-    if (session.sets.length > 0) {
-      const setRows = session.sets.map((set, i) => ({
-        session_id: data.id,
-        set_order: i + 1,
-        reps: set.reps,
-        weight: set.weight,
-        rpe: set.rpe,
-      }))
-      const { error: setsError } = await supabase.from('set_entries').insert(setRows)
-      if (setsError) throw new Error(setsError.message)
-    }
-    return mapStrengthRow(data as StrengthSessionRow, session.sets)
-  },
-
-  createCombatSession: async (session: Omit<CombatSession, 'id'>): Promise<CombatSession> => {
-    const userId = await requireUserId()
-    const { data, error } = await supabase
-      .from('combat_sessions')
-      .insert({
-        user_id: userId,
-        date: session.date,
-        type: session.type,
-        rounds: session.rounds,
-        duration_minutes: session.durationMinutes,
-        rpe: session.rpe,
-        positions: session.positions,
-        notes: session.notes,
-      })
-      .select()
-      .single()
-    if (error) throw new Error(error.message)
-    return mapCombatRow(data as CombatSessionRow)
-  },
-
-  getSessionsByDate: async (date: string): Promise<(StrengthSession | CombatSession)[]> => {
-    const { data: strengthData, error: strengthError } = await supabase
-      .from('strength_sessions')
-      .select('*, set_entries(reps, weight, rpe, set_order)')
-      .eq('date', date)
-    if (strengthError) throw new Error(strengthError.message)
-
-    const { data: combatData, error: combatError } = await supabase
-      .from('combat_sessions')
-      .select('*')
-      .eq('date', date)
-    if (combatError) throw new Error(combatError.message)
-
-    const strength = ((strengthData ?? []) as StrengthSessionWithSetsRow[]).map((row) => mapStrengthRow(row, mapSets(row.set_entries)))
-    const combat = ((combatData ?? []) as CombatSessionRow[]).map(mapCombatRow)
-    return [...strength, ...combat]
+  async createCombatSession(input: Omit<CombatSession, 'id'>): Promise<SaveResult<CombatSession>> {
+    const session: CombatSession = { ...input, id: newSessionId() }
+    await sessionQueue.enqueueCombat(session)
+    const synced = await sessionQueue.flushOne(session.id)
+    return { session, pending: !synced }
   },
 }
