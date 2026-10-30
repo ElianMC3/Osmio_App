@@ -22,6 +22,7 @@ import { analyticsApi, type CombatAnalytics } from '@/services/api/analytics.api
 import { nutritionApi } from '@/services/api/nutrition.api'
 import { profilesApi } from '@/services/api/profiles.api'
 import { sessionsApi } from '@/services/api/sessions.api'
+import { isNetworkError } from '@/services/offline/network'
 import type { DailyNutrition } from '@/shared/types/nutrition.types'
 import type { CombatSession, StrengthSession } from '@/shared/types/session.types'
 import { computeConsistencyStats, type ConsistencyEntry } from '@/shared/utils/consistency'
@@ -96,27 +97,37 @@ export default function DashboardHoy() {
     let active = true
 
     async function fetchData() {
-      try {
-        const [daySessions, combatAnalytics, consistencyData, dayNutrition, profile] =
-          await Promise.all([
-            sessionsApi.getSessionsByDate(todayKey),
-            analyticsApi.getCombatAnalytics(),
-            analyticsApi.getConsistency(),
-            nutritionApi.getDayNutrition(todayKey),
-            profilesApi.getProfile(),
-          ])
-        if (!active) return
-        setSessions(daySessions)
-        setCombat(combatAnalytics)
-        setConsistency(consistencyData)
-        setNutrition(dayNutrition)
-        setUserName(getFirstName(profile?.name))
-      } catch (e) {
-        console.error('Dashboard load error:', e)
-        if (active) setError('No se pudieron cargar los datos del panel.')
-      } finally {
-        if (active) setLoading(false)
+      // allSettled: sin red las analíticas fallan, pero las sesiones (que
+      // salen de la cola local) y el perfil pueden seguir mostrándose. Antes
+      // un solo fallo dejaba el panel vacío con un aviso.
+      const [daySessions, combatAnalytics, consistencyData, dayNutrition, profile] =
+        await Promise.allSettled([
+          sessionsApi.getSessionsByDate(todayKey),
+          analyticsApi.getCombatAnalytics(),
+          analyticsApi.getConsistency(),
+          nutritionApi.getDayNutrition(todayKey),
+          profilesApi.getProfile(),
+        ])
+      if (!active) return
+
+      if (daySessions.status === 'fulfilled') setSessions(daySessions.value)
+      if (combatAnalytics.status === 'fulfilled') setCombat(combatAnalytics.value)
+      if (consistencyData.status === 'fulfilled') setConsistency(consistencyData.value)
+      if (dayNutrition.status === 'fulfilled') setNutrition(dayNutrition.value)
+      if (profile.status === 'fulfilled') setUserName(getFirstName(profile.value?.name))
+
+      const failures = [daySessions, combatAnalytics, consistencyData, dayNutrition, profile].filter(
+        (result) => result.status === 'rejected',
+      )
+      if (failures.length > 0) console.error('Dashboard load error:', failures)
+
+      if (failures.length === 5) {
+        setError('No se pudieron cargar los datos del panel.')
+      } else if (failures.some((result) => isNetworkError(result.reason))) {
+        setError('Sin conexión: se muestran los datos guardados en el dispositivo.')
       }
+
+      setLoading(false)
     }
 
     fetchData()

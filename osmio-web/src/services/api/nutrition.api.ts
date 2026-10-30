@@ -1,4 +1,5 @@
 import { supabase } from '../supabase/client'
+import { getCurrentUserId } from '../supabase/currentUser'
 import type { DailyNutrition, MealEntry, MacroEntry } from '../../shared/types/nutrition.types'
 import { localDayRange, parseLocalDate } from '../../shared/utils/dateHelpers'
 import type { BodyWeightRow, MealRow, NutritionGoalRow } from './rows'
@@ -26,11 +27,7 @@ function sumMacros(meals: MealRow[]): MacroEntry {
   return totals
 }
 
-async function requireUserId(): Promise<string> {
-  const { data, error } = await supabase.auth.getUser()
-  if (error || !data.user) throw new Error('Not authenticated')
-  return data.user.id
-}
+const requireUserId = getCurrentUserId
 
 /** Mediodía local del día pedido: evita que un `T12:00:00Z` caiga en otro día. */
 function localNoon(date: string): string {

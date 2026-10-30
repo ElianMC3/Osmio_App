@@ -1,4 +1,5 @@
 import { supabase } from '../supabase/client'
+import { getCurrentUserId } from '../supabase/currentUser'
 import type {
   CombatRoundsByWeekRow,
   CombatTotalRoundsRow,
@@ -17,11 +18,7 @@ export interface CombatAnalytics {
   totalRounds: { striking: number; grappling: number }
 }
 
-async function requireUserId(): Promise<string> {
-  const { data, error } = await supabase.auth.getUser()
-  if (error || !data.user) throw new Error('Not authenticated')
-  return data.user.id
-}
+const requireUserId = getCurrentUserId
 
 export const analyticsApi = {
   getStrengthAnalytics: async (): Promise<StrengthAnalytics> => {

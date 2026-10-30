@@ -7,6 +7,8 @@ import { DesktopLayout } from '../design-system/components/DesktopLayout'
 import { Redirect } from '../shared/components/Redirect'
 import { AuthGuard } from '../shared/components/AuthGuard'
 import { useAuth } from '../shared/hooks/useAuth'
+import { useSessionSync } from '../services/offline/useSessionSync'
+import { useOfflineWarmup } from '../services/offline/useOfflineWarmup'
 import LoginScreen from '../features/auth/screens/LoginScreen'
 import ResetPasswordScreen from '../features/auth/screens/ResetPasswordScreen'
 import InitialSetupWizard from '../features/onboarding/screens/InitialSetupWizard'
@@ -90,10 +92,20 @@ function PageOutlet() {
 function AppShell() {
   return (
     <AuthGuard>
-      <DesktopLayout>
-        <PageOutlet />
-      </DesktopLayout>
+      <AuthenticatedShell />
     </AuthGuard>
+  )
+}
+
+/** Shell ya autenticado: aquí sí tiene sentido vaciar la cola offline. */
+function AuthenticatedShell() {
+  useSessionSync()
+  useOfflineWarmup()
+
+  return (
+    <DesktopLayout>
+      <PageOutlet />
+    </DesktopLayout>
   )
 }
 

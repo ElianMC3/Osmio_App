@@ -1,4 +1,7 @@
 import { supabase } from '../supabase/client'
+import { isNetworkError } from '../offline/network'
+import { routinesCache } from '../offline/routinesCache'
+import { getCurrentUserId } from '../supabase/currentUser'
 import type { Routine, RoutineExercise, Exercise, StrengthSession } from '../../shared/types/session.types'
 import type {
   ExerciseRow,
@@ -56,24 +59,32 @@ function mapRoutine(row: RoutineRow, exercises: RoutineExerciseRow[] = []): Rout
   }
 }
 
-async function requireUserId(): Promise<string> {
-  const { data, error } = await supabase.auth.getUser()
-  if (error || !data.user) throw new Error('Not authenticated')
-  return data.user.id
-}
+const requireUserId = getCurrentUserId
 
 export const routinesApi = {
   getRoutines: async (): Promise<Routine[]> => {
     const userId = await requireUserId()
-    const { data, error } = await supabase
-      .from('routines')
-      .select(`*, routine_exercises(*, exercises(${EXERCISE_FIELDS}))`)
-      .eq('user_id', userId)
-      .order('created_at')
-    if (error) throw new Error(error.message)
-    return ((data ?? []) as RoutineWithExercisesRow[]).map((row) =>
-      mapRoutine(row, [...(row.routine_exercises ?? [])].sort((a, b) => (a.position ?? 0) - (b.position ?? 0)))
-    )
+    try {
+      const { data, error } = await supabase
+        .from('routines')
+        .select(`*, routine_exercises(*, exercises(${EXERCISE_FIELDS}))`)
+        .eq('user_id', userId)
+        .order('created_at')
+      if (error) throw new Error(error.message)
+
+      const routines = ((data ?? []) as RoutineWithExercisesRow[]).map((row) =>
+        mapRoutine(row, [...(row.routine_exercises ?? [])].sort((a, b) => (a.position ?? 0) - (b.position ?? 0)))
+      )
+      // La caché es una mejora: si IndexedDB falla, la petición ya funcionó.
+      await routinesCache.save(userId, routines).catch(() => {})
+      return routines
+    } catch (error) {
+      // Sin red se entrena con la última copia buena. Un error de permisos o de
+      // sesión sí se propaga: no se tapa un problema real con datos viejos.
+      const cached = await routinesCache.get(userId).catch(() => null)
+      if (cached && isNetworkError(error)) return cached
+      throw error
+    }
   },
 
   createRoutine: async (name: string, description = ''): Promise<Routine> => {

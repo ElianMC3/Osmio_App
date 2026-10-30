@@ -199,8 +199,10 @@ describe('DashboardHoy', () => {
     })
   })
 
-  it('muestra un aviso cuando falla la carga', async () => {
-    mocks.getSessionsByDate.mockRejectedValue(new Error('offline'))
+  it('muestra un aviso cuando falla toda la carga', async () => {
+    for (const mock of Object.values(mocks).filter((m) => m !== mocks.navigate)) {
+      mock.mockRejectedValue(new Error('offline'))
+    }
 
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
     renderDashboard()
@@ -208,6 +210,23 @@ describe('DashboardHoy', () => {
     expect(
       await screen.findByText('No se pudieron cargar los datos del panel.'),
     ).toBeInTheDocument()
+    consoleError.mockRestore()
+  })
+
+  it('sin red enseña las sesiones locales y avisa de que faltan datos', async () => {
+    mocks.getSessionsByDate.mockResolvedValue([strengthSession])
+    mocks.getCombatAnalytics.mockRejectedValue(new Error('Failed to fetch'))
+    mocks.getConsistency.mockRejectedValue(new Error('Failed to fetch'))
+    mocks.getDayNutrition.mockRejectedValue(new Error('Failed to fetch'))
+    mocks.getProfile.mockRejectedValue(new Error('Failed to fetch'))
+
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+    renderDashboard()
+
+    expect(
+      await screen.findByText('Sin conexión: se muestran los datos guardados en el dispositivo.'),
+    ).toBeInTheDocument()
+    expect(screen.getByText('Sentadilla')).toBeInTheDocument()
     consoleError.mockRestore()
   })
 })

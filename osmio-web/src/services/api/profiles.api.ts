@@ -1,11 +1,12 @@
 import { supabase } from '../supabase/client'
+import { getCurrentUser } from '../supabase/currentUser'
 import type { UserProfile } from '../../store/userStore'
 import type { ProfileRow, TrainingDaysRow, WeeklyGoalsRow } from './rows'
 
 async function requireUser(): Promise<{ id: string; email?: string }> {
-  const { data, error } = await supabase.auth.getUser()
-  if (error || !data.user) throw new Error('Not authenticated')
-  return { id: data.user.id, email: data.user.email ?? undefined }
+  const user = await getCurrentUser()
+  if (!user) throw new Error('Not authenticated')
+  return { id: user.id, email: user.email ?? undefined }
 }
 
 function mapProfileRow(row: ProfileRow): UserProfile & { age?: number } {
