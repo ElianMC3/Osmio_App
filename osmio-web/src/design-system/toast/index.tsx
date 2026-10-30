@@ -24,7 +24,12 @@ const DURATIONS: Record<OsmioToastProps['tone'], number> & { confirm: number } =
 }
 
 function show(customProps: OsmioToastProps, duration: number, options?: ExternalToast) {
-  return sonnerToast.custom((id) => <OsmioToast toastId={id} {...customProps} />, { ...options, duration })
+  // `duration` primero para que un aviso concreto (p. ej. actualización de la
+  // PWA) pueda pedir más tiempo sin cambiar el default del tono.
+  return sonnerToast.custom((id) => <OsmioToast toastId={id} {...customProps} />, {
+    duration,
+    ...options,
+  })
 }
 
 export const toast = {
@@ -39,9 +44,12 @@ export const toast = {
     options?: ExternalToast & { action?: OsmioToastProps['action'] },
   ) => show({ tone: 'error', title, description }, DURATIONS.error, options),
 
-  /** Notificación neutra. */
-  info: (title: string, description?: string, options?: ExternalToast) =>
-    show({ tone: 'info', title, description }, DURATIONS.info, options),
+  /** Notificación neutra. Acepta action para avisos que piden una decisión. */
+  info: (
+    title: string,
+    description?: string,
+    options?: ExternalToast & { action?: OsmioToastProps['action'] },
+  ) => show({ tone: 'info', title, description, action: options?.action }, DURATIONS.info, options),
 
   /** Confirmación destructiva con botón en el propio toast; auto-cierra en 8s sin decisión. */
   confirm: (title: string, description: string, action: { label: string; onClick: () => void }) =>
