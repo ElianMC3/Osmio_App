@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../../services/supabase/client'
+import { getCurrentSession } from '../../services/supabase/currentUser'
 import type { User } from '@supabase/supabase-js'
 
 interface AuthState {
@@ -11,15 +12,34 @@ export function useAuth() {
   const [state, setState] = useState<AuthState>({ user: null, loading: true })
 
   useEffect(() => {
-    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
-      setState({ user: session?.user ?? null, loading: false })
+    let active = true
+
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!active) return
+      if (event === 'SIGNED_OUT') {
+        setState({ user: null, loading: false })
+        return
+      }
+      // Un evento sin sesión (p. ej. token caducado sin red) no debe borrar al
+      // usuario que ya estaba cargado: solo un SIGNED_OUT cierra sesión.
+      setState((prev) => ({ user: session?.user ?? prev.user ?? null, loading: false }))
     })
 
-    supabase.auth.getUser().then(({ data }) => {
-      setState({ user: data.user, loading: false })
-    })
+    // La sesión local evita depender de la red al arrancar (gimnasio sin
+    // cobertura). `getUser()` hacía una petición y dejaba `user: null`.
+    getCurrentSession()
+      .then((session) => {
+        if (!active) return
+        setState((prev) => ({ user: session?.user ?? prev.user ?? null, loading: false }))
+      })
+      .catch(() => {
+        if (active) setState((prev) => ({ user: prev.user, loading: false }))
+      })
 
-    return () => data.subscription.unsubscribe()
+    return () => {
+      active = false
+      data.subscription.unsubscribe()
+    }
   }, [])
 
   const login = useCallback(async (email: string, password: string) => {
